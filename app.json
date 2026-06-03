@@ -1,5 +1,6 @@
 {
   "expo": {
+    "privacy": "public",
     "name": "SpeechAndDebate",
     "slug": "SpeechAndDebate",
     "version": "1.0.0",
@@ -8,7 +9,11 @@
     "scheme": "speechanddebate",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.unbeatable0826.SpeechAndDebate",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +22,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.unbeatable0826.SpeechAndDebate"
     },
     "web": {
       "output": "static",
@@ -39,6 +45,19 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "71e4cd44-06be-4e1a-9bb4-e9c05baa1201"
+      }
+    },
+    "owner": "unbeatable0826",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/71e4cd44-06be-4e1a-9bb4-e9c05baa1201"
     }
   }
 }
