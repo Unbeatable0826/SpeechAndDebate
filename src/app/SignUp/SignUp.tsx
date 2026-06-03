@@ -1,30 +1,51 @@
-import { Text, View, StyleSheet, TextInput, Button, Pressable } from "react-native";
+import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler} from "react-native";
 import {createUserWithEmailAndPassword} from 'firebase/auth'
 import React, {useState, useEffect} from 'react';
 import { app, auth, db } from '../../../firebaseConfig.js';
+import { Ionicons } from '@expo/vector-icons';
 
 
-
-const bop = "Enter your Tabroom credentials";
+const bop = "Please Enter your  \n Tabroom Credentials";
 export default function THINGY1() {
+  const[stytitle, setSty] = useState(styles.title);
+  const [thingother,setThing] = useState(styles.other_thing);
   const [email, setEmail] = useState('');
-  const [display, setDisplay] = useState('Welcome !');
-  const [style1, setStyle] = useState(styles.first);
-  const [style2, setStyle2] = useState(styles.second);
+  const [display, setDisplay] = useState('Welcome Speech and Debaters !');
   const [style3, setStyle3] = useState(styles.press);
   const [password, setPas] = useState('');
+  const [focused1, setFocused1] = useState(false);
+  const [style1, setStyle1] = useState(styles.first);
+  const [style2, setStyle2] = useState(styles.second);
+useEffect(() => {
+    const goback = () => {
+      if (!focused1) {
+        BackHandler.exitApp();
+      } else {
+        Keyboard.dismiss();
+        setFocused1(false);
+      }
+      return true; 
+    }
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', goback);
+  }, [focused1]);
+
+  useEffect(() => {
+    const plswork = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {Keyboard.dismiss();
+        setFocused1(false);}
+    );
+    return () => {
+    };
+  }, []);
+
   const SIGNUP = async () => {
     setStyle3(styles.press);
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     alert("IT WORKSSSS FOR GOODNESS SAKE");
   }
-  const work = () => {
-    setStyle(styles.first2);
-  }
-  const work2 = () => {
-    setStyle2(styles.second2);
-  }
   useEffect(() => {
+    setTimeout(() =>{
     var index = 0;
     const doe = () => {
       index++;
@@ -37,17 +58,25 @@ export default function THINGY1() {
     return () => {
       clearTimeout(pl1);
     };
+    }, 1500);
   }, []);
-
+  const plswork = () => {
+    if (focused1) {
+      Keyboard.dismiss();
+      setFocused1(false);
+    }
+  };
   return (
-    <View style={styles.other_thing}>
-      <Text style={styles.title}>{display}</Text>
-      <TextInput   onPress={work} placeholder="Enter Email" style={style1} value={email} onChangeText={setEmail}></TextInput>
-      <TextInput onPress={work2} style={style2} placeholder="Enter Password" value={password} onChangeText={setPas}></TextInput>
-    <Pressable style={style3} onPress={SIGNUP}>
-      <Text style={styles.t1}>Sign In</Text>
-    </Pressable>
-    </View>
+    <TouchableWithoutFeedback onPress={plswork}>
+      <View style={[styles.other_thing, focused1 && styles.thingg2]}>
+        <Text style={styles.title} >{display}</Text>
+        <TextInput   onFocus={() => {setFocused1(true)}} onBlur={() => {setFocused1(false)}} placeholder="Enter Email" style={style1} value={email} onChangeText={setEmail}></TextInput>
+        <TextInput onFocus={() => {setFocused1(true)}} onBlur = {() => {setFocused1(false)}} style={style2} placeholder="Enter Password" value={password} onChangeText={setPas} secureTextEntry></TextInput>
+      <Pressable style={style3} onPress={SIGNUP}>
+        <Text style={styles.t1}>Sign In</Text>
+      </Pressable>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -57,6 +86,19 @@ const styles = StyleSheet.create({
     fontSize: 15,
 
   },
+  thingg2:{
+    padding: 20, 
+    justifyContent: 'flex-start',
+    transitionDelay: "0.5s",
+    flex: 1,
+  },
+  title2:{
+    marginBottom: 50,
+    textAlign: "center",
+    fontSize: 48,
+    fontFamily: "Petemoss",
+    transitionDelay: "0.5s",
+  },
   title:{
     marginBottom: 50,
     textAlign: "center",
@@ -64,17 +106,10 @@ const styles = StyleSheet.create({
     fontFamily: "Petemoss",
     transitionDelay: "0.5s",
   },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    transitionDelay: "0.5s",
-  },
   other_thing:{
     padding: 20, 
     justifyContent: 'center',
     transitionDelay: "0.5s",
-
     flex: 1,
   },
   first: {
