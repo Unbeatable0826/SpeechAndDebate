@@ -1,7 +1,3 @@
-# Expo app 👋
-
-This is an [Expo](https://expo.dev) project.
-
 ## Speech And Debate
 
 The speech and debate application of Tabroom, is extremely hard during rounds and tournaments as its not a responsive application whatsoever. However with this SpeechandDebate application
