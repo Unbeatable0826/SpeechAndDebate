@@ -8,7 +8,7 @@ This application uses firebase as its backend as well as firebase's authenticati
 
 ## Security
 
-This application does not store your tabroom password or userID, it only locally stores your cookies, which is the exact same way that most websites are able to remeber your device.
+This application does not store your tabroom password or userID on any servers. It only stores your information locally for the sake of accessing things
 
 ## FEATURES
 

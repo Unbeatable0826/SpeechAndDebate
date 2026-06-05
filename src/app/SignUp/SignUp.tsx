@@ -1,9 +1,13 @@
 import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler} from "react-native";
 import {createUserWithEmailAndPassword} from 'firebase/auth'
 import React, {useState, useEffect} from 'react';
-import { app, auth, db } from '../../../firebaseConfig.js';
-import { Ionicons } from '@expo/vector-icons';
-
+import { app, auth, db } from '../../../firebaseConfig.js'
+import { collection, addDoc, getDocs, setDoc,  } from "firebase/firestore";;
+import * as SecureStore from 'expo-secure-store';
+// import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const bop = "Please Enter your  \n Tabroom Credentials";
 export default function THINGY1() {
@@ -11,11 +15,11 @@ export default function THINGY1() {
   const [thingother,setThing] = useState(styles.other_thing);
   const [email, setEmail] = useState('');
   const [display, setDisplay] = useState('Welcome Speech and Debaters !');
-  const [style3, setStyle3] = useState(styles.press);
   const [password, setPas] = useState('');
   const [focused1, setFocused1] = useState(false);
   const [style1, setStyle1] = useState(styles.first);
   const [style2, setStyle2] = useState(styles.second);
+  const [buttton, setbuttton] = useState(false);
 useEffect(() => {
     const goback = () => {
       if (!focused1) {
@@ -39,10 +43,314 @@ useEffect(() => {
     };
   }, []);
 
+  useEffect(() => {
+      let stuff_does_not_work = false; 
+      const check = async () => {
+      try{
+        const ewail = await SecureStore.getItemAsync('email');
+        const paword = await SecureStore.getItemAsync('password');
+        if (typeof ewail !== 'string' || typeof paword !== 'string') {
+        let gop = new URLSearchParams();
+        gop.append("username", ewail || '');
+        gop.append("password", paword || '');
+        const headear = {
+        'Host': 'www.tabroom.com',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cache-Control': 'max-age=0',
+        'Origin': 'https://www.tabroom.com',
+        'Referer': 'https://www.tabroom.com/index/index.mhtml',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,applicati  on/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        };
+        const request = await fetch("https://www.tabroom.com/user/login/login_save.mhtml", {method: "POST", headers: headear, body: gop.toString(), redirect: 'manual'})
+        const head = Object.fromEntries(request.headers.entries());
+        console.log(head['set-cookie']);
+        try{
+        if (head['set-cookie'].split(';')[4].split(",")[1].includes("TabroomToken=%24")) {
+
+            //REDIRECT TO HOMEPAGE
+
+          }else{
+            stuff_does_not_work = true;
+          }
+        }catch (e) {
+          return;
+        }
+      }
+
+
+      } catch (e) {
+        if (stuff_does_not_work == true) {
+        alert("User ID and Password Changed, Please Sign In Again");
+        await SecureStore.deleteItemAsync('email');
+        await SecureStore.deleteItemAsync('password');
+        await AsyncStorage.removeItem('cookie');
+        }
+      }
+    }
+
+
+
+
+    check();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  })
+
+
+
+  const textt = useAnimatedStyle(() => {
+    return {
+      color: withTiming(buttton ? '#0080ff' : '#ffffff', {duration: 400}),
+    };
+  });
+    const tingy = useAnimatedStyle(() => {
+      return {
+      backgroundColor: withTiming(buttton ? '#ffffff' : '#0080ff', {duration: 400}),
+      borderRadius: withTiming(buttton ? 8 : 16, {duration: 400}),
+      borderWidth: withTiming(buttton ? 2 : 0, {duration: 400}),
+      borderColor: '#0080ff',
+      transform: [
+        { scale: withTiming(buttton ? 0.95 : 1, {duration: 400}) }
+      ]
+    };
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   const SIGNUP = async () => {
-    setStyle3(styles.press);
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    alert("IT WORKSSSS FOR GOODNESS SAKE");
+    setbuttton(true);
+    let New_user = true; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if (New_user == true) {
+      let gop = new URLSearchParams();
+      gop.append("username", email);
+      gop.append("password", password);
+      const headear = {
+      'Host': 'www.tabroom.com',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Cache-Control': 'max-age=0',
+      'Origin': 'https://www.tabroom.com',
+      'Referer': 'https://www.tabroom.com/index/index.mhtml',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,applicati  on/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      };
+      let logged_in = false
+      const request = await fetch("https://www.tabroom.com/user/login/login_save.mhtml", {method: "POST", headers: headear, body: gop.toString(), redirect: 'manual'})
+      const head = Object.fromEntries(request.headers.entries());
+      console.log(head['set-cookie']);
+      try{
+      if (head['set-cookie'].split(';')[4].split(",")[1].includes("TabroomToken=%24")) {
+        logged_in = true;
+        }
+      }catch (e) {
+        alert("Login Failed, your credentials are a littleeeee screwed up, please try again");
+        return;
+      }
+    }
+
+    // LOGIN VALIDATIONSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+    // NO IDEA ABOUT THE PASSWORD LENGTH
+    let thingy_met = false; 
+    if (email.includes("@") && email.includes(".") && password.length > 8) {
+      thingy_met = true;
+    } else {
+      alert("Please make sure your email and password are valid");
+    }
+
+
+
+
+
+
+
+
+
+
+    let nofirestore = true;
+    // const users = await getDocs(collection(db, "users", ));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if (logged_in == true && New_user == true && thingy_met == true && nofirestore == true) {
+      const cookie = request.headers.get('set-cookie')?.split(';')[4].split(",")[1] 
+      await AsyncStorage.setItem('cookie',cookie || '');
+      await SecureStore.setItemAsync('email', email );
+      await SecureStore.setItemAsync('password', password);
+      alert("IT WORKSSSS FOR GOODNESS SAKE");
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await addDoc(collection(db, "users"), {email});
+    } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    setbuttton(false);
+
   }
   useEffect(() => {
     setTimeout(() =>{
@@ -70,21 +378,22 @@ useEffect(() => {
     <TouchableWithoutFeedback onPress={plswork}>
       <View style={[styles.other_thing, focused1 && styles.thingg2]}>
         <Text style={styles.title} >{display}</Text>
-        <TextInput   onFocus={() => {setFocused1(true)}} onBlur={() => {setFocused1(false)}} placeholder="Enter Email" style={style1} value={email} onChangeText={setEmail}></TextInput>
-        <TextInput onFocus={() => {setFocused1(true)}} onBlur = {() => {setFocused1(false)}} style={style2} placeholder="Enter Password" value={password} onChangeText={setPas} secureTextEntry></TextInput>
-      <Pressable style={style3} onPress={SIGNUP}>
-        <Text style={styles.t1}>Sign In</Text>
-      </Pressable>
+        <TextInput onFocus={() => {setFocused1(true)}} onBlur={() => {setFocused1(false)}} placeholder="Enter Email" style={[styles.first, focused1 && styles.first2]} value={email} onChangeText={setEmail} />
+        <TextInput onFocus={() => {setFocused1(true)}} onBlur={() => {setFocused1(false)}} placeholder="Enter Password" style={[styles.second, focused1 && styles.second2]} value={password} onChangeText={setPas} secureTextEntry />
+      <AnimatedPressable style={[styles.press, tingy]} onPress={SIGNUP}>
+        <Animated.Text style={[styles.t1, textt]}>Sign In</Animated.Text>
+      </AnimatedPressable>
       </View>
     </TouchableWithoutFeedback>
   );
 }
 
+
 const styles = StyleSheet.create({
   t1:{
     color: "white",
     fontSize: 15,
-
+ 
   },
   thingg2:{
     padding: 20, 
