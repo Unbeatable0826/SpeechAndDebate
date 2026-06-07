@@ -1,8 +1,8 @@
 import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler} from "react-native";
-import {createUserWithEmailAndPassword} from 'firebase/auth'
+import {createUserWithEmailAndPassword, signInWithEmailAndPassword , getAuth, updatePassword} from 'firebase/auth'
 import React, {useState, useEffect} from 'react';
 import { app, auth, db } from '../../../firebaseConfig.js'
-import { collection, addDoc, getDocs, setDoc,  } from "firebase/firestore";;
+import { collection, addDoc, getDocs, setDoc, doc, getDoc } from "firebase/firestore";;
 import * as SecureStore from 'expo-secure-store';
 // import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +11,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const bop = "Please Enter your  \n Tabroom Credentials";
 export default function THINGY1() {
+  let tried = false;
   const[stytitle, setSty] = useState(styles.title);
   const [thingother,setThing] = useState(styles.other_thing);
   const [email, setEmail] = useState('');
@@ -42,79 +43,55 @@ useEffect(() => {
     return () => {
     };
   }, []);
-
   useEffect(() => {
       let stuff_does_not_work = false; 
       const check = async () => {
       try{
         const ewail = await SecureStore.getItemAsync('email');
         const paword = await SecureStore.getItemAsync('password');
-        if (typeof ewail !== 'string' || typeof paword !== 'string') {
-        let gop = new URLSearchParams();
-        gop.append("username", ewail || '');
-        gop.append("password", paword || '');
-        const headear = {
-        'Host': 'www.tabroom.com',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Cache-Control': 'max-age=0',
-        'Origin': 'https://www.tabroom.com',
-        'Referer': 'https://www.tabroom.com/index/index.mhtml',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,applicati  on/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        };
-        const request = await fetch("https://www.tabroom.com/user/login/login_save.mhtml", {method: "POST", headers: headear, body: gop.toString(), redirect: 'manual'})
-        const head = Object.fromEntries(request.headers.entries());
-        console.log(head['set-cookie']);
-        try{
-        if (head['set-cookie'].split(';')[4].split(",")[1].includes("TabroomToken=%24")) {
+        if (typeof ewail == 'string' && typeof paword == 'string' && tried == false) {
+            let gop = new URLSearchParams();
+            gop.append("username", ewail || '');
+            gop.append("password", paword || '');
+            const headear = {
+            'Host': 'www.tabroom.com',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cache-Control': 'max-age=0',
+            'Origin': 'https://www.tabroom.com',
+            'Referer': 'https://www.tabroom.com/index/index.mhtml',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,applicati  on/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            };
 
-            //REDIRECT TO HOMEPAGE
-
-          }else{
-            stuff_does_not_work = true;
-          }
-        }catch (e) {
-          return;
-        }
+            const request = await fetch("https://www.tabroom.com/user/login/login_save.mhtml", {method: "POST", headers: headear, body: gop.toString(), redirect: 'manual'})
+            const head =  Object.fromEntries(request.headers.entries());
+            console.log(head['set-cookie']);
+            try{
+            if (head['set-cookie'].split(';')[4].split(",")[1].includes("TabroomToken=%24")) {
+                signInWithEmailAndPassword(auth, ewail, paword);
+                //REDIRECT TO HOMEPAGE
+                tried = true;
+              }else{
+                stuff_does_not_work = true;
+              }
+            }catch (e) {
+              return;
+            }
       }
 
 
       } catch (e) {
-        if (stuff_does_not_work == true) {
+        tried == true
+      }
+      if (stuff_does_not_work == true && !tried) {
         alert("User ID and Password Changed, Please Sign In Again");
-        await SecureStore.deleteItemAsync('email');
-        await SecureStore.deleteItemAsync('password');
         await AsyncStorage.removeItem('cookie');
-        }
+        tried = true;
       }
     }
-
-
-
-
     check();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    tried = true;
   })
 
 
@@ -135,48 +112,10 @@ useEffect(() => {
       ]
     };
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
   const SIGNUP = async () => {
     setbuttton(true);
-    let New_user = true; 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    if (New_user == true) {
+    let logged_in = false; 
+    if (email !== '' && password !== '' && email.includes("@") ) {
       let gop = new URLSearchParams();
       gop.append("username", email);
       gop.append("password", password);
@@ -190,169 +129,73 @@ useEffect(() => {
       'Accept': 'text/html,application/xhtml+xml,applicati  on/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
       'Accept-Language': 'en-US,en;q=0.9',
       };
-      let logged_in = false
       const request = await fetch("https://www.tabroom.com/user/login/login_save.mhtml", {method: "POST", headers: headear, body: gop.toString(), redirect: 'manual'})
       const head = Object.fromEntries(request.headers.entries());
       console.log(head['set-cookie']);
       try{
       if (head['set-cookie'].split(';')[4].split(",")[1].includes("TabroomToken=%24")) {
         logged_in = true;
+        const cookie = request.headers.get('set-cookie')?.split(';')[4].split(",")[1] 
+        await SecureStore.setItemAsync('cookie',cookie || '');
         }
       }catch (e) {
         alert("Login Failed, your credentials are a littleeeee screwed up, please try again");
-        return;
       }
-    }
-
-    // LOGIN VALIDATIONSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
-    // NO IDEA ABOUT THE PASSWORD LENGTH
-    let thingy_met = false; 
-    if (email.includes("@") && email.includes(".") && password.length > 8) {
-      thingy_met = true;
-    } else {
-      alert("Please make sure your email and password are valid");
-    }
-
-
-
-
-
-
-
-
-
-
-    let nofirestore = true;
-    // const users = await getDocs(collection(db, "users", ));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    if (logged_in == true && New_user == true && thingy_met == true && nofirestore == true) {
-      const cookie = request.headers.get('set-cookie')?.split(';')[4].split(",")[1] 
-      await AsyncStorage.setItem('cookie',cookie || '');
+    }else {
+      if (email === '' || password === '') {
+        alert("Please fill in all fields");
+      } else if (!email.includes("@")) {
+        alert("Please enter a valid email address");
+      }
+    } 
+    let New_person = true;
+    // NEW USER CHECKER
+    let users = await getDocs(collection(db, "users"))
+    let user_list = [];
+    let old_user_uid = "";
+    users.forEach((thing) => {
+      if (thing.data().email == email){
+        New_person = false
+        old_user_uid = "" + thing.data().uid;
+        alert("THING")
+      }
+    })
+    if (!New_person && logged_in){
       await SecureStore.setItemAsync('email', email );
       await SecureStore.setItemAsync('password', password);
-      alert("IT WORKSSSS FOR GOODNESS SAKE");
+      let response = await fetch("https://updatepassword-login-g2bqgs72ua-uc.a.run.app", {
+        method: "POST",
+        headers: {
+           "Content-Type": "application/json; charset=UTF-8"
+        },
+        body: JSON.stringify({
+          'uid': "" + old_user_uid,
+          'new_password': "" + password,
+        }) // THIS THINGY SHOULD WORK
+      });
+      const response_now = await response.text()
+      let thingy_works = false;
+      if (response_now.includes("IT WORKED")){
+          thingy_works = true; 
+      }
+      if (!thingy_works){
+        alert("something didn't work out for some reason, sooo umm idk, redo it");
+      }
+      signInWithEmailAndPassword(auth, email, password);
+
+    }
+    if (New_person && logged_in){
+       await SecureStore.setItemAsync('email', email );
+       await SecureStore.setItemAsync('password', password);
       const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await addDoc(collection(db, "users"), {email});
-    } 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+       await setDoc(doc(db, "users", cred.user.uid), { email: email, Skin: "light", uid: cred.user.uid, });
+       alert("It works");
+    }
     setbuttton(false);
 
   }
   useEffect(() => {
+    tried = false;
     setTimeout(() =>{
     var index = 0;
     const doe = () => {
