@@ -9,9 +9,7 @@
   import AsyncStorage from '@react-native-async-storage/async-storage';
   import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
-  export default function THINGY1() {
-
-
+  export default function THINGY2() {
     return (
         <View>
             <Text>HELLO</Text>

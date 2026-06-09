@@ -1,7 +1,9 @@
   import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler} from "react-native";
   import {createUserWithEmailAndPassword, signInWithEmailAndPassword , getAuth, updatePassword} from 'firebase/auth'
   import React, {useState, useEffect} from 'react';
+  import styled from 'styled-components';
   import { app, auth, db } from '../../../firebaseConfig.js'
+  import Loader from '../Loading.js'
   import { useRouter } from "expo-router";
   import { collection, addDoc, getDocs, setDoc, doc, getDoc } from "firebase/firestore";;
   import * as SecureStore from 'expo-secure-store';
@@ -9,9 +11,9 @@
   import AsyncStorage from '@react-native-async-storage/async-storage';
   import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
   const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-  const router = useRouter();
   const bop = "Please Enter your  \n Tabroom Credentials";
   export default function THINGY1() {
+    const router = useRouter();
     let tried = false;
     const[stytitle, setSty] = useState(styles.title);
     const [thingother,setThing] = useState(styles.other_thing);
@@ -22,6 +24,7 @@
     const [style1, setStyle1] = useState(styles.first);
     const [style2, setStyle2] = useState(styles.second);
     const [buttton, setbuttton] = useState(false);
+    const [loading, setloading] = useState(false);
   useEffect(() => {
       const goback = () => {
         if (!focused1) {
@@ -115,9 +118,10 @@
           { scale: withTiming(buttton ? 0.95 : 1, {duration: 400}) }
         ]
       };
-    });
+      });
     const SIGNUP = async () => {
       setbuttton(true);
+      setloading(true);
       let logged_in = false; 
       if (email !== '' && password !== '' && email.includes("@") ) {
         let gop = new URLSearchParams();
@@ -155,16 +159,13 @@
       let New_person = true;
       // NEW USER CHECKER
       let users = await getDocs(collection(db, "users"))
-      let user_list = [];
       let old_user_uid = "";
       users.forEach((thing) => {
         if (thing.data().email == email){
           New_person = false
           old_user_uid = "" + thing.data().uid;
-          alert("THING")
         }
       })
-      alert(old_user_uid)
       if (!New_person && logged_in){
         let response = await fetch("https://us-central1-sandd-1304d.cloudfunctions.net/updatepassword_login", {
           method: "POST",
@@ -190,7 +191,7 @@
         await SecureStore.setItemAsync('email', email );
         await SecureStore.setItemAsync('password', password);
         await signInWithEmailAndPassword(auth, email, password);
-        router.navigate("../Home/Home");
+        router.replace("../Home/Home");
         }
       }
       if (New_person && logged_in){
@@ -200,6 +201,7 @@
         await setDoc(doc(db, "users", cred.user.uid), { email: email, Skin: "light", uid: cred.user.uid});
         router.replace("../Home/Home");
       }
+      setloading(false);
       setbuttton(false);
 
     }
@@ -227,21 +229,35 @@
       }
     };
     return (
+      
       <TouchableWithoutFeedback onPress={plswork}>
+            {loading ? (
+          <Loader />
+        ) : (
         <View style={[styles.other_thing, focused1 && styles.thingg2]}>
           <Text style={styles.title} >{display}</Text>
           <TextInput onFocus={() => {setFocused1(true)}} onBlur={() => {setFocused1(false)}} placeholder="Enter Email" style={[styles.first, focused1 && styles.first2]} value={email} onChangeText={setEmail} />
           <TextInput onFocus={() => {setFocused1(true)}} onBlur={() => {setFocused1(false)}} placeholder="Enter Password" style={[styles.second, focused1 && styles.second2]} value={password} onChangeText={setPas} secureTextEntry />
-        <AnimatedPressable style={[styles.press, tingy]} onPress={SIGNUP}>
-          <Animated.Text style={[styles.t1, textt]}>Sign In</Animated.Text>
-        </AnimatedPressable>
+          <AnimatedPressable style={[styles.press, tingy]} onPress={SIGNUP}>
+            <Animated.Text style={[styles.t1, textt]}>Sign In</Animated.Text>
+          </AnimatedPressable>
         </View>
+        )}
+
       </TouchableWithoutFeedback>
     );
   }
 
 
   const styles = StyleSheet.create({
+    // loading_style: {
+
+
+
+
+
+
+    // },
     t1:{
       color: "white",
       fontSize: 15,
