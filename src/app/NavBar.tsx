@@ -30,7 +30,7 @@ export default function NavBar() {
           <Pressable
             key={thing.name}
             style={styles.navItem}
-            onPress={() => router.push(thing.place)}
+            onPress={() => router.navigate(thing.place)}
           >
             <Ionicons
               name={nameee}

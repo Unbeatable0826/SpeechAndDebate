@@ -11,7 +11,7 @@
   import NavBar from '../NavBar';
 //Home Featureset
 //     
-    export default function THINGY2() {
+    export default function THINGY5() {
     const router = useRouter();
     const [name, setName] = useState('');
     let bop = "";
@@ -22,19 +22,6 @@
         fontFamily: "Petemoss",
     }
   });
-
- useEffect(() => {
-      const goback = () => {
-        if (router.canGoBack()){
-            router.back();
-        }else{
-            BackHandler.exitApp();
-            
-        }
-        return true; 
-      }
-      const backHandler = BackHandler.addEventListener('hardwareBackPress', goback);
-    }, []);
 
 useEffect(() => {onAuthStateChanged(auth, async(user) => {
         if (user){
@@ -65,41 +52,41 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                 // console.log(hi);
                 let Last_name = ""                
                 let run = 0
-                // hi.forEach(item => {
-                //     if (item.includes("<span class=\"threefifths padright\">") && run === 4){
+                // // hi.forEach(item => {
+                // //     if (item.includes("<span class=\"threefifths padright\">") && run === 4){
                         
-                //         run++;
-                //     }else if(item.includes("<span class=\"threefifths padright\">")){
-                //         run++;
+                // //         run++;
+                // //     }else if(item.includes("<span class=\"threefifths padright\">")){
+                // //         run++;
+                // //     }
+                // // })
+                // for (let i = 0; i < hi.length; i++){
+                //     if (hi[i].includes("<span class=\"threefifths padright\">") && run == 3){
+                //         let lst = hi[i + 4].trim();
+                //         Last_name = lst.slice(9, lst.length - 1);
+                //         bop = "  Welcome Mr. " + Last_name + " !";
+                //             setTimeout(() =>{
+                //             var index = 0;
+                //             const doe = () => {
+                //                 index++;
+                //                 setName(bop.slice(0, index));
+                //                 if (index < bop.length) {
+                //                 setTimeout(doe, 50);
+                //                 }
+                //             };
+
+                //             const pl1 = setTimeout(doe, 250);
+                //             return () => {
+                //                 clearTimeout(pl1);
+                //             };
+                //             }, 1500); 
+
+                //         console.log(Last_name);
+                //         break;
+                //     }else if (hi[i].includes("<span class=\"threefifths padright\">")){
+                //         run++
                 //     }
-                // })
-                for (let i = 0; i < hi.length; i++){
-                    if (hi[i].includes("<span class=\"threefifths padright\">") && run == 3){
-                        let lst = hi[i + 4].trim();
-                        Last_name = lst.slice(9, lst.length - 1);
-                        bop = "  Welcome Mr. " + Last_name + " !";
-                            setTimeout(() =>{
-                            var index = 0;
-                            const doe = () => {
-                                index++;
-                                setName(bop.slice(0, index));
-                                if (index < bop.length) {
-                                setTimeout(doe, 50);
-                                }
-                            };
-
-                            const pl1 = setTimeout(doe, 250);
-                            return () => {
-                                clearTimeout(pl1);
-                            };
-                            }, 1500); 
-
-                        console.log(Last_name);
-                        break;
-                    }else if (hi[i].includes("<span class=\"threefifths padright\">")){
-                        run++
-                    }
-                }
+                // }
 
             } catch (e){
                 router.replace("/");
@@ -111,7 +98,7 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
 }, []);
     return (
         <View style={{ flex: 1 }}>
-            <Text style={styles.nombre}>{name}</Text>
+            <Text style={styles.nombre}>SPEECH</Text>
             <NavBar />
         </View>
     );
