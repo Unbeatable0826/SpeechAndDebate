@@ -79,7 +79,7 @@
                 }catch(e){
 
                 }
-              
+
                   tried = true;
                 }else{
                   stuff_does_not_work = true;
@@ -99,18 +99,18 @@
       }
       check();
       tried = true;
-    })
+    }, [])
 
 
 
     const textt = useAnimatedStyle(() => {
       return {
-        color: withTiming(buttton ? '#0080ff' : '#ffffff', {duration: 400}),
+        color: withTiming(buttton ? '#0080ff' : '#ffffff', {duration: 200}),
       };
     });
       const tingy = useAnimatedStyle(() => {
         return {
-        backgroundColor: withTiming(buttton ? '#ffffff' : '#0080ff', {duration: 400}),
+        backgroundColor: withTiming(buttton ? '#ffffff' : '#0080ff', {duration: 200}),
         borderRadius: withTiming(buttton ? 8 : 16, {duration: 400}),
         borderWidth: withTiming(buttton ? 2 : 0, {duration: 400}),
         borderColor: '#0080ff',
@@ -147,7 +147,7 @@
           await SecureStore.setItemAsync('cookie',cookie || '');
           }
         }catch (e) {
-          alert("Login Failed, your credentials are a littleeeee screwed up, please try again");
+          alert("Failed, your credentials are a littleeeee screwed up, try again");
         }
       }else {
         if (email === '' || password === '') {
@@ -251,12 +251,6 @@
 
   const styles = StyleSheet.create({
     // loading_style: {
-
-
-
-
-
-
     // },
     t1:{
       color: "white",
