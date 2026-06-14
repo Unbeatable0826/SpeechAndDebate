@@ -1,4 +1,4 @@
-  import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler} from "react-native";
+  import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler, Linking} from "react-native";
   import {createUserWithEmailAndPassword, signInWithEmailAndPassword , getAuth, updatePassword, onAuthStateChanged} from 'firebase/auth'
   import React, {useState, useEffect} from 'react';
   import { app, auth, db } from '../../../firebaseConfig.js'
@@ -23,12 +23,19 @@
     const styles = StyleSheet.create({
     nsd: {
         borderColor: 'black',
+        marginTop: 10, 
+        fontSize: 17, 
+        padding: 6, 
         borderWidth: 1,
         width: 340, 
-        marginLeft: 20, 
+        marginLeft: 20,
+        height: 40, 
+        borderRadius: 10,
+        backgroundColor: 'white', 
     },
-
-
+    sec: {
+        color: 'blue',
+    }
   });
 
  useEffect(() => {
@@ -71,23 +78,6 @@ useEffect(() => {
                 console.log(hi[i+1]);
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     } catch(e){
         alert("COOKIE FETCHING FAILED, SIGN IN AGAIN")
     }
@@ -100,26 +90,14 @@ useEffect(() => {
 
 }, [])
 
+const distinction_redirect = async() => {
+    await Linking.openURL('https://www.speechanddebate.org/honor-society/');
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 useEffect(() => {onAuthStateChanged(auth, async(user) => {
         if (user){
@@ -163,40 +141,7 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
 }, []);
     return (
         <View style={{ flex: 1 }}>
-            <Text style={styles.nsd}>NSDA Points <Text style={styles.second}>{pts}</Text></Text>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            <Text style={styles.nsd}>NSDA Points:                                           <Text style={styles.sec} onPress={distinction_redirect}>{pts}</Text></Text>
 
 
 
