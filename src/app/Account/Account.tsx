@@ -60,6 +60,31 @@
     },
     logpout: {
         fontSize: 17, 
+    },
+    profile: {
+        marginTop: 10, 
+        fontSize: 17, 
+        padding: 6, 
+        // borderWidth: 1,
+        width: 340, 
+        marginLeft: 20,
+        height: 40, 
+        borderRadius: 10,
+        backgroundColor: 'white', 
+        borderWidth: 1,
+        borderColor: '#e2e8f0', 
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 3,
+
+    },
+    profile_2: {
+        fontSize: 17, 
+    },
+    fir: {
+        fontSize: 17, 
     }
 
   });
@@ -109,9 +134,6 @@ useEffect(() => {
     }
 
     }
-
-
-
     FETCH_NSDA();
 
 }, [])
@@ -120,23 +142,8 @@ const distinction_redirect = async() => {
     await Linking.openURL('https://www.speechanddebate.org/honor-society/');
 }
 const Logout = async() => {
-    
     await signOut(auth);
     router.replace("/");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 useEffect(() => {onAuthStateChanged(auth, async(user) => {
@@ -179,12 +186,18 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
         }
     })
 }, []);
+const moveprofile = async() => {
+    router.navigate('/Account/Profile/Profile')
+
+}
 
     return (
         <View style={{ flex: 1 }}>
-            <Text style={styles.nsd}>NSDA Points:                                           <Text style={styles.sec} onPress={distinction_redirect}>{pts}</Text></Text>
-            <TouchableOpacity  onPress={Logout} style={styles.logout}><Text style={styles.logpout}>Logout                                                      <Ionicons name="log-out-outline" size={24} color="#FF3B30" /> </Text></TouchableOpacity>
+            <TouchableOpacity style={styles.nsd}><Text style={styles.fir}>NSDA Points:                                           <Text style={styles.sec} onPress={distinction_redirect}>{pts}</Text></Text></TouchableOpacity>
+            <TouchableOpacity onPress={moveprofile}style={styles.profile}><Text style={styles.profile_2}>Profile</Text></TouchableOpacity>
 
+
+            <TouchableOpacity  onPress={Logout} style={styles.logout}><Text style={styles.logpout}>Logout                                                      <Ionicons name="log-out-outline" size={24} color="#FF3B30" /> </Text></TouchableOpacity>
 
             <NavBar />
         </View>
