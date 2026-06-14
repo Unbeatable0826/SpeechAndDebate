@@ -9,18 +9,26 @@
   import AsyncStorage from '@react-native-async-storage/async-storage';
   import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
   import NavBar from '../NavBar';
-//Home Featureset
-//     
+//PREFERENCES
+//LOG OUT
+// UPDATES --> BACKGROUND
+//PREVIOUS RESULTS
+
     export default function THINGY2() {
+    const[pts, setpts] = useState(0)
     const router = useRouter();
     const [name, setName] = useState('');
     let bop = "";
+    const OPTIONS =  ["Profile", ""];
     const styles = StyleSheet.create({
-    nombre: {
-        fontSize: 50,
-        marginTop: 10, 
-        fontFamily: "Petemoss",
-    }
+    nsd: {
+        borderColor: 'black',
+        borderWidth: 1,
+        width: 340, 
+        marginLeft: 20, 
+    },
+
+
   });
 
  useEffect(() => {
@@ -30,6 +38,76 @@
       }
       const backHandler = BackHandler.addEventListener('hardwareBackPress', goback);
     }, []);
+
+useEffect(() => {
+    const FETCH_NSDA = async () => {
+    const thingy = await SecureStore.getItemAsync('cookie');
+    try{
+        let header = {
+                'Host': 'www.tabroom.com',
+                'Cookie': thingy ,
+                'Sec-Ch-Ua': '"Not-A.Brand";v="24", "Chromium";v="146"',
+                'Sec-Ch-Ua-Mobile': '?0',
+                'Sec-Ch-Ua-Platform': '"Windows"',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Upgrade-Insecure-Requests': '1',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Sec-Fetch-Site': 'same-origin',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-User': '?1',
+                'Sec-Fetch-Dest': 'document',
+                'Referer': 'https://www.tabroom.com/user/student/nsda.mhtml',
+                'Priority': 'u=0, i'
+                };
+        const request = await fetch('https://www.tabroom.com/user/student/nsda.mhtml?update_nsda=1', {method: "GET", headers: header, redirect: 'follow'})
+        const hello = await request.text();
+        const hi = hello.split("\n")
+        
+        for (var i = 0; i < hi.length; i++){
+            if (hi[i].includes("class=\"full padvertless\"") && hi[i+1].includes("merit points")){
+                const ptsd = hi[i+1].split(" ")[0]
+                setpts(parseInt(ptsd, 10));
+                console.log(hi[i+1]);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    } catch(e){
+        alert("COOKIE FETCHING FAILED, SIGN IN AGAIN")
+    }
+
+    }
+
+
+
+    FETCH_NSDA();
+
+}, [])
+
+
+
+
+
+
+
+
+
 
 
 
@@ -68,46 +146,13 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                 }
                 const request = await fetch('https://www.tabroom.com/user/login/profile.mhtml', {method: "GET", headers: header, redirect: 'follow'})
                 const pop = await request.text();
+                if (!pop.includes("<span class=\"threefifths padright\">")){
+                    router.replace("/");
+                }
                 const hi = pop.split('\n')
-                // console.log(hi);
+
                 let Last_name = ""                
                 let run = 0
-                // // hi.forEach(item => {
-                // //     if (item.includes("<span class=\"threefifths padright\">") && run === 4){
-                        
-                // //         run++;
-                // //     }else if(item.includes("<span class=\"threefifths padright\">")){
-                // //         run++;
-                // //     }
-                // // })
-                // for (let i = 0; i < hi.length; i++){
-                //     if (hi[i].includes("<span class=\"threefifths padright\">") && run == 3){
-                //         let lst = hi[i + 4].trim();
-                //         Last_name = lst.slice(9, lst.length - 1);
-                //         bop = "  Welcome Mr. " + Last_name + " !";
-                //             setTimeout(() =>{
-                //             var index = 0;
-                //             const doe = () => {
-                //                 index++;
-                //                 setName(bop.slice(0, index));
-                //                 if (index < bop.length) {
-                //                 setTimeout(doe, 50);
-                //                 }
-                //             };
-
-                //             const pl1 = setTimeout(doe, 250);
-                //             return () => {
-                //                 clearTimeout(pl1);
-                //             };
-                //             }, 1500); 
-
-                //         console.log(Last_name);
-                //         break;
-                //     }else if (hi[i].includes("<span class=\"threefifths padright\">")){
-                //         run++
-                //     }
-                // }
-
             } catch (e){
                 router.replace("/");
             }
@@ -118,7 +163,43 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
 }, []);
     return (
         <View style={{ flex: 1 }}>
-            <Text style={styles.nombre}>Account</Text>
+            <Text style={styles.nsd}>NSDA Points <Text style={styles.second}>{pts}</Text></Text>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             <NavBar />
         </View>
     );
