@@ -1,11 +1,11 @@
-  import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler, Linking} from "react-native";
-  import {createUserWithEmailAndPassword, signInWithEmailAndPassword , getAuth, updatePassword, onAuthStateChanged} from 'firebase/auth'
+  import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler, Linking, TouchableOpacity} from "react-native";
+  import {createUserWithEmailAndPassword, signInWithEmailAndPassword , getAuth, updatePassword, onAuthStateChanged, signOut } from 'firebase/auth'
   import React, {useState, useEffect} from 'react';
   import { app, auth, db } from '../../../firebaseConfig.js'
   import { useRouter } from "expo-router";
   import { collection, addDoc, getDocs, setDoc, doc, getDoc } from "firebase/firestore";;
   import * as SecureStore from 'expo-secure-store';
-  // import { Ionicons } from '@expo/vector-icons';
+  import { Ionicons } from '@expo/vector-icons';
   import AsyncStorage from '@react-native-async-storage/async-storage';
   import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
   import NavBar from '../NavBar';
@@ -19,23 +19,49 @@
     const router = useRouter();
     const [name, setName] = useState('');
     let bop = "";
-    const OPTIONS =  ["Profile", ""];
     const styles = StyleSheet.create({
     nsd: {
-        borderColor: 'black',
         marginTop: 10, 
         fontSize: 17, 
         padding: 6, 
-        borderWidth: 1,
         width: 340, 
         marginLeft: 20,
         height: 40, 
         borderRadius: 10,
         backgroundColor: 'white', 
+        borderWidth: 1,
+        borderColor: '#e2e8f0', 
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 3,
     },
     sec: {
         color: 'blue',
+    },
+    logout: {
+        marginTop: 10, 
+        fontSize: 17, 
+        padding: 6, 
+        // borderWidth: 1,
+        width: 340, 
+        marginLeft: 20,
+        height: 40, 
+        borderRadius: 10,
+        backgroundColor: 'white', 
+        borderWidth: 1,
+        borderColor: '#e2e8f0', 
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    logpout: {
+        fontSize: 17, 
     }
+
   });
 
  useEffect(() => {
@@ -92,6 +118,20 @@ useEffect(() => {
 
 const distinction_redirect = async() => {
     await Linking.openURL('https://www.speechanddebate.org/honor-society/');
+}
+const Logout = async() => {
+    
+    await signOut(auth);
+    router.replace("/");
+
+
+
+
+
+
+
+
+
 
 
 
@@ -139,10 +179,11 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
         }
     })
 }, []);
+
     return (
         <View style={{ flex: 1 }}>
             <Text style={styles.nsd}>NSDA Points:                                           <Text style={styles.sec} onPress={distinction_redirect}>{pts}</Text></Text>
-
+            <TouchableOpacity  onPress={Logout} style={styles.logout}><Text style={styles.logpout}>Logout                                                      <Ionicons name="log-out-outline" size={24} color="#FF3B30" /> </Text></TouchableOpacity>
 
 
             <NavBar />

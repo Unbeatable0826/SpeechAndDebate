@@ -10,6 +10,7 @@
   // import { Ionicons } from '@expo/vector-icons';
   import AsyncStorage from '@react-native-async-storage/async-storage';
   import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { BottomTabBarHeightCallbackContext } from "expo-router/build/layouts/Tabs.js";
   const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
   const bop = "Please Enter your  \n Tabroom Credentials";
   export default function THINGY1() {
@@ -21,10 +22,14 @@
     const [display, setDisplay] = useState('Welcome Speech and Debaters !');
     const [password, setPas] = useState('');
     const [focused1, setFocused1] = useState(false);
-    const [style1, setStyle1] = useState(styles.first);
+    const [style1, setSteyle1] = useState(styles.first);
     const [style2, setStyle2] = useState(styles.second);
     const [buttton, setbuttton] = useState(false);
     const [loading, setloading] = useState(false);
+    //Home --> Current Tourney; Tourney Updates; Past speechdrops;  If not then previous results; NSDA POINTS; "Activate real time results/round notifications in the background ....(uses data in the background)"
+    //Tourney's / option to follow people and how they ding --> Looking at others --> sort by school and whatnot
+    //Speechdrop --> RTDB speechdrop updates && Opponent's SpeechDocs, if they exist....
+    //Account/Profile/(Settings --> Delete SandD account only)
   useEffect(() => {
       const goback = () => {
         if (!focused1) {
@@ -47,7 +52,7 @@
       return () => {
       };
     }, []);
-    useEffect(() => {
+    useEffect(() => {BottomTabBarHeightCallbackContext
         let stuff_does_not_work = false; 
         const check = async () => {
         try{
@@ -55,7 +60,7 @@
           const paword = await SecureStore.getItemAsync('password');
           if (typeof ewail == 'string' && typeof paword == 'string' && tried == false) {
               let gop = new URLSearchParams();
-              gop.append("username", ewail || '');
+              gop.append("username", email || '');
               const headear = {
               'Host': 'www.tabroom.com',
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -77,14 +82,12 @@
                   router.replace("../Home/Home");
 
                 }catch(e){
-
                 }
-
                   tried = true;
                 }else{
                   stuff_does_not_work = true;
                 }
-              }catch (e) {
+              }catch (ew) {
                 return;
               }
         }
@@ -205,7 +208,7 @@
       setbuttton(false);
 
     }
-    useEffect(() => {
+    useEffect(() => {2
       tried = false;
       setTimeout(() =>{
       var index = 0;
