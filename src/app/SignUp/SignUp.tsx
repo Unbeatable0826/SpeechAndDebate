@@ -56,12 +56,16 @@ import { BottomTabBarHeightCallbackContext } from "expo-router/build/layouts/Tab
         let stuff_does_not_work = false; 
         const check = async () => {
         try{
+          console.log("CHECKING");
           const ewail = await SecureStore.getItemAsync('email');
           const paword = await SecureStore.getItemAsync('password');
           if (typeof ewail == 'string' && typeof paword == 'string' && tried == false) {
-              let gop = new URLSearchParams();
-              gop.append("username", email || '');
-              const headear = {
+            setloading(true);
+             let gop = new URLSearchParams();
+             gop.append("username", ewail || '');
+             gop.append("password", paword);
+
+             const headear = {
               'Host': 'www.tabroom.com',
               'Content-Type': 'application/x-www-form-urlencoded',
               'Cache-Control': 'max-age=0',
@@ -79,13 +83,17 @@ import { BottomTabBarHeightCallbackContext } from "expo-router/build/layouts/Tab
               if (head['set-cookie'].split(';')[4].split(",")[1].includes("TabroomToken=%24")) {
                 try{
                   await signInWithEmailAndPassword(auth, ewail, paword);
+                  setloading(false);
                   router.replace("../Home/Home");
 
                 }catch(e){
+                  setloading(false);
                 }
+                  setloading(false);
                   tried = true;
                 }else{
                   stuff_does_not_work = true;
+                  setloading(false);
                 }
               }catch (ew) {
                 return;

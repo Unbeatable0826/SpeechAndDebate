@@ -85,6 +85,28 @@
     },
     fir: {
         fontSize: 17, 
+    },
+    set: {
+        marginTop: 10, 
+        fontSize: 17, 
+        padding: 6, 
+        // borderWidth: 1,
+        width: 340, 
+        marginLeft: 20,
+        height: 40, 
+        borderRadius: 10,
+        backgroundColor: 'white', 
+        borderWidth: 1,
+        borderColor: '#e2e8f0', 
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 3,
+
+    },
+    set_2: {
+        fontSize: 17, 
     }
 
   });
@@ -143,7 +165,11 @@ const distinction_redirect = async() => {
 }
 const Logout = async() => {
     await signOut(auth);
+    SecureStore.deleteItemAsync('cookie');
+    SecureStore.deleteItemAsync('email');
+    SecureStore.deleteItemAsync('password');
     router.replace("/");
+
 }
 
 useEffect(() => {onAuthStateChanged(auth, async(user) => {
@@ -182,7 +208,7 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                 router.replace("/");
             }
         }else{
-            alert("UMM SOMETHING HORRIBLE HAS HAPPENED< ANDDD IT NO GOOD. RESTART APP.")
+
         }
     })
 }, []);
@@ -190,12 +216,15 @@ const moveprofile = async() => {
     router.navigate('/Account/Profile/Profile')
 
 }
+const movePreferences = async() => {
+    router.navigate('/Account/Preferences/Preferences')
+}
 
     return (
         <View style={{ flex: 1 }}>
             <TouchableOpacity style={styles.nsd}><Text style={styles.fir}>NSDA Points:                                           <Text style={styles.sec} onPress={distinction_redirect}>{pts}</Text></Text></TouchableOpacity>
             <TouchableOpacity onPress={moveprofile}style={styles.profile}><Text style={styles.profile_2}>Profile</Text></TouchableOpacity>
-
+            <TouchableOpacity onPress={movePreferences} style={styles.set}><Text style={styles.set_2}>Preferences</Text></TouchableOpacity>
 
             <TouchableOpacity  onPress={Logout} style={styles.logout}><Text style={styles.logpout}>Logout                                                      <Ionicons name="log-out-outline" size={24} color="#FF3B30" /> </Text></TouchableOpacity>
 
