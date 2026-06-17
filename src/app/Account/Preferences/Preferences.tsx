@@ -10,41 +10,20 @@
   import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 //Home Featureset
 //     
-    export default function THINGY5() {
+export default function THINGY6() {
     const router = useRouter();
     const [name, setName] = useState('');
-    const [email, setemail] = useState('');
     let bop = "";
     const styles = StyleSheet.create({
-        email: {
-        width: 300, 
-        justifyContent: 'center',
-        marginBottom: 10, 
-        borderWidth: 1,
-        padding: 8, 
-        transitionDelay: "0.5s",
-        alignItems: "center",
-        marginLeft: 40,
-        borderRadius: 10,  
-        backgroundColor: 'rgb(255, 250, 250)',
-        fontSize: 17, 
-        elevation: 3, 
-        },
-        email_2: {
-            fontSize: 17, 
-            marginTop: 10, 
-            padding: 6, 
-            width: 340, 
-            marginLeft: 40,
-        }
-
-
+    nombre: {
+        fontSize: 50,
+        marginTop: 10, 
+        fontFamily: "Petemoss",
+    }
   });
 
 useEffect(() => {onAuthStateChanged(auth, async(user) => {
         if (user){
-            // alert(user.uid);
-            //LOGGED OUT PREVENTION
             const thingy = await SecureStore.getItemAsync('cookie');
             try{
                 let header = {
@@ -68,64 +47,45 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                 const pop = await request.text();
                 if (!pop.includes("<span class=\"threefifths padright\">")){
                     router.replace("/");
-                }else{
-                    const hi = pop.split('\n')
-                    let run = 0
-                    for (let i = 0; i < hi.length; i++){
-                        if (hi[i].includes("<span class=\"threefifths padright\">") ){  
-                            let lst = hi[i + 4].trim();
-                            const thing = lst.slice(9, lst.length - 1);
-                            if (run == 0){
-                                console.log(thing)
-                                setemail(thing);
-                                run++;
-                            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                         }}
                 }
+                // console.log(hi);
+                let Last_name = ""                
+                let run = 0
+                // // hi.forEach(item => {
+                // //     if (item.includes("<span class=\"threefifths padright\">") && run === 4){
+                        
+                // //         run++;
+                // //     }else if(item.includes("<span class=\"threefifths padright\">")){
+                // //         run++;
+                // //     }
+                // // })
+                // for (let i = 0; i < hi.length; i++){
+                //     if (hi[i].includes("<span class=\"threefifths padright\">") && run == 3){
+                //         let lst = hi[i + 4].trim();
+                //         Last_name = lst.slice(9, lst.length - 1);
+                //         bop = "  Welcome Mr. " + Last_name + " !";
+                //             setTimeout(() =>{
+                //             var index = 0;
+                //             const doe = () => {
+                //                 index++;
+                //                 setName(bop.slice(0, index));
+                //                 if (index < bop.length) {
+                //                 setTimeout(doe, 50);
+                //                 }
+                //             };
 
+                //             const pl1 = setTimeout(doe, 250);
+                //             return () => {
+                //                 clearTimeout(pl1);
+                //             };
+                //             }, 1500); 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                //         console.log(Last_name);
+                //         break;
+                //     }else if (hi[i].includes("<span class=\"threefifths padright\">")){
+                //         run++
+                //     }
+                // }
 
             } catch (e){
                 router.replace("/");
@@ -135,15 +95,11 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
         }
     })
 }, []);
-
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={{ flex: 1 }}>
-                <Text style={styles.email_2}>Email: </Text>
-                <TextInput style={styles.email} placeholder="Email">{email}</TextInput>
-            </View>
-        </TouchableWithoutFeedback>
+        <View style={{ flex: 1 }}>
 
+        </View>
     );
   }
 
+  

@@ -225,7 +225,6 @@ const movePreferences = async() => {
             <TouchableOpacity style={styles.nsd}><Text style={styles.fir}>NSDA Points:                                           <Text style={styles.sec} onPress={distinction_redirect}>{pts}</Text></Text></TouchableOpacity>
             <TouchableOpacity onPress={moveprofile}style={styles.profile}><Text style={styles.profile_2}>Profile</Text></TouchableOpacity>
             <TouchableOpacity onPress={movePreferences} style={styles.set}><Text style={styles.set_2}>Preferences</Text></TouchableOpacity>
-
             <TouchableOpacity  onPress={Logout} style={styles.logout}><Text style={styles.logpout}>Logout                                                      <Ionicons name="log-out-outline" size={24} color="#FF3B30" /> </Text></TouchableOpacity>
 
             <NavBar />
