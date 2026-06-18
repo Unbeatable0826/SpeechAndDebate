@@ -1,4 +1,5 @@
   import { Text, View, StyleSheet, TextInput, Button, Pressable , Keyboard, TouchableWithoutFeedback, BackHandler} from "react-native";
+  import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
   import {createUserWithEmailAndPassword, signInWithEmailAndPassword , getAuth, updatePassword, onAuthStateChanged} from 'firebase/auth'
   import React, {useState, useEffect} from 'react';
   import { app, auth, db } from '../../../../firebaseConfig.js'
@@ -15,13 +16,15 @@
     const [name, setName] = useState('');
     const [email, setemail] = useState('');
     const [first, setfirst] = useState('');
-    const [middle, setmid] = useState('')
+    const [last, setlast] = useState('');
+    const [middle, setmid] = useState('');
+    const [pronouns, setpro] = useState('');
+    const [num, setnum] = useState('')
     let bop = "";
     const styles = StyleSheet.create({
         email: {
         width: 300, 
         justifyContent: 'center',
-        marginBottom: 10, 
         borderWidth: 1,
         padding: 8, 
         transitionDelay: "0.5s",
@@ -34,7 +37,7 @@
         },
         email_2: {
             fontSize: 17, 
-            marginTop: 10, 
+            marginTop: 5, 
             padding: 6, 
             width: 340, 
             marginLeft: 40,
@@ -49,7 +52,7 @@
         first_2: {
             width: 300, 
             justifyContent: 'center',
-            marginBottom: 10, 
+         
             borderWidth: 1,
             padding: 8, 
             transitionDelay: "0.5s",
@@ -70,7 +73,6 @@
         mid_2: {
             width: 300, 
             justifyContent: 'center',
-            marginBottom: 10, 
             borderWidth: 1,
             padding: 8, 
             transitionDelay: "0.5s",
@@ -80,7 +82,68 @@
             backgroundColor: 'rgb(255, 250, 250)',
             fontSize: 17, 
             elevation: 3, 
-        }
+        },
+        ln: {
+            fontSize: 17, 
+            marginTop: 10, 
+            padding: 6, 
+            width: 340, 
+            marginLeft: 40,
+        },
+        ln_2: {
+            width: 300, 
+            justifyContent: 'center', 
+            borderWidth: 1,
+            padding: 8, 
+            transitionDelay: "0.5s",
+            alignItems: "center",
+            marginLeft: 40,
+            borderRadius: 10,  
+            backgroundColor: 'rgb(255, 250, 250)',
+            fontSize: 17, 
+            elevation: 3, 
+        },
+        num: {
+            fontSize: 17, 
+            marginTop: 10, 
+            padding: 6, 
+            width: 340, 
+            marginLeft: 40,
+
+        },
+    num_2: {
+        width: 300, 
+        justifyContent: 'center',
+        borderWidth: 1,
+        padding: 8, 
+        transitionDelay: "0.5s",
+        alignItems: "center",
+        marginLeft: 40,
+        borderRadius: 10,  
+        backgroundColor: 'rgb(255, 250, 250)',
+        fontSize: 17, 
+        elevation: 3, 
+        },
+    pron: {
+        fontSize: 17, 
+        marginTop: 10, 
+        padding: 6, 
+        width: 340, 
+        marginLeft: 40,
+    },
+    pron_2: {
+        width: 300, 
+        justifyContent: 'center',
+        borderWidth: 1,
+        padding: 8, 
+        transitionDelay: "0.5s",
+        alignItems: "center",
+        marginLeft: 40,
+        borderRadius: 10,  
+        backgroundColor: 'rgb(255, 250, 250)',
+        fontSize: 17, 
+        elevation: 3, 
+    }
   });
 
 useEffect(() => {onAuthStateChanged(auth, async(user) => {
@@ -128,6 +191,16 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                             } else if (run == 2){
                                 setmid(thing);
                                 run++;
+                            } else if (run == 3){
+                                setlast(thing)
+                                run++;
+                            } else if (run == 4){
+                                setnum(thing)
+                                run++;
+                            }else if (run == 5) {
+                                setpro(thing)
+                                run++;
+
                             }
 
 
@@ -163,14 +236,21 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={{ flex: 1 }}>
+            <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} bounces={true}>
                 <Text style={styles.email_2}>Email: </Text>
                 <TextInput style={styles.email} placeholder="Email">{email}</TextInput>
                 <Text style={styles.first}>First Name: </Text>
                 <TextInput placeholder="First Name" style={styles.first_2}>{first}</TextInput>
                 <Text style={styles.mid}>Middle Name: </Text>
                 <TextInput style={styles.mid_2} placeholder="Middle Name">{middle}</TextInput>
-            </View>
+                <Text style={styles.ln}>Last Name: </Text>
+                <TextInput style={styles.ln_2} placeholder="Last Name">{last}</TextInput>
+                <Text style={styles.num}>Phone Number: </Text>
+                <TextInput style={styles.num_2} placeholder="Phone Number">{num}</TextInput>
+                <Text style={styles.pron}>Pronouns: </Text>
+                <TextInput style={styles.pron_2} placeholder="Pronouns">{pronouns}</TextInput>
+             
+            </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>
 
     );

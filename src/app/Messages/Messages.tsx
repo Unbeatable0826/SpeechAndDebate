@@ -23,6 +23,23 @@
     }
   });
 
+  
+ useEffect(() => {
+      const goback = () => {
+        router.back();
+        return true; 
+      }
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', goback);
+    }, []);
+    
+
+
+
+
+
+
+
+
 useEffect(() => {onAuthStateChanged(auth, async(user) => {
         if (user){
             // alert(user.uid);

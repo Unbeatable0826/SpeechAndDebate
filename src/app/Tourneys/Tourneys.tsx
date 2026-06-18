@@ -56,9 +56,12 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                 const request = await fetch('https://www.tabroom.com/user/login/profile.mhtml', {method: "GET", headers: header, redirect: 'follow'})
                 const pop = await request.text();
                 const hi = pop.split('\n')
+                if (!pop.includes("<span class=\"threefifths padright\">")){
+                    router.replace("/");
+                }
                 // console.log(hi);
-                let Last_name = ""                
-                let run = 0
+                // let Last_name = ""                
+                // let run = 0
                 // // hi.forEach(item => {
                 // //     if (item.includes("<span class=\"threefifths padright\">") && run === 4){
                         

@@ -10,7 +10,6 @@ const Loader = () => {
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <style>
-/* From Uiverse.io by Nawsome */ 
 .loadingspinner {
   --square: 46px;
   --offset: 70px;
@@ -29,7 +28,6 @@ const Loader = () => {
   margin-bottom: 30px;
   position: relative;
 }
-
 .loadingspinner div {
   display: inline-block;
   background: darkorange;
@@ -45,14 +43,12 @@ const Loader = () => {
   font-size: 6pt;
   color: black;
 }
-
 .loadingspinner #square1 {
   left: calc( 0 * var(--offset) );
   top: calc( 0 * var(--offset) );
   animation: square1 var(--duration) var(--delay) var(--timing-function) infinite,
                squarefadein var(--in-duration) calc(1 * var(--in-delay)) var(--in-timing-function) both;
 }
-
 .loadingspinner #square2 {
   left: calc( 0 * var(--offset) );
   top: calc( 1 * var(--offset) );
@@ -312,5 +308,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   }
 });
-
 export default Loader;

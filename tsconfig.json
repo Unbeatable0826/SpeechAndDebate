@@ -16,5 +16,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "src/app/NavBar.js", "src/app/Loading.js", "src/app/Loading.js", "src/app/Loading.js"  ]
 }
