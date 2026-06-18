@@ -8,6 +8,7 @@
   import * as SecureStore from 'expo-secure-store';
   // import { Ionicons } from '@expo/vector-icons';
   import AsyncStorage from '@react-native-async-storage/async-storage';
+  import { Dropdown } from 'react-native-element-dropdown';
   import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 //Home Featureset
 //     
@@ -19,7 +20,15 @@
     const [last, setlast] = useState('');
     const [middle, setmid] = useState('');
     const [pronouns, setpro] = useState('');
+    const [timezone, setTimezone] = useState('EST');
     const [num, setnum] = useState('')
+    const [data, setdata] = useState([
+    {label: 'Eastern Standard Time (EST)', value: 'EST' },
+    {label: 'Central Standard Time (CST)', value: 'CST' },
+    {label: 'Mountain Standard Time (MST)', value: 'MST' },
+    {label: 'Pacific Standard Time (PST)', value: 'PST' },
+  ])
+    
     let bop = "";
     const styles = StyleSheet.create({
         email: {
@@ -143,10 +152,38 @@
         backgroundColor: 'rgb(255, 250, 250)',
         fontSize: 17, 
         elevation: 3, 
-    }
+    }, 
+    zone: {
+        fontSize: 17, 
+        marginTop: 10, 
+        padding: 6, 
+        width: 340, 
+        marginLeft: 40,
+    },
+    dropdown: {
+        width: 300, 
+        marginLeft: 40,
+        borderWidth: 1, 
+        padding: 8, 
+        borderRadius: 10, 
+        backgroundColor: 'rgb(255, 250, 250)',
+        elevation: 3, 
+    },
+    placeholderStyle: {
+    fontSize: 17,
+    color: 'rgb(100, 100, 100)',
+  },
+  selectedTextStyle: {
+    fontSize: 17,
+    color: 'black',
+    backgroundColor: 'rgba(232, 228, 228, 0.72)',
+  },
   });
-
-useEffect(() => {onAuthStateChanged(auth, async(user) => {
+const time = async () => {
+    console.log("HI");
+}
+useEffect(() => {
+    const thingpl = onAuthStateChanged(auth, async(user) => {
         if (user){
             // alert(user.uid);
             //LOGGED OUT PREVENTION
@@ -181,7 +218,6 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                             let lst = hi[i + 4].trim();
                             const thing = lst.slice(9, lst.length - 1);
                             if (run == 0){
-                                console.log(thing)
                                 setemail(thing);
                                 run++;
                             }
@@ -200,7 +236,18 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                             }else if (run == 5) {
                                 setpro(thing)
                                 run++;
-
+                            }else if (run == 6){
+                                let newData = [...data];
+                                for (let j = i + 1; j < hi.length; j++){
+                                    console.log(hi[j])
+                                    if (hi[j].includes("optgroup") && hi[j].includes("label")){
+                                        alert(hi[j])
+                                        newData.push({header: true, label: hi[j].trim().slice(17, hi[j].length -  1), value: hi[j].trim().slice(17, hi[j].length -1)});
+                                        setdata(newData);
+                                    }else if(hi[j].includes("\"threefifths padright\"")){
+                                        break;
+                                    }
+                                }
                             }
 
 
@@ -222,16 +269,20 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
 
 
 
-                         }}
+                    }}
                 }
 
             } catch (e){
+                console.log(e);
                 router.replace("/");
             }
         }else{
             alert("UMM SOMETHING HORRIBLE HAS HAPPENED< ANDDD IT NO GOOD. RESTART APP.")
         }
+    
     })
+
+    return () => thingpl();
 }, []);
 
     return (
@@ -249,7 +300,8 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                 <TextInput style={styles.num_2} placeholder="Phone Number">{num}</TextInput>
                 <Text style={styles.pron}>Pronouns: </Text>
                 <TextInput style={styles.pron_2} placeholder="Pronouns">{pronouns}</TextInput>
-             
+                <Text style={styles.zone}>TimeZone: </Text>
+                <Dropdown style={styles.dropdown} placeholderStyle={styles.placeholderStyle}  selectedTextStyle={styles.selectedTextStyle} data={data} labelField="label" valueField="value" placeholder="Select Timezone" value={timezone} onChange={time}/>
             </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>
 
