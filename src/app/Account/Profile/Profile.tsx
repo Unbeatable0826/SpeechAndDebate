@@ -14,6 +14,8 @@
     const router = useRouter();
     const [name, setName] = useState('');
     const [email, setemail] = useState('');
+    const [first, setfirst] = useState('');
+    const [middle, setmid] = useState('')
     let bop = "";
     const styles = StyleSheet.create({
         email: {
@@ -36,9 +38,49 @@
             padding: 6, 
             width: 340, 
             marginLeft: 40,
+        },
+        first: {
+            fontSize: 17, 
+            marginTop: 10, 
+            padding: 6, 
+            width: 340, 
+            marginLeft: 40,
+        },
+        first_2: {
+            width: 300, 
+            justifyContent: 'center',
+            marginBottom: 10, 
+            borderWidth: 1,
+            padding: 8, 
+            transitionDelay: "0.5s",
+            alignItems: "center",
+            marginLeft: 40,
+            borderRadius: 10,  
+            backgroundColor: 'rgb(255, 250, 250)',
+            fontSize: 17, 
+            elevation: 3, 
+        },
+        mid: {
+            fontSize: 17, 
+            marginTop: 10, 
+            padding: 6, 
+            width: 340, 
+            marginLeft: 40,
+        },
+        mid_2: {
+            width: 300, 
+            justifyContent: 'center',
+            marginBottom: 10, 
+            borderWidth: 1,
+            padding: 8, 
+            transitionDelay: "0.5s",
+            alignItems: "center",
+            marginLeft: 40,
+            borderRadius: 10,  
+            backgroundColor: 'rgb(255, 250, 250)',
+            fontSize: 17, 
+            elevation: 3, 
         }
-
-
   });
 
 useEffect(() => {onAuthStateChanged(auth, async(user) => {
@@ -80,6 +122,13 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                                 setemail(thing);
                                 run++;
                             }
+                            else if (run == 1){
+                                setfirst(thing);
+                                run++;
+                            } else if (run == 2){
+                                setmid(thing);
+                                run++;
+                            }
 
 
 
@@ -103,30 +152,6 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
                          }}
                 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             } catch (e){
                 router.replace("/");
             }
@@ -141,6 +166,10 @@ useEffect(() => {onAuthStateChanged(auth, async(user) => {
             <View style={{ flex: 1 }}>
                 <Text style={styles.email_2}>Email: </Text>
                 <TextInput style={styles.email} placeholder="Email">{email}</TextInput>
+                <Text style={styles.first}>First Name: </Text>
+                <TextInput placeholder="First Name" style={styles.first_2}>{first}</TextInput>
+                <Text style={styles.mid}>Middle Name: </Text>
+                <TextInput style={styles.mid_2} placeholder="Middle Name">{middle}</TextInput>
             </View>
         </TouchableWithoutFeedback>
 
