@@ -30,6 +30,167 @@
   ])
     
     let bop = "";
+
+
+useEffect(() => {
+    const thingpl = onAuthStateChanged(auth, async(user) => {
+        if (user){
+            // alert(user.uid);
+            //LOGGED OUT PREVENTION
+            const thingy = await SecureStore.getItemAsync('cookie');
+            try{
+                let header = {
+                'Host': 'www.tabroom.com',
+                'Cookie': thingy ,
+                'Sec-Ch-Ua': '"Not-A.Brand";v="24", "Chromium";v="146"',
+                'Sec-Ch-Ua-Mobile': '?0',
+                'Sec-Ch-Ua-Platform': '"Windows"',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Upgrade-Insecure-Requests': '1',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Sec-Fetch-Site': 'same-origin',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-User': '?1',
+                'Sec-Fetch-Dest': 'document',
+                'Referer': 'https://www.tabroom.com/user/student/index.mhtml?err=&msg=',
+                'Priority': 'u=0, i'
+                }
+                const request = await fetch('https://www.tabroom.com/user/login/profile.mhtml', {method: "GET", headers: header, redirect: 'follow'})
+                const pop = await request.text();
+                if (!pop.includes("<span class=\"threefifths padright\">")){
+                    router.replace("/");
+                }else{
+                    const hi = pop.split('\n')
+                    let run = 0
+                    for (let i = 0; i < hi.length; i++){
+                        if (hi[i].includes("<span class=\"threefifths padright\">") ){  
+                            let lst = hi[i + 4].trim();
+                            const thing = lst.slice(9, lst.length - 1);
+                            if (run == 0){
+                                setemail(thing);
+                                run++;
+                            }
+                            else if (run == 1){
+                                setfirst(thing);
+                                run++;
+                            } else if (run == 2){
+                                setmid(thing);
+                                run++;
+                            } else if (run == 3){
+                                setlast(thing)
+                                run++;
+                            } else if (run == 4){
+                                setnum(thing)
+                                run++;
+                            }else if (run == 5) {
+                                setpro(thing)
+                                run++;
+                            }else if (run == 6){
+                                console.log("RUN")
+                                setdata(prevData => {
+                                let newData = [...prevData];
+                                for (let j = i + 1; j < hi.length; j++){
+                                    if (hi[j].includes("optgroup") && hi[j].includes("label")){
+                                        const popl = hi[j].trim()
+                                        newData.push({head: true, label: popl.slice(17, popl.length - 2), value: popl.slice(17, popl.length - 2), search: true, });
+                                    }else if(hi[j].includes("\"threefifths padright\"")){
+                                        break;
+                                    }
+                                }
+                                    return newData;
+                                })
+                                run++;
+                            }
+
+                    }}
+                }
+
+            } catch (e){
+                console.log(e);
+                router.replace("/");
+            }
+        }else{
+            alert("UMM SOMETHING HORRIBLE HAS HAPPENED< ANDDD IT NO GOOD. RESTART APP.")
+        }
+    
+    })
+
+    return () => thingpl();
+}, []);
+
+    return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} bounces={true}>
+                <Text style={styles.email_2}>Email: </Text>
+                <TextInput style={styles.email} placeholder="Email">{email}</TextInput>
+                <Text style={styles.first}>First Name: </Text>
+                <TextInput placeholder="First Name" style={styles.first_2}>{first}</TextInput>
+                <Text style={styles.mid}>Middle Name: </Text>
+                <TextInput style={styles.mid_2} placeholder="Middle Name">{middle}</TextInput>
+                <Text style={styles.ln}>Last Name: </Text>
+                <TextInput style={styles.ln_2} placeholder="Last Name">{last}</TextInput>
+                <Text style={styles.num}>Phone Number: </Text>
+                <TextInput style={styles.num_2} placeholder="Phone Number">{num}</TextInput>
+                <Text style={styles.pron}>Pronouns: </Text>
+                <TextInput style={styles.pron_2} placeholder="Pronouns">{pronouns}</TextInput>
+                <Text style={styles.zone}>TimeZone: </Text>
+                <Dropdown style={styles.dropdown} placeholderStyle={styles.placeholderStyle}  selectedTextStyle={styles.selectedTextStyle} data={data} labelField="label" valueField="value" placeholder="Select Timezone" value={timezone} search={true} onChange={(item) => {
+                    if (item.head){ return;} else {
+                        setTimezone(item.value);
+                    }
+                }}
+                renderItem = {(item) => {
+                // if (item.head){
+                //     return(
+                //         <View style={styles.header_box}>
+                //             <Text style={styles.header_text}>{item.label}</Text>
+                //         </View>
+                //     );
+                // }
+                    return(
+                        <View style={styles.normal}>
+                            <Text style={styles.normal_thing}>{item.label}</Text>
+                        </View>
+                    );
+                }}
+                />
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                                        <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                                        <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
+            </KeyboardAwareScrollView>
+        </TouchableWithoutFeedback>
+
+    );
+  }
+
     const styles = StyleSheet.create({
         email: {
         width: 300, 
@@ -172,139 +333,29 @@
     placeholderStyle: {
     fontSize: 17,
     color: 'rgb(100, 100, 100)',
-  },
-  selectedTextStyle: {
-    fontSize: 17,
-    color: 'black',
-    backgroundColor: 'rgba(232, 228, 228, 0.72)',
-  },
+    },
+    selectedTextStyle: {
+        fontSize: 17,
+        color: 'black',
+        backgroundColor: 'rgba(232, 228, 228, 0.72)',
+    },
+    header_box: {
+        backgroundColor: 'rgba(232, 228, 228, 0.72)',
+        padding: 10, 
+        color: 'black', 
+        borderBottomWidth: 1, 
+        borderBottomColor: 'black',
+    },
+    header_text: {
+        fontSize: 17,
+        color: 'black',
+    },
+    normal: {
+        padding: 12,
+    },
+    normal_thing: {
+        fontSize: 17,
+        color: 'black',
+        marginLeft: 10, 
+    }
   });
-const time = async () => {
-    console.log("HI");
-}
-useEffect(() => {
-    const thingpl = onAuthStateChanged(auth, async(user) => {
-        if (user){
-            // alert(user.uid);
-            //LOGGED OUT PREVENTION
-            const thingy = await SecureStore.getItemAsync('cookie');
-            try{
-                let header = {
-                'Host': 'www.tabroom.com',
-                'Cookie': thingy ,
-                'Sec-Ch-Ua': '"Not-A.Brand";v="24", "Chromium";v="146"',
-                'Sec-Ch-Ua-Mobile': '?0',
-                'Sec-Ch-Ua-Platform': '"Windows"',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Upgrade-Insecure-Requests': '1',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                'Sec-Fetch-Site': 'same-origin',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-User': '?1',
-                'Sec-Fetch-Dest': 'document',
-                'Referer': 'https://www.tabroom.com/user/student/index.mhtml?err=&msg=',
-                'Priority': 'u=0, i'
-                }
-                const request = await fetch('https://www.tabroom.com/user/login/profile.mhtml', {method: "GET", headers: header, redirect: 'follow'})
-                const pop = await request.text();
-                if (!pop.includes("<span class=\"threefifths padright\">")){
-                    router.replace("/");
-                }else{
-                    const hi = pop.split('\n')
-                    let run = 0
-                    for (let i = 0; i < hi.length; i++){
-                        if (hi[i].includes("<span class=\"threefifths padright\">") ){  
-                            let lst = hi[i + 4].trim();
-                            const thing = lst.slice(9, lst.length - 1);
-                            if (run == 0){
-                                setemail(thing);
-                                run++;
-                            }
-                            else if (run == 1){
-                                setfirst(thing);
-                                run++;
-                            } else if (run == 2){
-                                setmid(thing);
-                                run++;
-                            } else if (run == 3){
-                                setlast(thing)
-                                run++;
-                            } else if (run == 4){
-                                setnum(thing)
-                                run++;
-                            }else if (run == 5) {
-                                setpro(thing)
-                                run++;
-                            }else if (run == 6){
-                                let newData = [...data];
-                                for (let j = i + 1; j < hi.length; j++){
-                                    console.log(hi[j])
-                                    if (hi[j].includes("optgroup") && hi[j].includes("label")){
-                                        alert(hi[j])
-                                        newData.push({header: true, label: hi[j].trim().slice(17, hi[j].length -  1), value: hi[j].trim().slice(17, hi[j].length -1)});
-                                        setdata(newData);
-                                    }else if(hi[j].includes("\"threefifths padright\"")){
-                                        break;
-                                    }
-                                }
-                            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    }}
-                }
-
-            } catch (e){
-                console.log(e);
-                router.replace("/");
-            }
-        }else{
-            alert("UMM SOMETHING HORRIBLE HAS HAPPENED< ANDDD IT NO GOOD. RESTART APP.")
-        }
-    
-    })
-
-    return () => thingpl();
-}, []);
-
-    return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} bounces={true}>
-                <Text style={styles.email_2}>Email: </Text>
-                <TextInput style={styles.email} placeholder="Email">{email}</TextInput>
-                <Text style={styles.first}>First Name: </Text>
-                <TextInput placeholder="First Name" style={styles.first_2}>{first}</TextInput>
-                <Text style={styles.mid}>Middle Name: </Text>
-                <TextInput style={styles.mid_2} placeholder="Middle Name">{middle}</TextInput>
-                <Text style={styles.ln}>Last Name: </Text>
-                <TextInput style={styles.ln_2} placeholder="Last Name">{last}</TextInput>
-                <Text style={styles.num}>Phone Number: </Text>
-                <TextInput style={styles.num_2} placeholder="Phone Number">{num}</TextInput>
-                <Text style={styles.pron}>Pronouns: </Text>
-                <TextInput style={styles.pron_2} placeholder="Pronouns">{pronouns}</TextInput>
-                <Text style={styles.zone}>TimeZone: </Text>
-                <Dropdown style={styles.dropdown} placeholderStyle={styles.placeholderStyle}  selectedTextStyle={styles.selectedTextStyle} data={data} labelField="label" valueField="value" placeholder="Select Timezone" value={timezone} onChange={time}/>
-            </KeyboardAwareScrollView>
-        </TouchableWithoutFeedback>
-
-    );
-  }
-
