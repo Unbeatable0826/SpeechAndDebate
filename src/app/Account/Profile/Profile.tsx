@@ -20,13 +20,9 @@
     const [last, setlast] = useState('');
     const [middle, setmid] = useState('');
     const [pronouns, setpro] = useState('');
-    const [timezone, setTimezone] = useState('EST');
+    const [timezone, setTimezone] = useState('');
     const [num, setnum] = useState('')
     const [data, setdata] = useState([
-    {label: 'Eastern Standard Time (EST)', value: 'EST' },
-    {label: 'Central Standard Time (CST)', value: 'CST' },
-    {label: 'Mountain Standard Time (MST)', value: 'MST' },
-    {label: 'Pacific Standard Time (PST)', value: 'PST' },
   ])
     
     let bop = "";
@@ -63,6 +59,7 @@ useEffect(() => {
                 }else{
                     const hi = pop.split('\n')
                     let run = 0
+                    let temp_zone = ""
                     for (let i = 0; i < hi.length; i++){
                         if (hi[i].includes("<span class=\"threefifths padright\">") ){  
                             let lst = hi[i + 4].trim();
@@ -91,9 +88,15 @@ useEffect(() => {
                                 setdata(prevData => {
                                 let newData = [...prevData];
                                 for (let j = i + 1; j < hi.length; j++){
-                                    if (hi[j].includes("optgroup") && hi[j].includes("label")){
-                                        const popl = hi[j].trim()
-                                        newData.push({head: true, label: popl.slice(17, popl.length - 2), value: popl.slice(17, popl.length - 2), search: true, });
+                                    if (hi[j].includes("<option") && hi[j+1].includes("value=")){
+                                        const popp = hi[j+1].trim()
+                                        const popl = hi[j+3].trim()
+                                        console.log(popp.slice(7, popp.length - 1))
+                                        newData.push({head: true, label: popl.slice(1, popl.length- 9), value: popp.slice(7, popp.length - 1)});
+                                        if (hi[j+2].includes("selected")){
+                                            temp_zone = popp.slice(7, popp.length - 1);
+                                            setTimezone(temp_zone);
+                                        }
                                     }else if(hi[j].includes("\"threefifths padright\"")){
                                         break;
                                     }
@@ -120,12 +123,11 @@ useEffect(() => {
 }, []);
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} bounces={true}>
+            <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} bounces={true} keyboardShouldPersistTaps="handled">
                 <Text style={styles.email_2}>Email: </Text>
-                <TextInput style={styles.email} placeholder="Email">{email}</TextInput>
+                <TextInput style={styles.email} placeholder="Email" value={email}></TextInput>
                 <Text style={styles.first}>First Name: </Text>
-                <TextInput placeholder="First Name" style={styles.first_2}>{first}</TextInput>
+                <TextInput placeholder="First Name" value={first} style={styles.first_2}></TextInput>
                 <Text style={styles.mid}>Middle Name: </Text>
                 <TextInput style={styles.mid_2} placeholder="Middle Name">{middle}</TextInput>
                 <Text style={styles.ln}>Last Name: </Text>
@@ -165,7 +167,6 @@ useEffect(() => {
                     <Text></Text>
                     <Text></Text>
                     <Text></Text>
-                                        <Text></Text>
                     <Text></Text>
                     <Text></Text>
                     <Text></Text>
@@ -175,7 +176,8 @@ useEffect(() => {
                     <Text></Text>
                     <Text></Text>
                     <Text></Text>
-                                        <Text></Text>
+                    <Text></Text>
+                    <Text></Text>
                     <Text></Text>
                     <Text></Text>
                     <Text></Text>
@@ -186,7 +188,6 @@ useEffect(() => {
                     <Text></Text>
                     <Text></Text>
             </KeyboardAwareScrollView>
-        </TouchableWithoutFeedback>
 
     );
   }
