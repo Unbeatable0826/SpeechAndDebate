@@ -26,6 +26,7 @@ export default function THINGY5() {
   const [state, setstate] = useState("");
   const [zip, setzip] = useState("");
   const [country, setcountry] = useState("");
+  const [contries, setcountries] = useState([]);
 
   useEffect(() => {
     const thingpl = onAuthStateChanged(auth, async (user) => {
@@ -152,7 +153,39 @@ export default function THINGY5() {
                   }
                   states.push({ value: "", label: "N/A - None" });
                   setstatedata(states);
+                  run++;
+                } else if (run == 10) {
+                  let countrys = [];
+                  for (let j = i + 1; j < hi.length; j++) {
+                    if (
+                      hi[j].includes("<option") &&
+                      hi[j + 1].includes("value=")
+                    ) {
+                      // VALUE GATHERING STUFF, HONESTLY SOO STUPID THE WAY THE HTML IS STRUCTURED
+                      const flop = hi[j + 1].trim();
+                      const rop = flop.split(">");
+                      const re_rop = rop[0].slice(15, rop[0].length - 2);
+                      const another = re_rop.replace('"', "");
+                      const another_one = another.replace("select", "");
+                      // LABEL FETCHING,
+                      const lbl = rop[1].slice(0, rop[1].length - 8);
+                      const fix = lbl.replace("&amp;", "&");
 
+                      countrys.push({
+                        label: fix,
+                        value: another_one,
+                      });
+                      if (re_rop.includes("select")) {
+                        setcountry(another_one);
+                      }
+                    } else if (hi[j].includes('class="threefifths padright')) {
+                      break;
+                    }
+                  }
+                  setcountries(countrys);
+                  run++;
+                } else if (run == 11) {
+                  setzip(thing);
                   run++;
                 }
               }
@@ -171,6 +204,12 @@ export default function THINGY5() {
 
     return () => thingpl();
   }, []);
+  const zipcodevery = () => {
+    setzip(zip.slice(0, 5));
+    if (zip.length > 5) {
+      setzip(zip.slice(0, 5));
+    }
+  };
 
   return (
     <KeyboardAwareScrollView
@@ -180,33 +219,29 @@ export default function THINGY5() {
       keyboardShouldPersistTaps="handled"
     >
       <Text style={styles.email_2}>Email: </Text>
-      <TextInput
-        style={styles.email}
-        placeholder="Email"
-        value={email}
-      ></TextInput>
+      <TextInput style={styles.email} placeholder="Email">
+        {email}
+      </TextInput>
       <Text style={styles.first}>First Name: </Text>
-      <TextInput
-        placeholder="First Name"
-        value={first}
-        style={styles.first_2}
-      ></TextInput>
+      <TextInput placeholder="First Name" style={styles.first_2}>
+        {first}
+      </TextInput>
       <Text style={styles.mid}>Middle Name: </Text>
-      <TextInput
-        style={styles.mid_2}
-        placeholder="Middle Name"
-        value={middle}
-      />
+      <TextInput style={styles.mid_2} placeholder="Middle Name">
+        {middle}
+      </TextInput>
       <Text style={styles.ln}>Last Name: </Text>
-      <TextInput style={styles.ln_2} placeholder="Last Name" value={last} />
+      <TextInput style={styles.ln_2} placeholder="Last Name">
+        {last}
+      </TextInput>
       <Text style={styles.num}>Phone Number: </Text>
-      <TextInput style={styles.num_2} placeholder="Phone Number" value={num} />
+      <TextInput style={styles.num_2} placeholder="Phone Number">
+        {num}
+      </TextInput>
       <Text style={styles.pron}>Pronouns: </Text>
-      <TextInput
-        style={styles.pron_2}
-        placeholder="Pronouns"
-        value={pronouns}
-      />
+      <TextInput style={styles.pron_2} placeholder="Pronouns">
+        {pronouns}
+      </TextInput>
       <Text style={styles.zone}>TimeZone: </Text>
       <Dropdown
         style={styles.dropdown}
@@ -228,18 +263,13 @@ export default function THINGY5() {
         }}
       />
       <Text style={styles.street_2}>Street Address: </Text>
-      <TextInput
-        style={styles.street}
-        placeholder="Street"
-        value={street}
-      ></TextInput>
-
+      <TextInput style={styles.street} placeholder="Street">
+        {street}
+      </TextInput>
       <Text style={styles.city}>City: </Text>
-      <TextInput
-        style={styles.city_2}
-        value={city}
-        placeholder="City"
-      ></TextInput>
+      <TextInput style={styles.city_2} placeholder="City">
+        {city}
+      </TextInput>
       <Text style={styles.state}>State: </Text>
       <Dropdown
         style={styles.dropdown}
@@ -256,7 +286,33 @@ export default function THINGY5() {
         }}
         search={true}
       />
-
+      <Text style={styles.country}>Country: </Text>
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        data={contries}
+        labelField="label"
+        autoScroll={false}
+        valueField="value"
+        placeholder="Select Country"
+        value={country}
+        onChange={(item) => {
+          setcountry(item.value);
+        }}
+        search={true}
+      />
+      <Text style={styles.zip}>Zip Code: </Text>
+      <TextInput
+        style={styles.zip_2}
+        keyboardType="numeric"
+        placeholder="Zip Code"
+        onChangeText={zipcodevery}
+        maxLength={5}
+      >
+        {zip}
+      </TextInput>
+      {/* BRUV TABROOM doesn't check if any of these inputs are valid :::::::: */}
       <Text></Text>
       <Text></Text>
       <Text></Text>
@@ -340,6 +396,27 @@ const styles = StyleSheet.create({
     width: 340,
     marginLeft: 40,
   },
+  zip: {
+    fontSize: 17,
+    marginTop: 10,
+    padding: 6,
+    width: 340,
+    marginLeft: 40,
+  },
+  zip_2: {
+    width: 300,
+    justifyContent: "center",
+    borderWidth: 1,
+    padding: 8,
+    transitionDelay: "0.5s",
+    alignItems: "center",
+    marginLeft: 40,
+    borderRadius: 10,
+    backgroundColor: "rgb(255, 250, 250)",
+    fontSize: 17,
+    elevation: 3,
+  },
+
   mid_2: {
     width: 300,
     justifyContent: "center",
@@ -454,6 +531,13 @@ const styles = StyleSheet.create({
     marginLeft: 40,
   },
   state: {
+    fontSize: 17,
+    marginTop: 10,
+    padding: 6,
+    width: 340,
+    marginLeft: 40,
+  },
+  country: {
     fontSize: 17,
     marginTop: 10,
     padding: 6,
