@@ -20,7 +20,12 @@ export default function THINGY5() {
   const [timezone, setTimezone] = useState("");
   const [num, setnum] = useState("");
   const [data, setdata] = useState([]);
-  const [curry, setcurry] = useState("");
+  const [statedata, setstatedata] = useState([]);
+  const [street, setstreet] = useState("");
+  const [city, setcity] = useState("");
+  const [state, setstate] = useState("");
+  const [zip, setzip] = useState("");
+  const [country, setcountry] = useState("");
 
   useEffect(() => {
     const thingpl = onAuthStateChanged(auth, async (user) => {
@@ -30,7 +35,7 @@ export default function THINGY5() {
         //LOGGED OUT PREVENTION
         const thingy = await SecureStore.getItemAsync("cookie");
         try {
-          alert("RUNNING");
+          //   alert("RUNNING");
           let header = {
             Host: "www.tabroom.com",
             Cookie: thingy,
@@ -87,9 +92,7 @@ export default function THINGY5() {
                   run++;
                 } else if (run == 6) {
                   console.log("RUN");
-
                   let newData = [];
-
                   for (let j = i + 1; j < hi.length; j++) {
                     if (
                       hi[j].includes("<option") &&
@@ -112,6 +115,44 @@ export default function THINGY5() {
                   }
                   setdata(newData);
                   setTimezone(curr);
+                  run++;
+                } else if (run == 7) {
+                  setstreet(thing);
+                  run++;
+                } else if (run == 8) {
+                  setcity(thing);
+                  run++;
+                } else if (run == 9) {
+                  let states = [];
+                  for (let j = i + 1; j < hi.length; j++) {
+                    if (
+                      hi[j].includes("<option") &&
+                      hi[j + 1].includes("value=")
+                    ) {
+                      // VALUE GATHERING STUFF, HONESTLY SOO STUPID THE WAY THE HTML IS STRUCTURED
+                      const flop = hi[j + 1].trim();
+                      const rop = flop.split(">");
+                      const re_rop = rop[0].slice(15, rop[0].length - 2);
+                      const another = re_rop.replace('"', "");
+                      const another_one = another.replace("select", "");
+                      // LABEL FETCHING,
+                      const lbl = rop[1].slice(0, rop[1].length - 8);
+                      const fix = lbl.replace("&amp;", "&");
+
+                      states.push({
+                        label: fix,
+                        value: another_one,
+                      });
+                      if (re_rop.includes("select")) {
+                        setstate(another_one);
+                      }
+                    } else if (hi[j].includes('class="threefifths padright')) {
+                      break;
+                    }
+                  }
+                  states.push({ value: "", label: "N/A - None" });
+                  setstatedata(states);
+
                   run++;
                 }
               }
@@ -186,6 +227,36 @@ export default function THINGY5() {
           }
         }}
       />
+      <Text style={styles.street_2}>Street Address: </Text>
+      <TextInput
+        style={styles.street}
+        placeholder="Street"
+        value={street}
+      ></TextInput>
+
+      <Text style={styles.city}>City: </Text>
+      <TextInput
+        style={styles.city_2}
+        value={city}
+        placeholder="City"
+      ></TextInput>
+      <Text style={styles.state}>State: </Text>
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        data={statedata}
+        labelField="label"
+        autoScroll={false}
+        valueField="value"
+        placeholder="Select State"
+        value={state}
+        onChange={(item) => {
+          setstate(item.value);
+        }}
+        search={true}
+      />
+
       <Text></Text>
       <Text></Text>
       <Text></Text>
@@ -341,6 +412,53 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(255, 250, 250)",
     fontSize: 17,
     elevation: 3,
+  },
+  street: {
+    width: 300,
+    justifyContent: "center",
+    borderWidth: 1,
+    padding: 8,
+    transitionDelay: "0.5s",
+    alignItems: "center",
+    marginLeft: 40,
+    borderRadius: 10,
+    backgroundColor: "rgb(255, 250, 250)",
+    fontSize: 17,
+    elevation: 3,
+  },
+  street_2: {
+    fontSize: 17,
+    marginTop: 10,
+    padding: 6,
+    width: 340,
+    marginLeft: 40,
+  },
+  city_2: {
+    width: 300,
+    justifyContent: "center",
+    borderWidth: 1,
+    padding: 8,
+    transitionDelay: "0.5s",
+    alignItems: "center",
+    marginLeft: 40,
+    borderRadius: 10,
+    backgroundColor: "rgb(255, 250, 250)",
+    fontSize: 17,
+    elevation: 3,
+  },
+  city: {
+    fontSize: 17,
+    marginTop: 10,
+    padding: 6,
+    width: 340,
+    marginLeft: 40,
+  },
+  state: {
+    fontSize: 17,
+    marginTop: 10,
+    padding: 6,
+    width: 340,
+    marginLeft: 40,
   },
   zone: {
     fontSize: 17,
