@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { auth } from "../../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
@@ -25,9 +25,10 @@ export default function THINGY5() {
   const [city, setcity] = useState("");
   const [state, setstate] = useState("");
   const [zip, setzip] = useState("");
+  const [loading, setloading] = useState(false);
   const [country, setcountry] = useState("");
   const [contries, setcountries] = useState([]);
-
+  const [auth_token, setauth_token] = useState("");
   useEffect(() => {
     const thingpl = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -68,6 +69,7 @@ export default function THINGY5() {
             const hi = pop.split("\n");
             let run = 0;
             let temp_zone = "";
+
             console.log("GOING");
             for (let i = 0; i < hi.length; i++) {
               if (hi[i].includes('<span class="threefifths padright">')) {
@@ -101,7 +103,7 @@ export default function THINGY5() {
                     ) {
                       const popp = hi[j + 1].trim();
                       const popl = hi[j + 3].trim();
-                      console.log(popp.slice(7, popp.length - 1));
+                      //   console.log(popp.slice(7, popp.length - 1));
                       newData.push({
                         head: false,
                         label: popl.slice(1, popl.length - 9),
@@ -188,6 +190,10 @@ export default function THINGY5() {
                   setzip(thing);
                   run++;
                 }
+              } else if (hi[i].includes('name = "token"')) {
+                const temp_auth = hi[i + 1].trim();
+                const another_temp = temp_auth.slice(9, temp_auth.length - 1);
+                setauth_token(another_temp);
               }
             }
           }
@@ -204,13 +210,80 @@ export default function THINGY5() {
 
     return () => thingpl();
   }, []);
-  const zipcodevery = () => {
-    setzip(zip.slice(0, 5));
-    if (zip.length > 5) {
-      setzip(zip.slice(0, 5));
-    }
-  };
 
+  const saving = async () => {
+    console.log("SAVING");
+    const thingy = await SecureStore.getItemAsync("cookie");
+
+    let header = {
+      Host: "www.tabroom.com",
+      Cookie: thingy,
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Referer:
+        "https://www.tabroom.com/user/login/profile.mhtml?msg=Changes%20saved&err=",
+      Priority: "u=0, i",
+    };
+    let phone_refactored = "";
+    phone_refactored = num.replace("(", "");
+    phone_refactored = phone_refactored.replace(")", "");
+    phone_refactored = phone_refactored.replace("-", "");
+    phone_refactored = phone_refactored.replace(" ", "");
+    phone_refactored = phone_refactored.replace("+", "");
+    let data_thing = new URLSearchParams();
+    data_thing.append("token", auth_token);
+    data_thing.append("email", email);
+    data_thing.append("first", first);
+    data_thing.append("middle", middle);
+    data_thing.append("last", last);
+    data_thing.append("phone", num);
+    data_thing.append("timezone", timezone);
+    data_thing.append("pronouns", pronouns);
+    data_thing.append("street", street);
+    data_thing.append("city", city);
+    data_thing.append("state", state);
+    data_thing.append("zip", zip);
+    data_thing.append("country", country);
+    // body: JSON.stringify({
+    //   token: "" + auth_token,
+    //   email: "" + email,
+    //   first: "" + first,
+    //   middle: "" + middle,
+    //   last: "" + last,
+    //   phone: "" + num,
+    //   pronouns: "" + pronouns,
+    //   timezone: "" + timezone,
+    //   street: "" + street,
+    //   city: "" + city,
+    //   state: "" + state,
+    //   zip: "" + zip,
+    //   country: "" + country,
+    // });
+    let response = await fetch(
+      "https://tabroom.com/user/login/profile_save.mhtml",
+      {
+        headers: header,
+        method: "POST",
+        body: data_thing.toString(),
+      },
+    );
+    const result = await response.text();
+    if (result.includes("Changes saved")) {
+      alert("Changes Saved");
+    }
+    // router.navigate("./Profile/Profile");
+  };
   return (
     <KeyboardAwareScrollView
       style={{ flex: 1 }}
@@ -307,11 +380,13 @@ export default function THINGY5() {
         style={styles.zip_2}
         keyboardType="numeric"
         placeholder="Zip Code"
-        onChangeText={zipcodevery}
         maxLength={5}
       >
         {zip}
       </TextInput>
+      <TouchableOpacity onPress={saving} style={styles.saving_but}>
+        <Text style={{ fontSize: 17, color: "white" }}>Save</Text>
+      </TouchableOpacity>
       {/* BRUV TABROOM doesn't check if any of these inputs are valid :::::::: */}
       <Text></Text>
       <Text></Text>
@@ -348,6 +423,17 @@ export default function THINGY5() {
 }
 
 const styles = StyleSheet.create({
+  saving_but: {
+    fontSize: 17,
+    marginTop: 20,
+    padding: 6,
+    alignItems: "center",
+    backgroundColor: "rgba(35, 100, 253, 0.78)",
+    width: 70,
+    marginLeft: 270,
+    borderRadius: 10,
+    height: 35,
+  },
   email: {
     width: 300,
     justifyContent: "center",
