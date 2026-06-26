@@ -182,7 +182,7 @@ export default function THINGY5() {
                         label: fix,
                         value: another_one,
                       });
-                      if (re_rop.includes("select")) {
+                      if (hi[j + 1].includes("select")) {
                         setcountry(another_one);
                       }
                     } else if (hi[j].includes('class="threefifths padright')) {
