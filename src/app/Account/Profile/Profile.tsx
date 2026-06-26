@@ -7,6 +7,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { auth } from "../../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
 import { Dropdown } from "react-native-element-dropdown";
+import Loader from "../../Loading.js";
+
 //Home Featureset
 //
 export default function THINGY5() {
@@ -166,7 +168,10 @@ export default function THINGY5() {
                       // VALUE GATHERING STUFF, HONESTLY SOO STUPID THE WAY THE HTML IS STRUCTURED
                       const flop = hi[j + 1].trim();
                       const rop = flop.split(">");
-                      const re_rop = rop[0].slice(15, rop[0].length - 2);
+                      const re_rop = rop[0]
+                        .slice(15, rop[0].length)
+                        .replace("selected", "")
+                        .trim();
                       const another = re_rop.replace('"', "");
                       const another_one = another.replace("select", "");
                       // LABEL FETCHING,
@@ -213,6 +218,7 @@ export default function THINGY5() {
 
   const saving = async () => {
     console.log("SAVING");
+    setloading(true);
     const thingy = await SecureStore.getItemAsync("cookie");
 
     let header = {
@@ -234,27 +240,30 @@ export default function THINGY5() {
       Referer:
         "https://www.tabroom.com/user/login/profile.mhtml?msg=Changes%20saved&err=",
       Priority: "u=0, i",
+      "Content-Type": "application/x-www-form-urlencoded",
     };
     let phone_refactored = "";
-    phone_refactored = num.replace("(", "");
-    phone_refactored = phone_refactored.replace(")", "");
-    phone_refactored = phone_refactored.replace("-", "");
-    phone_refactored = phone_refactored.replace(" ", "");
-    phone_refactored = phone_refactored.replace("+", "");
+    phone_refactored = num
+      .replace("(", "")
+      .replace(")", "")
+      .replace("-", "")
+      .replace(" ", "")
+      .replace("+", "");
     let data_thing = new URLSearchParams();
     data_thing.append("token", auth_token);
     data_thing.append("email", email);
     data_thing.append("first", first);
     data_thing.append("middle", middle);
     data_thing.append("last", last);
-    data_thing.append("phone", num);
+    data_thing.append("phone", phone_refactored);
     data_thing.append("timezone", timezone);
-    data_thing.append("pronouns", pronouns);
+    data_thing.append("pronoun", pronouns);
     data_thing.append("street", street);
     data_thing.append("city", city);
-    data_thing.append("state", state);
-    data_thing.append("zip", zip);
+    data_thing.append("state", state.trim());
     data_thing.append("country", country);
+    data_thing.append("zip", zip);
+
     // body: JSON.stringify({
     //   token: "" + auth_token,
     //   email: "" + email,
@@ -270,18 +279,22 @@ export default function THINGY5() {
     //   zip: "" + zip,
     //   country: "" + country,
     // });
+    const body_thing = await data_thing.toString();
     let response = await fetch(
       "https://tabroom.com/user/login/profile_save.mhtml",
       {
         headers: header,
         method: "POST",
-        body: data_thing.toString(),
+        body: body_thing,
       },
     );
+    console.log(response);
+    console.log(body_thing);
     const result = await response.text();
     if (result.includes("Changes saved")) {
       alert("Changes Saved");
     }
+    setloading(false);
     // router.navigate("./Profile/Profile");
   };
   return (
@@ -291,133 +304,143 @@ export default function THINGY5() {
       bounces={true}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.email_2}>Email: </Text>
-      <TextInput style={styles.email} placeholder="Email">
-        {email}
-      </TextInput>
-      <Text style={styles.first}>First Name: </Text>
-      <TextInput placeholder="First Name" style={styles.first_2}>
-        {first}
-      </TextInput>
-      <Text style={styles.mid}>Middle Name: </Text>
-      <TextInput style={styles.mid_2} placeholder="Middle Name">
-        {middle}
-      </TextInput>
-      <Text style={styles.ln}>Last Name: </Text>
-      <TextInput style={styles.ln_2} placeholder="Last Name">
-        {last}
-      </TextInput>
-      <Text style={styles.num}>Phone Number: </Text>
-      <TextInput style={styles.num_2} placeholder="Phone Number">
-        {num}
-      </TextInput>
-      <Text style={styles.pron}>Pronouns: </Text>
-      <TextInput style={styles.pron_2} placeholder="Pronouns">
-        {pronouns}
-      </TextInput>
-      <Text style={styles.zone}>TimeZone: </Text>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        data={data}
-        labelField="label"
-        autoScroll={false}
-        valueField="value"
-        placeholder="Select Timezone"
-        value={timezone}
-        search={true}
-        onChange={(item) => {
-          if (item.head) {
-            return;
-          } else {
-            setTimezone(item.value);
-          }
-        }}
-      />
-      <Text style={styles.street_2}>Street Address: </Text>
-      <TextInput style={styles.street} placeholder="Street">
-        {street}
-      </TextInput>
-      <Text style={styles.city}>City: </Text>
-      <TextInput style={styles.city_2} placeholder="City">
-        {city}
-      </TextInput>
-      <Text style={styles.state}>State: </Text>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        data={statedata}
-        labelField="label"
-        autoScroll={false}
-        valueField="value"
-        placeholder="Select State"
-        value={state}
-        onChange={(item) => {
-          setstate(item.value);
-        }}
-        search={true}
-      />
-      <Text style={styles.country}>Country: </Text>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        data={contries}
-        labelField="label"
-        autoScroll={false}
-        valueField="value"
-        placeholder="Select Country"
-        value={country}
-        onChange={(item) => {
-          setcountry(item.value);
-        }}
-        search={true}
-      />
-      <Text style={styles.zip}>Zip Code: </Text>
-      <TextInput
-        style={styles.zip_2}
-        keyboardType="numeric"
-        placeholder="Zip Code"
-        maxLength={5}
-      >
-        {zip}
-      </TextInput>
-      <TouchableOpacity onPress={saving} style={styles.saving_but}>
-        <Text style={{ fontSize: 17, color: "white" }}>Save</Text>
-      </TouchableOpacity>
-      {/* BRUV TABROOM doesn't check if any of these inputs are valid :::::::: */}
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <Text style={styles.email_2}>Email: </Text>
+          <TextInput
+            style={styles.email}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setemail(e.nativeEvent.text)}
+          />
+
+          <Text style={styles.first}>First Name: </Text>
+          <TextInput placeholder="First Name" style={styles.first_2}>
+            {first}
+          </TextInput>
+          <Text style={styles.mid}>Middle Name: </Text>
+          <TextInput style={styles.mid_2} placeholder="Middle Name">
+            {middle}
+          </TextInput>
+          <Text style={styles.ln}>Last Name: </Text>
+          <TextInput style={styles.ln_2} placeholder="Last Name">
+            {last}
+          </TextInput>
+          <Text style={styles.num}>Phone Number: </Text>
+          <TextInput style={styles.num_2} placeholder="Phone Number">
+            {num}
+          </TextInput>
+          <Text style={styles.pron}>Pronouns: </Text>
+          <TextInput style={styles.pron_2} placeholder="Pronouns">
+            {pronouns}
+          </TextInput>
+          <Text style={styles.zone}>TimeZone: </Text>
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={data}
+            labelField="label"
+            autoScroll={false}
+            valueField="value"
+            placeholder="Select Timezone"
+            value={timezone}
+            search={true}
+            onChange={(item) => {
+              if (item.head) {
+                return;
+              } else {
+                setTimezone(item.value);
+              }
+            }}
+          />
+          <Text style={styles.street_2}>Street Address: </Text>
+          <TextInput style={styles.street} placeholder="Street">
+            {street}
+          </TextInput>
+          <Text style={styles.city}>City: </Text>
+          <TextInput style={styles.city_2} placeholder="City">
+            {city}
+          </TextInput>
+          <Text style={styles.state}>State: </Text>
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={statedata}
+            labelField="label"
+            autoScroll={false}
+            valueField="value"
+            placeholder="Select State"
+            value={state}
+            onChange={(item) => {
+              setstate(item.value);
+            }}
+            search={true}
+          />
+          <Text style={styles.country}>Country: </Text>
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={contries}
+            labelField="label"
+            autoScroll={false}
+            valueField="value"
+            placeholder="Select Country"
+            value={country}
+            onChange={(item) => {
+              setcountry(item.value);
+            }}
+            search={true}
+          />
+          <Text style={styles.zip}>Zip Code: </Text>
+          <TextInput
+            style={styles.zip_2}
+            keyboardType="numeric"
+            value={zip}
+            placeholder="Zip Code"
+            maxLength={5}
+            onChangeText={(text) => setzip(text)}
+          />
+          <TouchableOpacity onPress={saving} style={styles.saving_but}>
+            <Text style={{ fontSize: 17, color: "white" }}>Save</Text>
+          </TouchableOpacity>
+          {/* BRUV TABROOM doesn't check if any of these inputs are valid :::::::: */}
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+        </>
+      )}
     </KeyboardAwareScrollView>
   );
 }
