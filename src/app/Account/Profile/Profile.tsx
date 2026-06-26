@@ -76,7 +76,7 @@ export default function THINGY5() {
             for (let i = 0; i < hi.length; i++) {
               if (hi[i].includes('<span class="threefifths padright">')) {
                 let lst = hi[i + 4].trim();
-                const thing = lst.slice(9, lst.length - 1);
+                let thing = lst.slice(9, lst.length - 1);
                 if (run == 0) {
                   setemail(thing);
                   run++;
@@ -90,7 +90,13 @@ export default function THINGY5() {
                   setlast(thing);
                   run++;
                 } else if (run == 4) {
-                  setnum(thing);
+                  const diff = thing
+                    .replace("(", "")
+                    .replace(")", "")
+                    .replace("+", "")
+                    .replace("-", "")
+                    .replace(" ", "");
+                  setnum(diff);
                   run++;
                 } else if (run == 5) {
                   setpro(thing);
@@ -279,23 +285,46 @@ export default function THINGY5() {
     //   zip: "" + zip,
     //   country: "" + country,
     // });
-    const body_thing = await data_thing.toString();
-    let response = await fetch(
-      "https://tabroom.com/user/login/profile_save.mhtml",
-      {
-        headers: header,
-        method: "POST",
-        body: body_thing,
-      },
-    );
-    console.log(response);
-    console.log(body_thing);
-    const result = await response.text();
-    if (result.includes("Changes saved")) {
-      alert("Changes Saved");
+    let verification = false;
+    if (
+      email.includes("@") &&
+      email.includes(".") &&
+      first != "" &&
+      phone_refactored.length == 10 &&
+      zip != "00000"
+    ) {
+      verification = true;
+    } else if (!email.includes("@") && !email.includes(".")) {
+      alert("Please Check you email address");
+    } else if (first == "") {
+      alert("Please Check your first name");
+    } else if (phone_refactored.length != 10) {
+      alert("Please check your phone number");
+    } else if (zip == "00000") {
+      alert("Please check your zip code");
     }
+
+    if (verification) {
+      const body_thing = await data_thing.toString();
+      let response = await fetch(
+        "https://tabroom.com/user/login/profile_save.mhtml",
+        {
+          headers: header,
+          method: "POST",
+          body: body_thing,
+        },
+      );
+      console.log(response);
+      console.log(body_thing);
+      const result = await response.text();
+      if (result.includes("Changes saved")) {
+        alert("Changes Saved");
+      }
+      setloading(false);
+      router.navigate("/Account/Profile/Profile");
+    }
+
     setloading(false);
-    // router.navigate("./Profile/Profile");
   };
   return (
     <KeyboardAwareScrollView
@@ -313,29 +342,46 @@ export default function THINGY5() {
             style={styles.email}
             placeholder="Email"
             value={email}
-            onChange={(e) => setemail(e.nativeEvent.text)}
+            onChangeText={(text) => setemail(text)}
           />
 
           <Text style={styles.first}>First Name: </Text>
-          <TextInput placeholder="First Name" style={styles.first_2}>
-            {first}
-          </TextInput>
+          <TextInput
+            placeholder="First Name"
+            style={styles.first_2}
+            value={name}
+            onChangeText={(text) => setName(text)}
+          />
           <Text style={styles.mid}>Middle Name: </Text>
-          <TextInput style={styles.mid_2} placeholder="Middle Name">
-            {middle}
-          </TextInput>
+          <TextInput
+            style={styles.mid_2}
+            placeholder="Middle Name"
+            value={middle}
+            onChangeText={(text) => setmid(text)}
+          />
           <Text style={styles.ln}>Last Name: </Text>
-          <TextInput style={styles.ln_2} placeholder="Last Name">
-            {last}
-          </TextInput>
+          <TextInput
+            style={styles.ln_2}
+            placeholder="Last Name"
+            value={last}
+            onChangeText={(text) => setlast(text)}
+          />
           <Text style={styles.num}>Phone Number: </Text>
-          <TextInput style={styles.num_2} placeholder="Phone Number">
-            {num}
-          </TextInput>
+          <TextInput
+            style={styles.num_2}
+            placeholder="Phone Number"
+            value={num}
+            maxLength={10}
+            onChangeText={(text) => setnum(text)}
+            keyboardType="numeric"
+          />
           <Text style={styles.pron}>Pronouns: </Text>
-          <TextInput style={styles.pron_2} placeholder="Pronouns">
-            {pronouns}
-          </TextInput>
+          <TextInput
+            style={styles.pron_2}
+            placeholder="Pronouns"
+            value={pronouns}
+            onChangeText={(text) => setpro(text)}
+          />
           <Text style={styles.zone}>TimeZone: </Text>
           <Dropdown
             style={styles.dropdown}
@@ -357,13 +403,19 @@ export default function THINGY5() {
             }}
           />
           <Text style={styles.street_2}>Street Address: </Text>
-          <TextInput style={styles.street} placeholder="Street">
-            {street}
-          </TextInput>
+          <TextInput
+            style={styles.street}
+            placeholder="Street"
+            value={street}
+            onChangeText={(text) => setstreet(text)}
+          />
           <Text style={styles.city}>City: </Text>
-          <TextInput style={styles.city_2} placeholder="City">
-            {city}
-          </TextInput>
+          <TextInput
+            style={styles.city_2}
+            placeholder="City"
+            value={city}
+            onChangeText={(text) => setcity(text)}
+          />
           <Text style={styles.state}>State: </Text>
           <Dropdown
             style={styles.dropdown}
