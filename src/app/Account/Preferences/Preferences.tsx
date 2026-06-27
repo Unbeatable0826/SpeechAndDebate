@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Stack } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore"; //SO THIS STUPID AHH AI PRETIFIER OR SOME GARBAGE KEEPS REMOVING MY IMPorts and idk how to stop it :(((((((((((((((((((((((())))))))))))))))))))))))
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { auth, db } from "../../../../firebaseConfig.js";
@@ -72,11 +73,12 @@ export default function THINGY6() {
   }, []);
 
   const lightd = async () => {
+    console.log("INSTANT RUN");
     updateDoc(doc(db, "users", auth.currentUser.uid), {
       Skin: light_dark ? "light" : "dark",
     });
-    await AsyncStorage.setItem("theme", light_dark ? "dark" : "light");
-    setld(!light_dark);
+    await AsyncStorage.setItem("theme", !light_dark ? "dark" : "light");
+    await setld(!light_dark);
   };
 
   return (
@@ -86,6 +88,15 @@ export default function THINGY6() {
         { backgroundColor: !light_dark ? "white" : "black" },
       ]}
     >
+      <Stack.Screen
+        options={{
+          title: "Preferences",
+          headerStyle: {
+            backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
+          },
+          headerTintColor: light_dark ? "#ffffff" : "black",
+        }}
+      />
       <TouchableOpacity
         style={[
           styles.light_d_1,
@@ -114,7 +125,9 @@ export default function THINGY6() {
           thumbColor={!light_dark ? "#ffffff" : "#292729"}
           ios_backgroundColor="#3e3e3e"
           style={styles.light_d}
+          onValueChange={lightd}
         />
+
         <MaterialIcons
           name="nights-stay"
           size={24}

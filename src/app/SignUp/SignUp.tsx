@@ -281,7 +281,7 @@ export default function THINGY1() {
         uid: cred.user.uid,
         skin: "light",
       });
-      await AsyncStorage.setItem("theme", "light");
+      await AsyncStorage.setItem("theme", "light ");
 
       router.replace("../Home/Home");
     }
