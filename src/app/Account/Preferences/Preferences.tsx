@@ -5,8 +5,11 @@ import { useEffect, useState } from "react";
 // import { StyleSheet, View } from "react-native"; this is now an old one
 import Fontisto from "@expo/vector-icons/Fontisto";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StyleSheet, Switch, Text, View } from "react-native";
-import { auth } from "../../../../firebaseConfig.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { doc, updateDoc } from "firebase/firestore"; //SO THIS STUPID AHH AI PRETIFIER OR SOME GARBAGE KEEPS REMOVING MY IMPorts and idk how to stop it :(((((((((((((((((((((((())))))))))))))))))))))))
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { auth, db } from "../../../../firebaseConfig.js";
+
 // Current preferences --> store in firebase database so no renewal and major problems during re-login
 // DARK AND LIGHT
 // Message Updates
@@ -15,7 +18,6 @@ import { auth } from "../../../../firebaseConfig.js";
 export default function THINGY6() {
   const router = useRouter();
   const [light_dark, setld] = useState(false);
-
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -59,21 +61,54 @@ export default function THINGY6() {
       }
     });
   }, []);
+  useEffect(() => {
+    const light_or_dark = async () => {
+      console.log(AsyncStorage.getItem("theme"));
+      const temp = await AsyncStorage.getItem("theme");
+      const temp_2 = temp == "light" ? false : true;
+      setld(temp_2);
+    };
+    light_or_dark();
+  }, []);
+
   const lightd = async () => {
+    updateDoc(doc(db, "users", auth.currentUser.uid), {
+      Skin: light_dark ? "light" : "dark",
+    });
+    await AsyncStorage.setItem("theme", light_dark ? "dark" : "light");
     setld(!light_dark);
   };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.light_d_1}>
-        <Text style={styles.theme}> Theme </Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: !light_dark ? "white" : "black" },
+      ]}
+    >
+      <TouchableOpacity
+        style={[
+          styles.light_d_1,
+          { borderColor: !light_dark ? "black" : "white" },
+        ]}
+        onPress={lightd}
+      >
+        <Text
+          style={[styles.theme, { color: !light_dark ? "black" : "white" }]}
+        >
+          {" "}
+          Theme{" "}
+        </Text>
         <Fontisto
           name="day-sunny"
           size={24}
           color="black"
-          style={{ marginLeft: 170 }}
+          style={{
+            marginLeft: 170,
+            color: light_dark ? "white" : "black",
+          }}
         />
         <Switch
-          onValueChange={lightd}
           value={light_dark}
           trackColor={{ false: "#767577", true: "#b9bbbe" }}
           thumbColor={!light_dark ? "#ffffff" : "#292729"}
@@ -84,14 +119,15 @@ export default function THINGY6() {
           name="nights-stay"
           size={24}
           color="black"
-          style={{ marginLeft: 10 }}
+          style={{ marginLeft: 10, color: light_dark ? "white" : "black" }}
         />
-      </View>
+      </TouchableOpacity>
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
+    color: "black",
     flex: 1,
     alignItems: "center",
   },
@@ -103,6 +139,8 @@ const styles = StyleSheet.create({
     marginTop: 25,
     flexDirection: "row",
     alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 10,
   },
   theme: {
     fontSize: 20,
