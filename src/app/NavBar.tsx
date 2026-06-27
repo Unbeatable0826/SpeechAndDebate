@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePathname, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const NAV_THINGY = [
@@ -13,9 +15,25 @@ const NAV_THINGY = [
 export default function NavBar() {
   const router = useRouter();
   const pathname = usePathname();
+  const [light_dark, setld] = useState(false);
 
+  useEffect(() => {
+    const working = async () => {
+      const temp = await AsyncStorage.getItem("theme");
+      const temp_2 = temp == "light" ? false : true;
+      setld(temp_2);
+    };
+    working();
+  }, []);
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
+        },
+      ]}
+    >
       {NAV_THINGY.map((thing) => {
         const isActive =
           pathname.includes(thing.place) || pathname.includes(thing.name);
@@ -24,6 +42,8 @@ export default function NavBar() {
         if (isActive) {
           coloor = "#0080ff";
           nameee = thing.icon;
+        } else {
+          coloor = light_dark ? "#ffffff" : "#8E8E93";
         }
 
         return (
@@ -38,10 +58,10 @@ export default function NavBar() {
               color={coloor}
               style={styles.icon}
             />
-            <Text style={[styles.navText, isActive && styles.navTextActive]}>
+            <Text style={[styles.navText, isActive && styles.peep]}>
               {thing.name}
             </Text>
-            {isActive && <View style={styles.activeIndicator} />}
+            {isActive && <View style={styles.isup} />}
           </Pressable>
         );
       })}
@@ -84,11 +104,11 @@ const styles = StyleSheet.create({
     color: "#8E8E93",
     fontWeight: "500",
   },
-  navTextActive: {
+  peep: {
     color: "#0080ff",
     fontWeight: "bold",
   },
-  activeIndicator: {
+  isup: {
     width: 4,
     height: 4,
     backgroundColor: "#0080ff",

@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useIsFocused, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -24,6 +24,7 @@ export default function THINGY2() {
   const [pts, setpts] = useState(0);
   const router = useRouter();
   const [light_dark, setld] = useState(false);
+  const isFocused = useIsFocused();
   const [name, setName] = useState("");
   let bop = "";
   const styles = StyleSheet.create({
@@ -125,6 +126,18 @@ export default function THINGY2() {
       goback,
     );
   }, []);
+
+  useEffect(() => {
+    const thingy = async () => {
+      if (isFocused) {
+        const temp = await AsyncStorage.getItem("theme");
+        const temp_2 = !(temp == "light");
+        console.log(temp_2);
+        setld(temp_2);
+      }
+    };
+    thingy();
+  }, [isFocused]);
 
   useEffect(() => {
     const FETCH_NSDA = async () => {
@@ -247,7 +260,12 @@ export default function THINGY2() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: light_dark ? "rgb(0, 0, 0)" : "white",
+      }}
+    >
       <Stack.Screen
         options={{
           title: "Account",
@@ -257,22 +275,78 @@ export default function THINGY2() {
           headerTintColor: light_dark ? "#ffffff" : "black",
         }}
       />
-      <TouchableOpacity style={styles.nsd}>
-        <Text style={styles.fir}>
+      <TouchableOpacity
+        style={[
+          styles.nsd,
+          {
+            backgroundColor: light_dark ? "rgb(0, 0, 0)" : "white",
+            borderColor: light_dark ? "#404142" : "#e2e8f0",
+            shadowColor: light_dark ? "white" : "black",
+          },
+        ]}
+        onPress={distinction_redirect}
+      >
+        <Text
+          style={[
+            styles.fir,
+            {
+              color: light_dark ? "white" : "black",
+            },
+          ]}
+        >
           NSDA Points:{" "}
           <Text style={styles.sec} onPress={distinction_redirect}>
             {pts}
           </Text>
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={moveprofile} style={styles.profile}>
-        <Text style={styles.profile_2}>Profile</Text>
+      <TouchableOpacity
+        onPress={moveprofile}
+        style={[
+          styles.profile,
+          {
+            backgroundColor: light_dark ? "rgb(0, 0, 0)" : "white",
+            borderColor: light_dark ? "#404142" : "#e2e8f0",
+            shadowColor: light_dark ? "white" : "black",
+          },
+        ]}
+      >
+        <Text
+          style={[styles.profile_2, { color: light_dark ? "white" : "black" }]}
+        >
+          Profile
+        </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={movePreferences} style={styles.set}>
-        <Text style={styles.set_2}>Preferences</Text>
+      <TouchableOpacity
+        onPress={movePreferences}
+        style={[
+          styles.set,
+
+          {
+            backgroundColor: light_dark ? "rgb(0, 0, 0)" : "white",
+            borderColor: light_dark ? "#404142" : "#e2e8f0",
+            shadowColor: light_dark ? "white" : "black",
+          },
+        ]}
+      >
+        <Text style={[styles.set_2, { color: light_dark ? "white" : "black" }]}>
+          Preferences
+        </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={Logout} style={styles.logout}>
-        <Text style={styles.logpout}>
+      <TouchableOpacity
+        onPress={Logout}
+        style={[
+          styles.logout,
+          {
+            backgroundColor: light_dark ? "rgb(0, 0, 0)" : "white",
+            borderColor: light_dark ? "#404142" : "#e2e8f0",
+            shadowColor: light_dark ? "white" : "black",
+          },
+        ]}
+      >
+        <Text
+          style={[styles.logpout, { color: light_dark ? "white" : "black" }]}
+        >
           Logout{" "}
           <Ionicons name="log-out-outline" size={24} color="#FF3B30" />{" "}
         </Text>

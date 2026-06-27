@@ -213,9 +213,9 @@ export default function THINGY5() {
           router.replace("/");
         }
       } else {
-        alert(
-          "UMM SOMETHING HORRIBLE HAS HAPPENED< ANDDD IT NO GOOD. RESTART APP.",
-        );
+        // alert(
+        //   "UMM SOMETHING HORRIBLE HAS HAPPENED< ANDDD IT NO GOOD. RESTART APP.",
+        // );
       }
     });
 
