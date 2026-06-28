@@ -6,6 +6,8 @@ import { StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { auth } from "../../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Stack } from "expo-router";
 import { Dropdown } from "react-native-element-dropdown";
 import Loader from "../../Loading.js";
 
@@ -31,6 +33,7 @@ export default function THINGY5() {
   const [country, setcountry] = useState("");
   const [contries, setcountries] = useState([]);
   const [auth_token, setauth_token] = useState("");
+  const [light_dark, setld] = useState(false);
   useEffect(() => {
     const thingpl = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -81,6 +84,7 @@ export default function THINGY5() {
                   setemail(thing);
                   run++;
                 } else if (run == 1) {
+                  console.log(thing);
                   setfirst(thing);
                   run++;
                 } else if (run == 2) {
@@ -222,6 +226,15 @@ export default function THINGY5() {
     return () => thingpl();
   }, []);
 
+  useEffect(() => {
+    const thingy = async () => {
+      const temp = await AsyncStorage.getItem("theme");
+      const temp_2 = temp == "light" ? false : true;
+      setld(temp_2);
+    };
+    thingy();
+  });
+
   const saving = async () => {
     console.log("SAVING");
     setloading(true);
@@ -328,7 +341,7 @@ export default function THINGY5() {
   };
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: !light_dark ? "white" : "black" }}
       contentContainerStyle={{ flexGrow: 1 }}
       bounces={true}
       keyboardShouldPersistTaps="handled"
@@ -337,55 +350,162 @@ export default function THINGY5() {
         <Loader />
       ) : (
         <>
-          <Text style={styles.email_2}>Email: </Text>
+          <Stack.Screen
+            options={{
+              title: "Profile",
+              headerStyle: {
+                backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
+              },
+              headerTintColor: light_dark ? "#ffffff" : "black",
+            }}
+          />
+          <Text
+            style={[styles.email_2, { color: !light_dark ? "black" : "white" }]}
+          >
+            Email:
+          </Text>
           <TextInput
-            style={styles.email}
+            style={[
+              styles.email,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
             placeholder="Email"
             value={email}
             onChangeText={(text) => setemail(text)}
           />
 
-          <Text style={styles.first}>First Name: </Text>
+          <Text
+            style={[styles.first, { color: !light_dark ? "black" : "white" }]}
+          >
+            First Name:
+          </Text>
           <TextInput
             placeholder="First Name"
-            style={styles.first_2}
-            value={name}
-            onChangeText={(text) => setName(text)}
+            style={[
+              styles.first_2,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
+            value={first}
+            onChangeText={(text) => setfirst(text)}
           />
-          <Text style={styles.mid}>Middle Name: </Text>
+          <Text
+            style={[styles.mid, { color: !light_dark ? "black" : "white" }]}
+          >
+            Middle Name:{" "}
+          </Text>
           <TextInput
-            style={styles.mid_2}
+            style={[
+              styles.mid_2,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
             placeholder="Middle Name"
             value={middle}
             onChangeText={(text) => setmid(text)}
           />
-          <Text style={styles.ln}>Last Name: </Text>
+          <Text style={[styles.ln, { color: !light_dark ? "black" : "white" }]}>
+            Last Name:{" "}
+          </Text>
           <TextInput
-            style={styles.ln_2}
+            style={[
+              styles.ln_2,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
             placeholder="Last Name"
             value={last}
             onChangeText={(text) => setlast(text)}
           />
-          <Text style={styles.num}>Phone Number: </Text>
+          <Text
+            style={[styles.num, { color: !light_dark ? "black" : "white" }]}
+          >
+            Phone Number:{" "}
+          </Text>
           <TextInput
-            style={styles.num_2}
+            style={[
+              styles.num_2,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
             placeholder="Phone Number"
             value={num}
             maxLength={10}
             onChangeText={(text) => setnum(text)}
             keyboardType="numeric"
           />
-          <Text style={styles.pron}>Pronouns: </Text>
+          <Text
+            style={[
+              styles.pron,
+              {
+                color: !light_dark ? "black" : "white",
+              },
+            ]}
+          >
+            Pronouns:{" "}
+          </Text>
           <TextInput
-            style={styles.pron_2}
+            style={[
+              styles.pron_2,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
             placeholder="Pronouns"
             value={pronouns}
             onChangeText={(text) => setpro(text)}
           />
-          <Text style={styles.zone}>TimeZone: </Text>
+          <Text
+            style={[styles.zone, { color: !light_dark ? "black" : "white" }]}
+          >
+            TimeZone:{" "}
+          </Text>
           <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
+            style={[
+              styles.dropdown,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
+            placeholderStyle={[
+              styles.placeholderStyle,
+              {
+                color: !light_dark ? "rgb(100,100,100)" : "black",
+              },
+            ]}
             selectedTextStyle={styles.selectedTextStyle}
             data={data}
             labelField="label"
@@ -402,23 +522,64 @@ export default function THINGY5() {
               }
             }}
           />
-          <Text style={styles.street_2}>Street Address: </Text>
+          <Text
+            style={[
+              styles.street_2,
+              { color: !light_dark ? "black" : "white" },
+            ]}
+          >
+            Street Address:{" "}
+          </Text>
           <TextInput
-            style={styles.street}
+            style={[
+              styles.street,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
             placeholder="Street"
             value={street}
             onChangeText={(text) => setstreet(text)}
           />
-          <Text style={styles.city}>City: </Text>
+          <Text
+            style={[styles.city, { color: !light_dark ? "black" : "white" }]}
+          >
+            City:{" "}
+          </Text>
           <TextInput
-            style={styles.city_2}
+            style={[
+              styles.city_2,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
             placeholder="City"
             value={city}
             onChangeText={(text) => setcity(text)}
           />
-          <Text style={styles.state}>State: </Text>
+          <Text
+            style={[styles.state, { color: !light_dark ? "black" : "white" }]}
+          >
+            State:{" "}
+          </Text>
           <Dropdown
-            style={styles.dropdown}
+            style={[
+              styles.dropdown,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             data={statedata}
@@ -432,9 +593,21 @@ export default function THINGY5() {
             }}
             search={true}
           />
-          <Text style={styles.country}>Country: </Text>
+          <Text
+            style={[styles.country, { color: !light_dark ? "black" : "white" }]}
+          >
+            Country:{" "}
+          </Text>
           <Dropdown
-            style={styles.dropdown}
+            style={[
+              styles.dropdown,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             data={contries}
@@ -448,9 +621,22 @@ export default function THINGY5() {
             }}
             search={true}
           />
-          <Text style={styles.zip}>Zip Code: </Text>
+          <Text
+            style={[styles.zip, { color: !light_dark ? "black" : "white" }]}
+          >
+            Zip Code:{" "}
+          </Text>
           <TextInput
-            style={styles.zip_2}
+            style={[
+              styles.zip_2,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+                color: light_dark ? "white" : "black",
+              },
+            ]}
             keyboardType="numeric"
             value={zip}
             placeholder="Zip Code"
