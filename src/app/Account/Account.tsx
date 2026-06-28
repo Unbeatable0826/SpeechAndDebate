@@ -284,7 +284,6 @@ export default function THINGY2() {
             shadowColor: light_dark ? "white" : "black",
           },
         ]}
-        onPress={distinction_redirect}
       >
         <Text
           style={[
@@ -351,7 +350,6 @@ export default function THINGY2() {
           <Ionicons name="log-out-outline" size={24} color="#FF3B30" />{" "}
         </Text>
       </TouchableOpacity>
-
       <NavBar />
     </View>
   );

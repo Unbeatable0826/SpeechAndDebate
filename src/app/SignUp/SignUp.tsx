@@ -267,7 +267,9 @@ export default function THINGY1() {
         await signInWithEmailAndPassword(auth, email, password);
         const thing = await getDoc(doc(db, "users", auth.currentUser.uid));
         await AsyncStorage.setItem("theme", thing.data().Skin);
-
+        await AsyncStorage.setItem("messages", thing.data().Message_Updates);
+        await AsyncStorage.setItem("results", thing.data().Result_Updates);
+        await AsyncStorage.setItem("timer", thing.data().Timer_Alarm);
         router.replace("../Home/Home");
       }
     }
@@ -281,9 +283,13 @@ export default function THINGY1() {
         uid: cred.user.uid,
         skin: "light",
         Message_Updates: "on",
+        Result_Updates: "on",
+        Timer_Alarm: "on",
       });
       await AsyncStorage.setItem("theme", "light ");
-
+      await AsyncStorage.setItem("messages", "on");
+      await AsyncStorage.setItem("results", "on");
+      await AsyncStorage.setItem("timer", "on");
       router.replace("../Home/Home");
     }
     setloading(false);

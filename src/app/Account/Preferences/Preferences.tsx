@@ -5,22 +5,25 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 // import { StyleSheet, View } from "react-native"; this is now an old one
 import Fontisto from "@expo/vector-icons/Fontisto";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore"; //SO THIS STUPID AHH AI PRETIFIER OR SOME GARBAGE KEEPS REMOVING MY IMPorts and idk how to stop it :(((((((((((((((((((((((())))))))))))))))))))))))
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { auth, db } from "../../../../firebaseConfig.js";
-
+// import Ionicons from '@expo/vector-icons/Ionicons';
 // Current preferences --> store in firebase database so no renewal and major problems during re-login
 // DARK AND LIGHT
 // Message Updates
-// Notifications for feedback
+// Notifications for feedbackF
 // Timer alarm, On or off
 export default function THINGY6() {
   const router = useRouter();
+  const [timer, settimer] = useState(true);
   const [light_dark, setld] = useState(false);
   const [messages, setm] = useState(true);
+  const [results, setr] = useState(true);
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -88,6 +91,20 @@ export default function THINGY6() {
     });
     await AsyncStorage.setItem("messages", !messages ? "on" : "off");
     setm(!messages);
+  };
+  const changeresults = async () => {
+    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+      Result_Updates: results ? "off" : "on",
+    });
+    await AsyncStorage.setItem("results", !results ? "on" : "off");
+    setr(!results);
+  };
+  const timerchange = async () => {
+    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+      Timer_Alarm: timer ? "off" : "on",
+    });
+    await AsyncStorage.setItem("timer", !timer ? "on" : "off");
+    settimer(!timer);
   };
 
   return (
@@ -171,6 +188,66 @@ export default function THINGY6() {
           onValueChange={message_update}
         />
       </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.rupdates,
+          { borderColor: !light_dark ? "black" : "white" },
+        ]}
+        onPress={changeresults}
+      >
+        <Text
+          style={[styles.randf, { color: !light_dark ? "black" : "white" }]}
+        >
+          Tourney Result & Feedback
+        </Text>
+        <Ionicons
+          name="notifications"
+          size={24}
+          color={light_dark ? "white" : "black"}
+          style={{ marginLeft: 20 }}
+        />
+        <Switch
+          value={results}
+          trackColor={{ false: "#767577", true: "#b9bbbe" }}
+          thumbColor={!results ? "#ffffff" : "#292729"}
+          ios_backgroundColor="#3e3e3e"
+          style={styles.rupdates_2}
+          onValueChange={changeresults}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.timer_alarm,
+          {
+            borderColor: !light_dark ? "black" : "white",
+          },
+        ]}
+        onPress={timerchange}
+      >
+        <Text
+          style={{
+            marginLeft: 10,
+            color: !light_dark ? "black" : "white",
+            fontSize: 20,
+          }}
+        >
+          Timer alarm
+        </Text>
+        <Ionicons
+          name="timer"
+          size={24}
+          color={light_dark ? "white" : "black"}
+          style={{ marginLeft: 160 }}
+        />
+        <Switch
+          value={timer}
+          trackColor={{ false: "#767577", true: "#b9bbbe" }}
+          thumbColor={!timer ? "#ffffff" : "#292729"}
+          ios_backgroundColor="#3e3e3e"
+          style={styles.rupdates_2}
+          onValueChange={timerchange}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -181,6 +258,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   under: {
+    fontSize: 20,
+    marginLeft: 10,
+  },
+  randf: {
     fontSize: 20,
     marginLeft: 10,
   },
@@ -209,5 +290,24 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 10,
     transform: [{ scaleX: 1.4 }, { scaleY: 1.4 }],
+  },
+  rupdates: {
+    marginTop: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  rupdates_2: {
+    marginLeft: 5,
+    marginRight: 10,
+    transform: [{ scaleX: 1.4 }, { scaleY: 1.4 }],
+  },
+  timer_alarm: {
+    marginTop: 25,
+    borderWidth: 1,
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
