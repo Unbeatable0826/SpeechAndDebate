@@ -1,3 +1,4 @@
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
@@ -19,6 +20,7 @@ import { auth, db } from "../../../../firebaseConfig.js";
 export default function THINGY6() {
   const router = useRouter();
   const [light_dark, setld] = useState(false);
+  const [messages, setm] = useState(true);
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -80,6 +82,13 @@ export default function THINGY6() {
     await AsyncStorage.setItem("theme", !light_dark ? "dark" : "light");
     await setld(!light_dark);
   };
+  const message_update = async () => {
+    updateDoc(doc(db, "users", auth.currentUser.uid), {
+      Message_Updates: messages ? "off" : "on",
+    });
+    await AsyncStorage.setItem("messages", !messages ? "on" : "off");
+    setm(!messages);
+  };
 
   return (
     <View
@@ -135,6 +144,33 @@ export default function THINGY6() {
           style={{ marginLeft: 10, color: light_dark ? "white" : "black" }}
         />
       </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.mupdates,
+          { borderColor: !light_dark ? "black" : "white" },
+        ]}
+        onPress={message_update}
+      >
+        <Text
+          style={[styles.under, { color: !light_dark ? "black" : "white" }]}
+        >
+          Message Notifications
+        </Text>
+        <MaterialCommunityIcons
+          name="message-alert"
+          size={24}
+          color={light_dark ? "white" : "black"}
+          style={{ marginLeft: 60 }}
+        />
+        <Switch
+          value={messages}
+          trackColor={{ false: "#767577", true: "#b9bbbe" }}
+          thumbColor={!messages ? "#ffffff" : "#292729"}
+          ios_backgroundColor="#3e3e3e"
+          style={styles.mupdates_2}
+          onValueChange={message_update}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -143,6 +179,10 @@ const styles = StyleSheet.create({
     color: "black",
     flex: 1,
     alignItems: "center",
+  },
+  under: {
+    fontSize: 20,
+    marginLeft: 10,
   },
   light_d: {
     marginLeft: 10,
@@ -155,7 +195,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
   },
+  mupdates: {
+    marginTop: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 10,
+  },
   theme: {
     fontSize: 20,
+  },
+  mupdates_2: {
+    marginLeft: 5,
+    marginRight: 10,
+    transform: [{ scaleX: 1.4 }, { scaleY: 1.4 }],
   },
 });

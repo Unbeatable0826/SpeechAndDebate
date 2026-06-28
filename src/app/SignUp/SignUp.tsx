@@ -280,6 +280,7 @@ export default function THINGY1() {
         Skin: "light",
         uid: cred.user.uid,
         skin: "light",
+        Message_Updates: "on",
       });
       await AsyncStorage.setItem("theme", "light ");
 
