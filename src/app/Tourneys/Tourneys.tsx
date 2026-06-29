@@ -1,28 +1,44 @@
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Stack, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-    BackHandler,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  BackHandler,
+  Easing,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-
 import { auth } from "../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../NavBar";
+
 //Home Featureset
 //
 export default function THINGY2() {
   const router = useRouter();
+  const [ontop, setontop] = useState(false);
   const [name, setName] = useState("");
   const [tourneys, setTourneys] = useState([]);
+  const [light_dark, setld] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   let bop = "";
+
+  useEffect(() => {
+    const workpls = async () => {
+      const temp = await AsyncStorage.getItem("theme");
+      const temp_2 = !(temp == "light");
+      setld(temp_2);
+    };
+    workpls();
+  }, []);
 
   useEffect(() => {
     const goback = () => {
@@ -275,9 +291,62 @@ export default function THINGY2() {
       }
     });
   }, []);
+  const overlayyes = () => {
+    if (ontop) {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start(() => setontop(false));
+    } else {
+      setontop(true);
+    }
+  };
+  useEffect(() => {
+    if (ontop) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [ontop]);
+
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: light_dark ? "rgb(21, 20, 20)" : "white",
+      }}
+    >
+      <Stack.Screen
+        options={{
+          title: "Tournaments",
+          headerStyle: {
+            backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
+          },
+          headerTintColor: light_dark ? "#ffffff" : "black",
+        }}
+      />
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 10,
+        }}
+      >
+        <TouchableOpacity onPress={overlayyes}>
+          <FontAwesome5
+            name="filter"
+            size={24}
+            color={light_dark ? "white" : "black"}
+            style={{ marginLeft: 330 }}
+          />
+        </TouchableOpacity>
+      </View>
+      <ScrollView style={{ flex: 1, marginTop: 10 }}>
         {tourneys.map((thingy) => {
           let registration_color = "green";
           if (
@@ -288,16 +357,39 @@ export default function THINGY2() {
           }
           return (
             <TouchableOpacity
-              style={styles.tourneyButton}
+              style={[
+                styles.tourneyButton,
+                {
+                  backgroundColor: light_dark ? "rgb(0, 0, 0)" : "lightgray",
+                  borderColor: light_dark ? "white" : "black",
+                  borderWidth: 0,
+                  shadowColor: light_dark ? "white" : "black",
+                  shadowOffset: { width: 1, height: 2 },
+                  shadowOpacity: 0.8,
+                  shadowRadius: 5,
+                  elevation: 3,
+                },
+              ]}
               key={thingy.reference}
+              onPress={() => {
+                //SHOULD REDIRECT TO TOURNAMENT PAGE// LATER PROBLEM
+              }}
             >
               <View>
                 <Text style={{ color: "blue" }}>Date: {thingy.date}</Text>
-                <Text>Name: {thingy.name}</Text>
-                <Text>City: {thingy.city}</Text>
-                <Text>State: {thingy.state}</Text>
+                <Text style={{ color: light_dark ? "white" : "black" }}>
+                  Name: {thingy.name}
+                </Text>
+                <Text style={{ color: light_dark ? "white" : "black" }}>
+                  City: {thingy.city}
+                </Text>
+                <Text style={{ color: light_dark ? "white" : "black" }}>
+                  State: {thingy.state}
+                </Text>
                 <View style={{ flex: 1, flexDirection: "row" }}>
-                  <Text>Type:</Text>
+                  <Text style={{ color: light_dark ? "white" : "black" }}>
+                    Type:
+                  </Text>
                   <MaterialIcons
                     display={
                       thingy.tipe == "O" || thingy.tipe == "PO"
@@ -312,7 +404,7 @@ export default function THINGY2() {
                     name="person-circle-question"
                     size={24}
                     display={thingy.tipe == "Unknown" ? "flex" : "none"}
-                    color="black"
+                    color={light_dark ? "white" : "black"}
                   />
                   <FontAwesome6
                     name="person"
@@ -322,7 +414,7 @@ export default function THINGY2() {
                         ? "flex"
                         : "none"
                     }
-                    color="black"
+                    color={light_dark ? "white" : "black"}
                   />
                 </View>
                 <Text style={{ color: registration_color }}>
@@ -334,6 +426,15 @@ export default function THINGY2() {
         })}
       </ScrollView>
       <NavBar />
+      <Animated.View
+        style={[
+          styles.ontop,
+          {
+            display: ontop ? "flex" : "none",
+            opacity: fadeAnim,
+          },
+        ]}
+      ></Animated.View>
     </View>
   );
 }
@@ -348,5 +449,15 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 15,
     borderRadius: 15,
+  },
+  ontop: {
+    position: "absolute",
+    bottom: 200,
+    width: "85%",
+    borderRadius: 15,
+    marginLeft: "7.5%",
+    transitionDuration: "0.5s",
+    height: "50%",
+    backgroundColor: "white",
   },
 });
