@@ -1,14 +1,8 @@
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import {
-    onAuthStateChanged
-} from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import {
-    StyleSheet,
-    Text,
-    View
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { auth } from "../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../NavBar";

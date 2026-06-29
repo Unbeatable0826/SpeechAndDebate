@@ -61,20 +61,28 @@ export default function THINGY6() {
           router.replace("/");
         }
       } else {
-        alert(
-          "UMM SOMETHING HORRIBLE HAS HAPPENED< ANDDD IT NO GOOD. RESTART APP.",
-        );
+        // alert(
+        //   "UMM SOMETHING HORRIBLE HAS HAPPENED< ANDDD IT NO GOOD. RESTART APP.",
+        // );
       }
     });
   }, []);
   useEffect(() => {
-    const light_or_dark = async () => {
-      console.log(AsyncStorage.getItem("theme"));
+    const preferences = async () => {
       const temp = await AsyncStorage.getItem("theme");
       const temp_2 = temp == "light" ? false : true;
       setld(temp_2);
+      const temp_3 = await AsyncStorage.getItem("messages");
+      const temp_4 = temp_3 == "on" ? true : false;
+      setm(temp_4);
+      const temp_5 = await AsyncStorage.getItem("results");
+      const temp_6 = temp_5 == "on" ? true : false;
+      setr(temp_6);
+      const temp_7 = await AsyncStorage.getItem("timer");
+      const temp_8 = temp_7 == "on" ? true : false;
+      settimer(temp_8);
     };
-    light_or_dark();
+    preferences();
   }, []);
 
   const lightd = async () => {

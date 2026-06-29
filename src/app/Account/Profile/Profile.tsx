@@ -646,7 +646,7 @@ export default function THINGY5() {
           <TouchableOpacity onPress={saving} style={styles.saving_but}>
             <Text style={{ fontSize: 17, color: "white" }}>Save</Text>
           </TouchableOpacity>
-          {/* BRUV TABROOM doesn't check if any of these inputs are valid :::::::: */}
+          {/* BRUV TABROOM doesn't check if any of these inputs are valid  */}
           <Text></Text>
           <Text></Text>
           <Text></Text>
