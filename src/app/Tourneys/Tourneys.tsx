@@ -1,8 +1,18 @@
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { BackHandler, StyleSheet, View } from "react-native";
+import {
+    BackHandler,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+
 import { auth } from "../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../NavBar";
@@ -13,13 +23,7 @@ export default function THINGY2() {
   const [name, setName] = useState("");
   const [tourneys, setTourneys] = useState([]);
   let bop = "";
-  const styles = StyleSheet.create({
-    nombre: {
-      fontSize: 50,
-      marginTop: 10,
-      fontFamily: "Petemoss",
-    },
-  });
+
   useEffect(() => {
     const goback = () => {
       router.back();
@@ -96,18 +100,36 @@ export default function THINGY2() {
           for (let i = 0; i < temp.length; i++) {
             if (temp[i].includes("padleft full padrightless")) {
               const type = temp[i + 25].trim();
-              let type2 = "";
-              if (type.includes("span")) {
-                type2 = "Unknown";
-              } else {
-                type2 = type;
+              let type2 = "Unknown";
+              let t1 = false;
+              let t2 = false;
+              for (let k = i + 1; k < temp.length; k++) {
+                if (temp[k].includes("padleft full padrightless")) {
+                  break;
+                }
+                if (temp[k].includes("Tournament has online events")) {
+                  t2 = true;
+                }
+                if (temp[k].includes("Tournament has in-person events")) {
+                  t1 = true;
+                }
               }
+
+              if (t1 && t2) {
+                type2 = "PO";
+              } else if (t1) {
+                type2 = "P";
+              } else if (t2) {
+                type2 = "O";
+              }
+
               let type3 = "";
               for (let j = i + 1; j < temp.length; j++) {
                 if (temp[j].includes("padleft full padrightless")) {
                   break;
                 } else if (temp[j].includes("greentext semibold fifth")) {
-                  console.log(
+                  type3 +=
+                    " " +
                     temp[j]
                       .trim()
                       .replace("greentext semibold fifth", "")
@@ -121,8 +143,109 @@ export default function THINGY2() {
                       .trim()
                       .replaceAll("<", "")
                       .trim()
-                      .replaceAll('"', ""),
-                  );
+                      .replaceAll('"', "");
+
+                  type3 +=
+                    " " +
+                    temp[j + 1]
+                      .trim()
+                      .replace("quarter centeralign", "")
+                      .trim()
+                      .replaceAll("/span", "")
+                      .replaceAll("span", "")
+                      .trim()
+                      .replaceAll("class=", "")
+                      .trim()
+                      .replaceAll(">", "")
+                      .trim()
+                      .replaceAll("<", "")
+                      .trim()
+                      .replaceAll('"', "");
+
+                  type3 +=
+                    " " +
+                    temp[j + 2]
+                      .trim()
+                      .replace("half grow nowrap padrightless", "")
+                      .trim()
+                      .replaceAll("span", "")
+                      .trim()
+                      .replaceAll("class=", "")
+                      .trim()
+                      .replaceAll("/", "")
+                      .replaceAll(">", "")
+                      .trim()
+                      .replaceAll("<", "")
+                      .trim()
+                      .replaceAll('"', "");
+                } else if (
+                  temp[j].includes("redtext full centeralign semibold")
+                ) {
+                  type3 =
+                    "" +
+                    temp[j]
+                      .trim()
+                      .replace("redtext full centeralign semibold", "")
+                      .trim()
+                      .replaceAll("span", "")
+                      .trim()
+                      .replaceAll("class=", "")
+                      .trim()
+                      .replaceAll("/", "")
+                      .replaceAll(">", "")
+                      .trim()
+                      .replaceAll("<", "")
+                      .trim()
+                      .replaceAll('"', "");
+                } else if (temp[j].includes("orangetext semibold fifth")) {
+                  type3 +=
+                    "" +
+                    temp[j]
+                      .trim()
+                      .replace("orangetext semibold fifth", "")
+                      .trim()
+                      .replaceAll("span", "")
+                      .replaceAll("/", "")
+                      .trim()
+                      .replaceAll("class=", "")
+                      .trim()
+                      .replaceAll(">", "")
+                      .trim()
+                      .replaceAll("<", "")
+                      .trim()
+                      .replaceAll('"', "");
+                  type3 +=
+                    " " +
+                    temp[j + 1]
+                      .trim()
+                      .replace("quarter centeralign", "")
+                      .trim()
+                      .replaceAll("/span", "")
+                      .replaceAll("span", "")
+                      .trim()
+                      .replaceAll("class=", "")
+                      .trim()
+                      .replaceAll(">", "")
+                      .trim()
+                      .replaceAll("<", "")
+                      .trim()
+                      .replaceAll('"', "");
+                  type3 +=
+                    " " +
+                    temp[j + 2]
+                      .trim()
+                      .replace("half", "")
+                      .trim()
+                      .replaceAll("span", "")
+                      .trim()
+                      .replaceAll("class=", "")
+                      .trim()
+                      .replaceAll("/", "")
+                      .replaceAll(">", "")
+                      .trim()
+                      .replaceAll("<", "")
+                      .trim()
+                      .replaceAll('"', "");
                 }
               }
 
@@ -139,9 +262,11 @@ export default function THINGY2() {
                 city: temp[i + 10].trim(),
                 state: temp[i + 19].trim(),
                 tipe: type2,
+                registration: type3,
               });
             }
           }
+          setTourneys(temp_tourney);
         } catch (e) {
           router.replace("/");
         }
@@ -152,7 +277,76 @@ export default function THINGY2() {
   }, []);
   return (
     <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }}>
+        {tourneys.map((thingy) => {
+          let registration_color = "green";
+          if (
+            thingy.registration.includes("Closed") ||
+            thingy.registration.includes("No open registration")
+          ) {
+            registration_color = "red";
+          }
+          return (
+            <TouchableOpacity
+              style={styles.tourneyButton}
+              key={thingy.reference}
+            >
+              <View>
+                <Text style={{ color: "blue" }}>Date: {thingy.date}</Text>
+                <Text>Name: {thingy.name}</Text>
+                <Text>City: {thingy.city}</Text>
+                <Text>State: {thingy.state}</Text>
+                <View style={{ flex: 1, flexDirection: "row" }}>
+                  <Text>Type:</Text>
+                  <MaterialIcons
+                    display={
+                      thingy.tipe == "O" || thingy.tipe == "PO"
+                        ? "flex"
+                        : "none"
+                    }
+                    name="computer"
+                    size={24}
+                    color="blue"
+                  />
+                  <FontAwesome6
+                    name="person-circle-question"
+                    size={24}
+                    display={thingy.tipe == "Unknown" ? "flex" : "none"}
+                    color="black"
+                  />
+                  <FontAwesome6
+                    name="person"
+                    size={24}
+                    display={
+                      thingy.tipe == "P" || thingy.tipe == "PO"
+                        ? "flex"
+                        : "none"
+                    }
+                    color="black"
+                  />
+                </View>
+                <Text style={{ color: registration_color }}>
+                  Registration: {thingy.registration}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
       <NavBar />
     </View>
   );
 }
+const styles = StyleSheet.create({
+  nombre: {
+    fontSize: 50,
+    marginTop: 10,
+    fontFamily: "Petemoss",
+  },
+  tourneyButton: {
+    backgroundColor: "lightgray",
+    padding: 10,
+    margin: 15,
+    borderRadius: 15,
+  },
+});
