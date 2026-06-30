@@ -29,7 +29,7 @@ export default function THINGY2() {
   const [circuit_data, setCircuitData] = useState([
     { label: "All", value: "" },
   ]);
-  const [year, setYear] = useState("");
+  const [year, setYear] = useState("0");
   const [state, setState] = useState("");
   const [country, setCountry] = useState("");
   const router = useRouter();
@@ -295,7 +295,7 @@ export default function THINGY2() {
               temp[i].includes("this.form.submit()") &&
               filter_ran == 0
             ) {
-              let temp_circuit = [{ value: "All", label: "All" }];
+              let temp_circuit = [{ value: "", label: "All" }];
               console.log(temp[i + 9]); // HAS 4
               for (let j = i + 8; j < temp.length; j++) {
                 if (temp[j].includes("option") && temp[j].includes("=")) {
@@ -371,16 +371,36 @@ export default function THINGY2() {
     setTourneys(temp);
   };
 
-  const new_query_fetch = async () => {
-    console.log(circuit);
+  const new_query_fetch = async (thing, valop) => {
     const thingy = await SecureStore.getItemAsync("cookie");
     let gop = new URLSearchParams();
     gop.append("circuit_id", circuit);
-    gop.append("year", year);
-    gop.append("state", state);
-    gop.append("country", country);
+    if (valop === "circuit") {
+      gop.append("circuit_id", thing);
+      gop.append("year", year);
+      gop.append("state", state);
+      gop.append("country", country);
+    } else if (valop === "year") {
+      gop.append("circuit_id", circuit);
+      gop.append("state", state);
+      gop.append("country", country);
+      gop.append("year", thing);
+    } else if (valop === "state") {
+      gop.append("state", thing);
+      gop.append("year", year);
+      gop.append("circuit_id", circuit);
+      gop.append("country", country);
+    } else if (valop === "country") {
+      gop.append("circuit_id", circuit);
+      gop.append("year", year);
+      gop.append("state", state);
+      gop.append("country", thing);
+    }
+    // IT FREEKING WORKS; FINALLY
+
     let tourney_header = {
       Host: "www.tabroom.com",
+      "Content-Type": "application/x-www-form-urlencoded",
       Cookie: thingy,
       "Accept-Language": "en-US,en;q=0.9",
       "Upgrade-Insecure-Requests": "1",
@@ -403,7 +423,6 @@ export default function THINGY2() {
         method: "POST",
         headers: tourney_header,
         body: gop,
-        redirect: "follow",
       },
     );
 
@@ -411,6 +430,7 @@ export default function THINGY2() {
     const temp = tourney_result.split("\n");
     let temp_tourney = [];
     for (let i = 0; i < temp.length; i++) {
+      // console.log(temp[i]);
       if (temp[i].includes("padleft full padrightless")) {
         const type = temp[i + 25].trim();
         let type2 = "Unknown";
@@ -559,7 +579,7 @@ export default function THINGY2() {
                 .replaceAll('"', "");
           }
         }
-
+        console.log("WORK");
         temp_tourney.push({
           date: temp[i - 11].trim(),
           name: temp[i + 1].trim(),
@@ -578,13 +598,14 @@ export default function THINGY2() {
         });
       }
     }
+    console.log(temp_tourney);
     setTourneys(temp_tourney);
   };
 
   const circuit_value = (item) => {
     console.log("ChANGIN");
     setCircuit(item.value);
-    new_query_fetch();
+    new_query_fetch(item.value, "circuit");
   };
 
   //THAT ACTUALLY WORKS REALLY WELL
