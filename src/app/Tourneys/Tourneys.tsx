@@ -25,9 +25,9 @@ import NavBar from "../NavBar";
 //Home Featureset
 //
 export default function THINGY2() {
-  const [circuit, setCircuit] = useState("All");
+  const [circuit, setCircuit] = useState("");
   const [circuit_data, setCircuitData] = useState([
-    { label: "All", value: "" },
+    { label: "Upcoming", value: "" },
   ]);
   const [year, setYear] = useState("0");
   const [state, setState] = useState("");
@@ -36,6 +36,9 @@ export default function THINGY2() {
   const [ontop, setontop] = useState(false);
   // const [name, setName] = useState("");
   const [tourneys, setTourneys] = useState([]);
+  const [yr, setyrdata] = useState([{ value: "", label: "Upcoming" }]);
+  const [counter, setcounter] = useState([{ value: "", label: "Upcoming" }]);
+  const [statep, setdatas] = useState([{ value: "", label: "Upcoming" }]);
   const [light_dark, setld] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   let bop = "";
@@ -295,7 +298,7 @@ export default function THINGY2() {
               temp[i].includes("this.form.submit()") &&
               filter_ran == 0
             ) {
-              let temp_circuit = [{ value: "", label: "All" }];
+              let temp_circuit = [{ value: "", label: "Upcoming" }];
               console.log(temp[i + 9]); // HAS 4
               for (let j = i + 8; j < temp.length; j++) {
                 if (temp[j].includes("option") && temp[j].includes("=")) {
@@ -320,6 +323,96 @@ export default function THINGY2() {
                 }
               }
               setCircuitData(temp_circuit);
+              filter_ran += 1;
+            } else if (
+              temp[i].includes("this.form.submit()") &&
+              filter_ran == 1
+            ) {
+              let temp_year = [{ value: "0", label: "Upcoming" }];
+              for (let f = i + 6; f < temp.length; f++) {
+                if (temp[f].includes("this.form.submit()")) {
+                  break;
+                }
+                if (temp[f].includes("option") && temp[f].includes("=")) {
+                  const temp23 = temp[f]
+                    .trim()
+                    .replace("option", "")
+                    .trim()
+                    .replaceAll(">", "")
+                    .trim()
+                    .replaceAll("<", "")
+                    .trim()
+                    .replaceAll('"', "")
+                    .trim()
+                    .replace("value", "")
+                    .trim()
+                    .replace("=", "")
+                    .trim();
+                  temp_year.push({ value: temp23, label: temp23 });
+                }
+              }
+              setyrdata(temp_year);
+              filter_ran += 1;
+            } else if (
+              temp[i].includes("this.form.submit()") &&
+              filter_ran == 2
+            ) {
+              let temp3 = [{ value: "", label: "Upcoming" }];
+              for (let g = i + 6; g < temp.length; g++) {
+                if (temp[g].includes("this.form.submit()")) {
+                  break;
+                }
+                console.log(temp[g]);
+                if (temp[g].includes("value") && temp[g].includes("=")) {
+                  const temp9 = temp[g]
+                    .trim()
+                    .replace("value", "")
+                    .replace("=", "")
+                    .trim()
+                    .replaceAll('"', "")
+                    .trim();
+                  const temp10 = temp[g + 2].trim().replace(">", "").trim();
+                  // const temp9 = temp[g]
+                  //   .trim()
+                  //   .replace("option", "")
+                  //   .trim()
+                  //   .replaceAll(">", "")
+                  //   .trim()
+                  //   .replaceAll("<", "")
+                  //   .trim()
+                  //   .replaceAll('"', "")
+                  //   .trim()
+                  //   .replace("value", "")
+                  //   .trim()
+                  //   .replace("=", "")
+                  //   .trim();
+                  temp3.push({ value: temp9, label: temp10 });
+                }
+              }
+              setdatas(temp3);
+              filter_ran += 1;
+            } else if (
+              temp[i].includes("this.form.submit()") &&
+              filter_ran == 3
+            ) {
+              let temp4 = [{ value: "", label: "Upcoming" }];
+              for (let h = i + 6; h < temp.length; h++) {
+                if (temp[h].includes('src="/lib/javascript/slick.min.js"')) {
+                  break;
+                }
+                if (temp[h].includes("value") && temp[h].includes("=")) {
+                  const temp11 = temp[h]
+                    .trim()
+                    .replace("value", "")
+                    .replace("=", "")
+                    .trim()
+                    .replaceAll('"', "")
+                    .trim();
+                  const temp12 = temp[h + 2].trim().replace(">", "").trim();
+                  temp4.push({ value: temp11, label: temp12 });
+                }
+              }
+              setcounter(temp4);
               filter_ran += 1;
             }
           }
@@ -374,7 +467,7 @@ export default function THINGY2() {
   const new_query_fetch = async (thing, valop) => {
     const thingy = await SecureStore.getItemAsync("cookie");
     let gop = new URLSearchParams();
-    gop.append("circuit_id", circuit);
+    // gop.append("circuit_id", circuit);
     if (valop === "circuit") {
       gop.append("circuit_id", thing);
       gop.append("year", year);
@@ -397,6 +490,7 @@ export default function THINGY2() {
       gop.append("country", thing);
     }
     // IT FREEKING WORKS; FINALLY
+    console.log(gop.toString());
 
     let tourney_header = {
       Host: "www.tabroom.com",
@@ -603,9 +697,22 @@ export default function THINGY2() {
   };
 
   const circuit_value = (item) => {
-    console.log("ChANGIN");
+    // console.log("ChANGIN");
     setCircuit(item.value);
     new_query_fetch(item.value, "circuit");
+  };
+  const year_value = (item) => {
+    setYear(item.value);
+    new_query_fetch(item.value, "year");
+  };
+  const state_value = (item) => {
+    console.log(item.value);
+    setState(item.value);
+    new_query_fetch(item.value, "state");
+  };
+  const country_value = (item) => {
+    setCountry(item.value);
+    new_query_fetch(item.value, "country");
   };
 
   //THAT ACTUALLY WORKS REALLY WELL
@@ -767,7 +874,7 @@ export default function THINGY2() {
             placeholderStyle={[
               styles.placeholderStyle,
               {
-                color: !light_dark ? "rgb(100,100,100)" : "black",
+                color: light_dark ? "white" : "black",
               },
             ]}
             style={[
@@ -794,16 +901,94 @@ export default function THINGY2() {
           <Text style={{ color: light_dark ? "white" : "black", fontSize: 20 }}>
             School year Ending:
           </Text>
+          <Dropdown
+            placeholderStyle={[
+              styles.placeholderStyle,
+              {
+                color: light_dark ? "white" : "black",
+              },
+            ]}
+            style={[
+              styles.dropdown,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
+            onChange={year_value}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={yr}
+            labelField="label"
+            autoScroll={false}
+            valueField="value"
+            placeholder="Select Year"
+            value={year}
+            search={true}
+          />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ color: light_dark ? "white" : "black", fontSize: 20 }}>
             States/Provinces:
           </Text>
+          <Dropdown
+            placeholderStyle={[
+              styles.placeholderStyle,
+              {
+                color: light_dark ? "white" : "black",
+              },
+            ]}
+            style={[
+              styles.dropdown,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
+            onChange={state_value}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={statep}
+            labelField="label"
+            autoScroll={false}
+            valueField="value"
+            placeholder="Select State/Province"
+            value={state}
+            search={true}
+          />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ color: light_dark ? "white" : "black", fontSize: 20 }}>
             Countries:{" "}
           </Text>
+          <Dropdown
+            placeholderStyle={[
+              styles.placeholderStyle,
+              {
+                color: light_dark ? "white" : "black",
+              },
+            ]}
+            style={[
+              styles.dropdown,
+              {
+                backgroundColor: light_dark
+                  ? "rgb(46,45,45)"
+                  : "rgb(255,250,250)",
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
+            onChange={country_value}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={counter}
+            labelField="label"
+            autoScroll={false}
+            valueField="value"
+            placeholder="Select Country"
+            value={country}
+            search={true}
+          />
         </View>
       </Animated.View>
     </View>
@@ -839,6 +1024,7 @@ const styles = StyleSheet.create({
     width: "90%",
     marginLeft: 20,
     borderWidth: 1,
+    marginTop: 10,
     padding: 8,
     borderRadius: 10,
     backgroundColor: "rgb(255, 250, 250)",
