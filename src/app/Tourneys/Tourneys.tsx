@@ -760,7 +760,7 @@ export default function THINGY2() {
     const result = await request.text();
     const plop = result.split("\n");
     let temp_tourney = [];
-    let isnew = false;
+    let seen = false;
 
     for (let i = 0; i < plop.length; i++) {
       if (
@@ -782,6 +782,7 @@ export default function THINGY2() {
           }
           if (plop[j].includes("data-text")) {
             thing23 = plop[j + 1].trim().replace("&ndash;", "-").trim();
+            seen = true;
           }
 
           if (
@@ -807,13 +808,11 @@ export default function THINGY2() {
               .replaceAll("/", "")
               .trim()
               .replaceAll("'", "");
-            isnew = true;
           }
           if (
             plop[j].includes(
               "padleft padright half smaller nospace padvertless nowrap",
-            ) &&
-            isnew == true
+            )
           ) {
             yummy = plop[j]
               .replaceAll(
@@ -833,8 +832,15 @@ export default function THINGY2() {
               .replaceAll("/", "")
               .trim()
               .replaceAll("'", "");
+            const current = yummy.split("  ");
+            for (let k = 0; k < current.length; k++) {
+              if (current[k].includes("title=")) {
+                const temp783589 = current[k].split("=");
+                temp393.push(temp783589[1].trim().replaceAll('"', "").trim());
+              }
+            }
+            console.log(temp393);
           }
-          console.log(yummy + "YUM");
           // console.log(yummy.split("  "));
           // const banana = yummy.split("  ");
           // for (let k = 0; k < banana.length; k++) {
@@ -848,7 +854,6 @@ export default function THINGY2() {
           //     );
           //   }
           // }
-          isnew = false;
         }
         let temp33 = plop[i + 9].trim() + plop[i + 11].trim();
         if (plop[i + 9].trim() == ",") {
@@ -861,6 +866,10 @@ export default function THINGY2() {
           reference: plop[i + 1]
             .trim()
             .replace('href="/index/tourn/index.mhtml?tourn_id=', "")
+            .replace(" ", "")
+            .replaceAll("href", "")
+            .replace('"/index/tourn/index.mhtml?tourn_id=', "")
+            .trim()
             .replace('"', " ")
             .replace("=", "")
             .trim(),
@@ -871,6 +880,7 @@ export default function THINGY2() {
         });
       }
     }
+
     console.log(temp_tourney);
   };
 
