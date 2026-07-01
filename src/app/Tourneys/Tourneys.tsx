@@ -10,11 +10,13 @@ import {
   Animated,
   BackHandler,
   Easing,
+  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { auth } from "../../../firebaseConfig.js";
@@ -29,6 +31,7 @@ export default function THINGY2() {
   const [circuit_data, setCircuitData] = useState([
     { label: "Upcoming", value: "" },
   ]);
+  const [hardsearch, sethardsearch] = useState("");
   const [year, setYear] = useState("0");
   const [state, setState] = useState("");
   const [country, setCountry] = useState("");
@@ -299,7 +302,7 @@ export default function THINGY2() {
               filter_ran == 0
             ) {
               let temp_circuit = [{ value: "", label: "Upcoming" }];
-              console.log(temp[i + 9]); // HAS 4
+              // console.log(temp[i + 9]); // HAS 4
               for (let j = i + 8; j < temp.length; j++) {
                 if (temp[j].includes("option") && temp[j].includes("=")) {
                   const temp1 = temp[j]
@@ -362,7 +365,7 @@ export default function THINGY2() {
                 if (temp[g].includes("this.form.submit()")) {
                   break;
                 }
-                console.log(temp[g]);
+                // console.log(temp[g]);
                 if (temp[g].includes("value") && temp[g].includes("=")) {
                   const temp9 = temp[g]
                     .trim()
@@ -421,7 +424,7 @@ export default function THINGY2() {
           router.replace("/");
         }
       } else {
-        console.log("WROMG");
+        // console.log("WROMG");
       }
     });
   }, []);
@@ -463,6 +466,9 @@ export default function THINGY2() {
     });
     setTourneys(temp);
   };
+  const searchhhh = (text) => {
+    sethardsearch(text);
+  };
 
   const new_query_fetch = async (thing, valop) => {
     const thingy = await SecureStore.getItemAsync("cookie");
@@ -490,7 +496,7 @@ export default function THINGY2() {
       gop.append("country", thing);
     }
     // IT FREEKING WORKS; FINALLY
-    console.log(gop.toString());
+    // console.log(gop.toString());
 
     let tourney_header = {
       Host: "www.tabroom.com",
@@ -692,7 +698,6 @@ export default function THINGY2() {
         });
       }
     }
-    console.log(temp_tourney);
     setTourneys(temp_tourney);
   };
 
@@ -714,284 +719,511 @@ export default function THINGY2() {
     setCountry(item.value);
     new_query_fetch(item.value, "country");
   };
+  const searchthing = async (thing) => {
+    Keyboard.dismiss();
+    setCircuit("");
+    setYear("0");
+    setState("");
+    setCountry("");
+    const thingys = await SecureStore.getItemAsync("cookie");
+    const headers = {
+      Host: "www.tabroom.com",
+      Cookie: thingys,
+      "Cache-Control": "max-age=0",
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      Origin: "https://www.tabroom.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Referer: "https://www.tabroom.com/index/index.mhtml",
+      Priority: "u=0, i",
+    };
+    let hoop = new URLSearchParams();
+    hoop.append("search", thing);
+    hoop.append("tourn_id", "");
+    hoop.append("caller", "/index/search.mhtml");
+    const request = await fetch("https://www.tabroom.com/index/search.mhtml", {
+      method: "POST",
+      headers: headers,
+      body: hoop,
+    });
+    const result = await request.text();
+    const plop = result.split("\n");
+    let temp_tourney = [];
+    let isnew = false;
+
+    for (let i = 0; i < plop.length; i++) {
+      if (
+        plop[i].includes(
+          "bluetext semibold full padvertless link-underline hover padleft",
+        )
+      ) {
+        let thing23 = "";
+        let yummy = "";
+        let temp393 = [];
+        let thingy24 = "";
+        for (let j = i + 1; j < plop.length; j++) {
+          if (
+            plop[j].includes(
+              "bluetext semibold full padvertless link-underline hover padleft",
+            )
+          ) {
+            break;
+          }
+          if (plop[j].includes("data-text")) {
+            thing23 = plop[j + 1].trim().replace("&ndash;", "-").trim();
+          }
+
+          if (
+            plop[j].includes(
+              "full centeralign padvertless padleft padright nowrap",
+            )
+          ) {
+            thingy24 = plop[j]
+              .replaceAll(
+                "full centeralign padvertless padleft padright nowrap",
+                "",
+              )
+              .trim()
+              .replaceAll("span", "")
+              .trim()
+              .replaceAll("class=", "")
+              .trim()
+              .replaceAll(">", "")
+              .trim()
+              .replaceAll("<", "")
+              .trim()
+              .replaceAll('"', "")
+              .replaceAll("/", "")
+              .trim()
+              .replaceAll("'", "");
+            isnew = true;
+          }
+          if (
+            plop[j].includes(
+              "padleft padright half smaller nospace padvertless nowrap",
+            ) &&
+            isnew == true
+          ) {
+            yummy = plop[j]
+              .replaceAll(
+                "padleft padright half smaller nospace padvertless nowrap",
+                "",
+              )
+              .trim()
+              .replaceAll("span", "")
+              .trim()
+              .replaceAll("class=", "")
+              .trim()
+              .replaceAll(">", "")
+              .trim()
+              .replaceAll("<", "")
+              .trim()
+              .replaceAll('"', "")
+              .replaceAll("/", "")
+              .trim()
+              .replaceAll("'", "");
+          }
+          console.log(yummy + "YUM");
+          // console.log(yummy.split("  "));
+          // const banana = yummy.split("  ");
+          // for (let k = 0; k < banana.length; k++) {
+          //   if (banana[k].includes("title=")) {
+          //     temp393.push(
+          //       banana[k]
+          //         .trim()
+          //         .replaceAll('"', "")
+          //         .replace("title=", "")
+          //         .trim(),
+          //     );
+          //   }
+          // }
+          isnew = false;
+        }
+        let temp33 = plop[i + 9].trim() + plop[i + 11].trim();
+        if (plop[i + 9].trim() == ",") {
+          temp33 = plop[i + 11].trim();
+        }
+        //YOOO EVETYHING IS ACTUALLY STUFFED INTO ONE LINE FOR THE EVENT DEETAILSS
+
+        temp_tourney.push({
+          name: plop[i + 4].trim(),
+          reference: plop[i + 1]
+            .trim()
+            .replace('href="/index/tourn/index.mhtml?tourn_id=', "")
+            .replace('"', " ")
+            .replace("=", "")
+            .trim(),
+          location: temp33,
+          events: temp393,
+          date: thing23,
+          circuit: thingy24, // HONESTLY I HAVE NO IDEA IF I AM GOING TO BE USING THIS CuZ IT SEEMSSSSS USELESSSS BUT IDK; JUST PUTTING IT IN THERE JIC
+        });
+      }
+    }
+    console.log(temp_tourney);
+  };
 
   //THAT ACTUALLY WORKS REALLY WELL
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: light_dark ? "rgb(21, 20, 20)" : "white",
-      }}
-    >
-      <Stack.Screen
-        options={{
-          title: "Tournaments",
-          headerStyle: {
-            backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
-          },
-          headerTintColor: light_dark ? "#ffffff" : "black",
-        }}
-      />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View
         style={{
-          flexDirection: "row",
-          marginTop: 10,
+          flex: 1,
+          backgroundColor: light_dark ? "rgb(21, 20, 20)" : "white",
         }}
       >
-        <TextInput
-          style={{
-            marginLeft: 20,
-            width: "80%",
-            borderWidth: 1,
-            borderRadius: 10,
-            borderColor: light_dark ? "white" : "black",
-            padding: 10,
-            color: light_dark ? "white" : "black",
+        <Stack.Screen
+          options={{
+            title: "Tournaments",
+            headerStyle: {
+              backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
+            },
+            headerTintColor: light_dark ? "#ffffff" : "black",
           }}
-          onChangeText={searchypls}
-          placeholderTextColor={light_dark ? "white" : "black"}
-          placeholder="Search tournaments..."
         />
-        <TouchableOpacity onPress={overlayyes}>
-          <FontAwesome5
-            name="filter"
-            size={24}
-            color={light_dark ? "white" : "black"}
-            style={{ marginTop: 5, marginLeft: 10 }}
+        <View
+          style={{
+            flexDirection: "row",
+            marginTop: 10,
+          }}
+        >
+          <TextInput
+            style={{
+              marginLeft: 20,
+              width: "80%",
+              borderWidth: 1,
+              borderRadius: 10,
+              borderColor: light_dark ? "white" : "black",
+              padding: 10,
+              color: light_dark ? "white" : "black",
+            }}
+            onChangeText={searchypls}
+            placeholderTextColor={light_dark ? "white" : "black"}
+            placeholder="Search tournaments..."
           />
-        </TouchableOpacity>
-      </View>
-      <ScrollView style={{ flex: 1, marginTop: 10 }}>
-        {tourneys.map((thingy) => {
-          let registration_color = "green";
-          if (
-            thingy.registration.includes("Closed") ||
-            thingy.registration.includes("No open registration")
-          ) {
-            registration_color = "red";
-          }
-          return (
-            <TouchableOpacity
-              style={[
-                styles.tourneyButton,
-                {
-                  display: thingy.show == "show" ? "flex" : "none",
-                  backgroundColor: light_dark ? "rgb(0, 0, 0)" : "lightgray",
-                  borderColor: light_dark ? "white" : "black",
-                  borderWidth: 0,
-                  shadowColor: light_dark ? "white" : "black",
-                  shadowOffset: { width: 1, height: 2 },
-                  shadowOpacity: 0.8,
-                  shadowRadius: 5,
-                  elevation: 3,
-                },
-              ]}
-              key={thingy.reference}
-              onPress={() => {
-                router.navigate("/Tourneys/current/curry", {
-                  params: { reference: thingy.reference },
-                });
-                //SHOULD REDIRECT TO TOURNAMENT PAGE// LATER PROBLEM
+          <TouchableOpacity onPress={overlayyes}>
+            <FontAwesome5
+              name="filter"
+              size={24}
+              color={light_dark ? "white" : "black"}
+              style={{ marginTop: 5, marginLeft: 10 }}
+            />
+          </TouchableOpacity>
+        </View>
+        <ScrollView style={{ flex: 1, marginTop: 10 }}>
+          {tourneys.map((thingy) => {
+            let registration_color = "green";
+            if (
+              thingy.registration.includes("Closed") ||
+              thingy.registration.includes("No open registration")
+            ) {
+              registration_color = "red";
+            }
+            return (
+              <TouchableOpacity
+                style={[
+                  styles.tourneyButton,
+                  {
+                    display: thingy.show == "show" ? "flex" : "none",
+                    backgroundColor: light_dark ? "rgb(0, 0, 0)" : "lightgray",
+                    borderColor: light_dark ? "white" : "black",
+                    borderWidth: 0,
+                    shadowColor: light_dark ? "white" : "black",
+                    shadowOffset: { width: 1, height: 2 },
+                    shadowOpacity: 0.8,
+                    shadowRadius: 5,
+                    elevation: 3,
+                  },
+                ]}
+                key={thingy.reference}
+                onPress={() => {
+                  router.navigate("/Tourneys/current/curry", {
+                    params: { reference: thingy.reference },
+                  });
+                  //SHOULD REDIRECT TO TOURNAMENT PAGE// LATER PROBLEM
+                }}
+              >
+                <View>
+                  <Text style={{ color: "blue" }}>Date: {thingy.date}</Text>
+                  <Text style={{ color: light_dark ? "white" : "black" }}>
+                    Name: {thingy.name}
+                  </Text>
+                  <Text style={{ color: light_dark ? "white" : "black" }}>
+                    City: {thingy.city}
+                  </Text>
+                  <Text style={{ color: light_dark ? "white" : "black" }}>
+                    State: {thingy.state}
+                  </Text>
+                  <View style={{ flex: 1, flexDirection: "row" }}>
+                    <Text style={{ color: light_dark ? "white" : "black" }}>
+                      Type:
+                    </Text>
+                    <MaterialIcons
+                      display={
+                        thingy.tipe == "O" || thingy.tipe == "PO"
+                          ? "flex"
+                          : "none"
+                      }
+                      name="computer"
+                      size={24}
+                      color="blue"
+                    />
+                    <FontAwesome6
+                      name="person-circle-question"
+                      size={24}
+                      display={thingy.tipe == "Unknown" ? "flex" : "none"}
+                      color={light_dark ? "white" : "black"}
+                    />
+                    <FontAwesome6
+                      name="person"
+                      size={24}
+                      display={
+                        thingy.tipe == "P" || thingy.tipe == "PO"
+                          ? "flex"
+                          : "none"
+                      }
+                      color={light_dark ? "white" : "black"}
+                    />
+                  </View>
+                  <Text style={{ color: registration_color }}>
+                    Registration: {thingy.registration}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+        </ScrollView>
+        <NavBar />
+        <Animated.View
+          style={[
+            styles.ontop,
+            {
+              backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
+              display: ontop ? "flex" : "none",
+              opacity: fadeAnim,
+              shadowRadius: 5,
+              elevation: 10,
+              shadowColor: light_dark ? "white" : "black",
+              shadowOffset: { width: 10, height: 2 },
+              shadowOpacity: 0.8,
+            },
+          ]}
+        >
+          <View>
+            <Text
+              style={{
+                marginTop: 10,
+                marginLeft: 10,
+                marginBottom: 10,
+                color: light_dark ? "white" : "black",
+                fontSize: 20,
               }}
             >
-              <View>
-                <Text style={{ color: "blue" }}>Date: {thingy.date}</Text>
-                <Text style={{ color: light_dark ? "white" : "black" }}>
-                  Name: {thingy.name}
-                </Text>
-                <Text style={{ color: light_dark ? "white" : "black" }}>
-                  City: {thingy.city}
-                </Text>
-                <Text style={{ color: light_dark ? "white" : "black" }}>
-                  State: {thingy.state}
-                </Text>
-                <View style={{ flex: 1, flexDirection: "row" }}>
-                  <Text style={{ color: light_dark ? "white" : "black" }}>
-                    Type:
-                  </Text>
-                  <MaterialIcons
-                    display={
-                      thingy.tipe == "O" || thingy.tipe == "PO"
-                        ? "flex"
-                        : "none"
-                    }
-                    name="computer"
-                    size={24}
-                    color="blue"
-                  />
-                  <FontAwesome6
-                    name="person-circle-question"
-                    size={24}
-                    display={thingy.tipe == "Unknown" ? "flex" : "none"}
-                    color={light_dark ? "white" : "black"}
-                  />
-                  <FontAwesome6
-                    name="person"
-                    size={24}
-                    display={
-                      thingy.tipe == "P" || thingy.tipe == "PO"
-                        ? "flex"
-                        : "none"
-                    }
-                    color={light_dark ? "white" : "black"}
-                  />
-                </View>
-                <Text style={{ color: registration_color }}>
-                  Registration: {thingy.registration}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-      <NavBar />
-      <Animated.View
-        style={[
-          styles.ontop,
-          {
-            backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
-            display: ontop ? "flex" : "none",
-            opacity: fadeAnim,
-            shadowRadius: 5,
-            elevation: 10,
-            shadowColor: light_dark ? "white" : "black",
-            shadowOffset: { width: 10, height: 2 },
-            shadowOpacity: 0.8,
-          },
-        ]}
-      >
-        <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              marginLeft: 10,
-              color: light_dark ? "white" : "black",
-              fontSize: 20,
-            }}
-          >
-            Circuit:
-          </Text>
-          <Dropdown
-            placeholderStyle={[
-              styles.placeholderStyle,
-              {
+              Broad Tourney Search:
+            </Text>
+            <TextInput
+              style={{
                 color: light_dark ? "white" : "black",
-              },
-            ]}
-            style={[
-              styles.dropdown,
-              {
+                fontSize: 15,
+                borderRadius: 10,
+                marginLeft: 10,
+                marginRight: 10,
+                borderWidth: 1,
+                borderColor: light_dark ? "white" : "black",
                 backgroundColor: light_dark
                   ? "rgb(46,45,45)"
                   : "rgb(255,250,250)",
-                borderColor: light_dark ? "white" : "black",
-              },
-            ]}
-            onChange={circuit_value}
-            selectedTextStyle={styles.selectedTextStyle}
-            data={circuit_data}
-            labelField="label"
-            autoScroll={false}
-            valueField="value"
-            placeholder="Select circuit"
-            value={circuit}
-            search={true}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ color: light_dark ? "white" : "black", fontSize: 20 }}>
-            School year Ending:
-          </Text>
-          <Dropdown
-            placeholderStyle={[
-              styles.placeholderStyle,
-              {
+              }}
+              placeholder="Enter Tournament Name"
+              value={hardsearch}
+              placeholderTextColor={light_dark ? "white" : "black"}
+              onChangeText={searchhhh}
+              returnKeyType="done"
+              blurOnSubmit={true}
+              onBlur={() => {
+                Keyboard.dismiss();
+              }}
+              onEndEditing={(e) => {
+                searchthing(e.nativeEvent.text);
+              }}
+            />
+          </View>
+          <View style={{ flex: 1, marginTop: 10 }}>
+            <Text
+              style={{
+                marginLeft: 10,
                 color: light_dark ? "white" : "black",
-              },
-            ]}
-            style={[
-              styles.dropdown,
-              {
-                backgroundColor: light_dark
-                  ? "rgb(46,45,45)"
-                  : "rgb(255,250,250)",
-                borderColor: light_dark ? "white" : "black",
-              },
-            ]}
-            onChange={year_value}
-            selectedTextStyle={styles.selectedTextStyle}
-            data={yr}
-            labelField="label"
-            autoScroll={false}
-            valueField="value"
-            placeholder="Select Year"
-            value={year}
-            search={true}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ color: light_dark ? "white" : "black", fontSize: 20 }}>
-            States/Provinces:
-          </Text>
-          <Dropdown
-            placeholderStyle={[
-              styles.placeholderStyle,
-              {
+                fontSize: 20,
+              }}
+            >
+              Circuit:
+            </Text>
+            <Dropdown
+              placeholderStyle={[
+                styles.placeholderStyle,
+                {
+                  color: light_dark ? "white" : "black",
+                },
+              ]}
+              style={[
+                styles.dropdown,
+                {
+                  backgroundColor: light_dark
+                    ? "rgb(46,45,45)"
+                    : "rgb(255,250,250)",
+                  borderColor: light_dark ? "white" : "black",
+                },
+              ]}
+              onChange={circuit_value}
+              selectedTextStyle={styles.selectedTextStyle}
+              data={circuit_data}
+              labelField="label"
+              autoScroll={false}
+              valueField="value"
+              placeholder="Select circuit"
+              value={circuit}
+              search={true}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
                 color: light_dark ? "white" : "black",
-              },
-            ]}
-            style={[
-              styles.dropdown,
-              {
-                backgroundColor: light_dark
-                  ? "rgb(46,45,45)"
-                  : "rgb(255,250,250)",
-                borderColor: light_dark ? "white" : "black",
-              },
-            ]}
-            onChange={state_value}
-            selectedTextStyle={styles.selectedTextStyle}
-            data={statep}
-            labelField="label"
-            autoScroll={false}
-            valueField="value"
-            placeholder="Select State/Province"
-            value={state}
-            search={true}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ color: light_dark ? "white" : "black", fontSize: 20 }}>
-            Countries:{" "}
-          </Text>
-          <Dropdown
-            placeholderStyle={[
-              styles.placeholderStyle,
-              {
+                fontSize: 20,
+                marginLeft: 10,
+              }}
+            >
+              School year Ending:
+            </Text>
+            <Dropdown
+              placeholderStyle={[
+                styles.placeholderStyle,
+                {
+                  color: light_dark ? "white" : "black",
+                },
+              ]}
+              style={[
+                styles.dropdown,
+                {
+                  backgroundColor: light_dark
+                    ? "rgb(46,45,45)"
+                    : "rgb(255,250,250)",
+                  borderColor: light_dark ? "white" : "black",
+                },
+              ]}
+              onChange={year_value}
+              selectedTextStyle={styles.selectedTextStyle}
+              data={yr}
+              labelField="label"
+              autoScroll={false}
+              valueField="value"
+              placeholder="Select Year"
+              value={year}
+              search={true}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
                 color: light_dark ? "white" : "black",
-              },
-            ]}
-            style={[
-              styles.dropdown,
-              {
-                backgroundColor: light_dark
-                  ? "rgb(46,45,45)"
-                  : "rgb(255,250,250)",
-                borderColor: light_dark ? "white" : "black",
-              },
-            ]}
-            onChange={country_value}
-            selectedTextStyle={styles.selectedTextStyle}
-            data={counter}
-            labelField="label"
-            autoScroll={false}
-            valueField="value"
-            placeholder="Select Country"
-            value={country}
-            search={true}
-          />
-        </View>
-      </Animated.View>
-    </View>
+                fontSize: 20,
+                marginLeft: 10,
+              }}
+            >
+              States/Provinces:
+            </Text>
+            <Dropdown
+              placeholderStyle={[
+                styles.placeholderStyle,
+                {
+                  color: light_dark ? "white" : "black",
+                },
+              ]}
+              style={[
+                styles.dropdown,
+                {
+                  backgroundColor: light_dark
+                    ? "rgb(46,45,45)"
+                    : "rgb(255,250,250)",
+                  borderColor: light_dark ? "white" : "black",
+                },
+              ]}
+              onChange={state_value}
+              selectedTextStyle={styles.selectedTextStyle}
+              data={statep}
+              labelField="label"
+              autoScroll={false}
+              valueField="value"
+              placeholder="Select State/Province"
+              value={state}
+              search={true}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                color: light_dark ? "white" : "black",
+                fontSize: 20,
+                marginLeft: 10,
+              }}
+            >
+              Countries:{" "}
+            </Text>
+            <Dropdown
+              placeholderStyle={[
+                styles.placeholderStyle,
+                {
+                  color: light_dark ? "white" : "black",
+                },
+              ]}
+              style={[
+                styles.dropdown,
+                {
+                  backgroundColor: light_dark
+                    ? "rgb(46,45,45)"
+                    : "rgb(255,250,250)",
+                  borderColor: light_dark ? "white" : "black",
+                },
+              ]}
+              onChange={country_value}
+              selectedTextStyle={styles.selectedTextStyle}
+              data={counter}
+              labelField="label"
+              autoScroll={false}
+              valueField="value"
+              placeholder="Select Country"
+              value={country}
+              search={true}
+            />
+          </View>
+        </Animated.View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 const styles = StyleSheet.create({
@@ -1008,12 +1240,12 @@ const styles = StyleSheet.create({
   },
   ontop: {
     position: "absolute",
-    bottom: 200,
+    bottom: "20%",
     width: "85%",
     borderRadius: 15,
     marginLeft: "7.5%",
     transitionDuration: "0.5s",
-    height: "50%",
+    height: "65%",
     backgroundColor: "white",
   },
   placeholderStyle: {
