@@ -292,7 +292,8 @@ export default function THINGY2() {
                   .replace('"/index/tourn/index.mhtml?tourn_id=', "")
                   .replace('"', " ")
                   .replace("=", "")
-                  .trim(),
+                  .trim()
+                  .replaceAll("href", ""),
                 city: temp[i + 10].trim(),
                 state: temp[i + 19].trim(),
                 show: "show",
@@ -456,15 +457,27 @@ export default function THINGY2() {
 
   const searchypls = (text) => {
     let temp = tourneys.map((thingy) => {
-      if (
-        thingy.name.toLowerCase().includes(text.toLowerCase()) ||
-        thingy.city.toLowerCase().includes(text.toLowerCase()) ||
-        thingy.state.toLowerCase().includes(text.toLowerCase()) ||
-        thingy.date.toLowerCase().includes(text.toLowerCase())
-      ) {
-        return { ...thingy, show: "show" };
-      } else {
-        return { ...thingy, show: "hide" };
+      if (thingy.normal == true) {
+        if (
+          thingy.name.toLowerCase().includes(text.toLowerCase()) ||
+          thingy.city.toLowerCase().includes(text.toLowerCase()) ||
+          thingy.state.toLowerCase().includes(text.toLowerCase()) ||
+          thingy.date.toLowerCase().includes(text.toLowerCase())
+        ) {
+          return { ...thingy, show: "show" };
+        } else {
+          return { ...thingy, show: "hide" };
+        }
+      } else if (thingy.normal == false) {
+        if (
+          thingy.name.toLowerCase().includes(text.toLowerCase()) ||
+          thingy.location.toLowerCase().includes(text.toLowerCase()) ||
+          thingy.date.toLowerCase().includes(text.toLowerCase())
+        ) {
+          return { ...thingy, show: "show" };
+        } else {
+          return { ...thingy, show: "hide" };
+        }
       }
     });
     setTourneys(temp);

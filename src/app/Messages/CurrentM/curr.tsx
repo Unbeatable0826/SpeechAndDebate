@@ -64,6 +64,8 @@ export default function THINGY4() {
           );
           const pop = await request.text();
           const hi = pop.split("\n");
+          const thingy = await SecureStore.getItemAsync("cookie");
+          console.log(thingy);
         } catch (e) {
           router.replace("/");
         }
