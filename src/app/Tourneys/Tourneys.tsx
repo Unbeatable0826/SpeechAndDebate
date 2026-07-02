@@ -21,6 +21,7 @@ import {
 } from "react-native";
 import { auth } from "../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { Dropdown } from "react-native-element-dropdown";
 import NavBar from "../NavBar";
 
@@ -31,6 +32,7 @@ export default function THINGY2() {
   const [circuit_data, setCircuitData] = useState([
     { label: "Upcoming", value: "" },
   ]);
+  const [pressed, setPressed] = useState(false);
   const [hardsearch, sethardsearch] = useState("");
   const [year, setYear] = useState("0");
   const [state, setState] = useState("");
@@ -295,6 +297,7 @@ export default function THINGY2() {
                 state: temp[i + 19].trim(),
                 show: "show",
                 tipe: type2,
+                normal: true,
                 registration: type3,
               });
             } else if (
@@ -681,6 +684,7 @@ export default function THINGY2() {
         }
         console.log("WORK");
         temp_tourney.push({
+          normal: true,
           date: temp[i - 11].trim(),
           name: temp[i + 1].trim(),
           reference: temp[i - 2]
@@ -703,19 +707,23 @@ export default function THINGY2() {
 
   const circuit_value = (item) => {
     // console.log("ChANGIN");
+    sethardsearch("");
     setCircuit(item.value);
     new_query_fetch(item.value, "circuit");
   };
   const year_value = (item) => {
+    sethardsearch("");
     setYear(item.value);
     new_query_fetch(item.value, "year");
   };
   const state_value = (item) => {
     console.log(item.value);
+    sethardsearch("");
     setState(item.value);
     new_query_fetch(item.value, "state");
   };
   const country_value = (item) => {
+    sethardsearch("");
     setCountry(item.value);
     new_query_fetch(item.value, "country");
   };
@@ -725,163 +733,171 @@ export default function THINGY2() {
     setYear("0");
     setState("");
     setCountry("");
-    const thingys = await SecureStore.getItemAsync("cookie");
-    const headers = {
-      Host: "www.tabroom.com",
-      Cookie: thingys,
-      "Cache-Control": "max-age=0",
-      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
-      "Sec-Ch-Ua-Mobile": "?0",
-      "Sec-Ch-Ua-Platform": '"Windows"',
-      "Accept-Language": "en-US,en;q=0.9",
-      Origin: "https://www.tabroom.com",
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Upgrade-Insecure-Requests": "1",
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-      Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-      "Sec-Fetch-Site": "same-origin",
-      "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-User": "?1",
-      "Sec-Fetch-Dest": "document",
-      Referer: "https://www.tabroom.com/index/index.mhtml",
-      Priority: "u=0, i",
-    };
-    let hoop = new URLSearchParams();
-    hoop.append("search", thing);
-    hoop.append("tourn_id", "");
-    hoop.append("caller", "/index/search.mhtml");
-    const request = await fetch("https://www.tabroom.com/index/search.mhtml", {
-      method: "POST",
-      headers: headers,
-      body: hoop,
-    });
-    const result = await request.text();
-    const plop = result.split("\n");
-    let temp_tourney = [];
-    let seen = false;
+    if (thing.trim() == "") {
+      new_query_fetch("", "circuit");
+    } else {
+      const thingys = await SecureStore.getItemAsync("cookie");
+      const headers = {
+        Host: "www.tabroom.com",
+        Cookie: thingys,
+        "Cache-Control": "max-age=0",
+        "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Accept-Language": "en-US,en;q=0.9",
+        Origin: "https://www.tabroom.com",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        Referer: "https://www.tabroom.com/index/index.mhtml",
+        Priority: "u=0, i",
+      };
+      let hoop = new URLSearchParams();
+      hoop.append("search", thing);
+      hoop.append("tourn_id", "");
+      hoop.append("caller", "/index/search.mhtml");
+      const request = await fetch(
+        "https://www.tabroom.com/index/search.mhtml",
+        {
+          method: "POST",
+          headers: headers,
+          body: hoop,
+        },
+      );
+      const result = await request.text();
+      const plop = result.split("\n");
+      let temp_tourney = [];
+      let seen = false;
 
-    for (let i = 0; i < plop.length; i++) {
-      if (
-        plop[i].includes(
-          "bluetext semibold full padvertless link-underline hover padleft",
-        )
-      ) {
-        let thing23 = "";
-        let yummy = "";
-        let temp393 = [];
-        let thingy24 = "";
-        for (let j = i + 1; j < plop.length; j++) {
-          if (
-            plop[j].includes(
-              "bluetext semibold full padvertless link-underline hover padleft",
-            )
-          ) {
-            break;
-          }
-          if (plop[j].includes("data-text")) {
-            thing23 = plop[j + 1].trim().replace("&ndash;", "-").trim();
-            seen = true;
-          }
+      for (let i = 0; i < plop.length; i++) {
+        if (
+          plop[i].includes(
+            "bluetext semibold full padvertless link-underline hover padleft",
+          )
+        ) {
+          let thing23 = "";
+          let yummy = "";
+          let temp393 = [];
+          let thingy24 = "";
+          for (let j = i + 1; j < plop.length; j++) {
+            if (
+              plop[j].includes(
+                "bluetext semibold full padvertless link-underline hover padleft",
+              )
+            ) {
+              break;
+            }
+            if (plop[j].includes("data-text")) {
+              thing23 = plop[j + 1].trim().replace("&ndash;", "-").trim();
+              seen = true;
+            }
 
-          if (
-            plop[j].includes(
-              "full centeralign padvertless padleft padright nowrap",
-            )
-          ) {
-            thingy24 = plop[j]
-              .replaceAll(
+            if (
+              plop[j].includes(
                 "full centeralign padvertless padleft padright nowrap",
-                "",
               )
-              .trim()
-              .replaceAll("span", "")
-              .trim()
-              .replaceAll("class=", "")
-              .trim()
-              .replaceAll(">", "")
-              .trim()
-              .replaceAll("<", "")
-              .trim()
-              .replaceAll('"', "")
-              .replaceAll("/", "")
-              .trim()
-              .replaceAll("'", "");
-          }
-          if (
-            plop[j].includes(
-              "padleft padright half smaller nospace padvertless nowrap",
-            )
-          ) {
-            yummy = plop[j]
-              .replaceAll(
+            ) {
+              thingy24 = plop[j]
+                .replaceAll(
+                  "full centeralign padvertless padleft padright nowrap",
+                  "",
+                )
+                .trim()
+                .replaceAll("span", "")
+                .trim()
+                .replaceAll("class=", "")
+                .trim()
+                .replaceAll(">", "")
+                .trim()
+                .replaceAll("<", "")
+                .trim()
+                .replaceAll('"', "")
+                .replaceAll("/", "")
+                .trim()
+                .replaceAll("'", "");
+            }
+            if (
+              plop[j].includes(
                 "padleft padright half smaller nospace padvertless nowrap",
-                "",
               )
-              .trim()
-              .replaceAll("span", "")
-              .trim()
-              .replaceAll("class=", "")
-              .trim()
-              .replaceAll(">", "")
-              .trim()
-              .replaceAll("<", "")
-              .trim()
-              .replaceAll('"', "")
-              .replaceAll("/", "")
-              .trim()
-              .replaceAll("'", "");
-            const current = yummy.split("  ");
-            for (let k = 0; k < current.length; k++) {
-              if (current[k].includes("title=")) {
-                const temp783589 = current[k].split("=");
-                temp393.push(temp783589[1].trim().replaceAll('"', "").trim());
+            ) {
+              yummy = plop[j]
+                .replaceAll(
+                  "padleft padright half smaller nospace padvertless nowrap",
+                  "",
+                )
+                .trim()
+                .replaceAll("span", "")
+                .trim()
+                .replaceAll("class=", "")
+                .trim()
+                .replaceAll(">", "")
+                .trim()
+                .replaceAll("<", "")
+                .trim()
+                .replaceAll('"', "")
+                .replaceAll("/", "")
+                .trim()
+                .replaceAll("'", "");
+              const current = yummy.split("  ");
+              for (let k = 0; k < current.length; k++) {
+                if (current[k].includes("title=")) {
+                  const temp783589 = current[k].split("=");
+                  temp393.push(temp783589[1].trim().replaceAll('"', "").trim());
+                }
               }
             }
-            console.log(temp393);
+            // console.log(yummy.split("  "));
+            // const banana = yummy.split("  ");
+            // for (let k = 0; k < banana.length; k++) {
+            //   if (banana[k].includes("title=")) {
+            //     temp393.push(
+            //       banana[k]
+            //         .trim()
+            //         .replaceAll('"', "")
+            //         .replace("title=", "")
+            //         .trim(),
+            //     );
+            //   }
+            // }
           }
-          // console.log(yummy.split("  "));
-          // const banana = yummy.split("  ");
-          // for (let k = 0; k < banana.length; k++) {
-          //   if (banana[k].includes("title=")) {
-          //     temp393.push(
-          //       banana[k]
-          //         .trim()
-          //         .replaceAll('"', "")
-          //         .replace("title=", "")
-          //         .trim(),
-          //     );
-          //   }
-          // }
-        }
-        let temp33 = plop[i + 9].trim() + plop[i + 11].trim();
-        if (plop[i + 9].trim() == ",") {
-          temp33 = plop[i + 11].trim();
-        }
-        //YOOO EVETYHING IS ACTUALLY STUFFED INTO ONE LINE FOR THE EVENT DEETAILSS
+          let temp33 = plop[i + 9].trim() + plop[i + 11].trim();
+          if (plop[i + 9].trim() == ",") {
+            temp33 = plop[i + 11].trim();
+          }
+          //YOOO EVETYHING IS ACTUALLY STUFFED INTO ONE LINE FOR THE EVENT DEETAILSS
 
-        temp_tourney.push({
-          name: plop[i + 4].trim(),
-          reference: plop[i + 1]
-            .trim()
-            .replace('href="/index/tourn/index.mhtml?tourn_id=', "")
-            .replace(" ", "")
-            .replaceAll("href", "")
-            .replace('"/index/tourn/index.mhtml?tourn_id=', "")
-            .trim()
-            .replace('"', " ")
-            .replace("=", "")
-            .trim(),
-          location: temp33,
-          events: temp393,
-          date: thing23,
-          circuit: thingy24, // HONESTLY I HAVE NO IDEA IF I AM GOING TO BE USING THIS CuZ IT SEEMSSSSS USELESSSS BUT IDK; JUST PUTTING IT IN THERE JIC
-        });
+          temp_tourney.push({
+            name: plop[i + 4].trim(),
+            normal: false,
+            reference: plop[i + 1]
+              .trim()
+              .replace('href="/index/tourn/index.mhtml?tourn_id=', "")
+              .replace(" ", "")
+              .replaceAll("href", "")
+              .replace('"/index/tourn/index.mhtml?tourn_id=', "")
+              .trim()
+              .replace('"', " ")
+              .replace("=", "")
+              .trim(),
+            location: temp33,
+            view_more: false,
+            events: temp393,
+            show: "show",
+            date: thing23,
+            circuit: thingy24, // HONESTLY I HAVE NO IDEA IF I AM GOING TO BE USING THIS CuZ IT SEEMSSSSS USELESSSS BUT IDK; JUST PUTTING IT IN THERE JIC
+          });
+        }
       }
+      setTourneys(temp_tourney);
     }
-
-    console.log(temp_tourney);
   };
 
   //THAT ACTUALLY WORKS REALLY WELL
@@ -933,85 +949,200 @@ export default function THINGY2() {
         </View>
         <ScrollView style={{ flex: 1, marginTop: 10 }}>
           {tourneys.map((thingy) => {
-            let registration_color = "green";
-            if (
-              thingy.registration.includes("Closed") ||
-              thingy.registration.includes("No open registration")
-            ) {
-              registration_color = "red";
-            }
-            return (
-              <TouchableOpacity
-                style={[
-                  styles.tourneyButton,
-                  {
-                    display: thingy.show == "show" ? "flex" : "none",
-                    backgroundColor: light_dark ? "rgb(0, 0, 0)" : "lightgray",
-                    borderColor: light_dark ? "white" : "black",
-                    borderWidth: 0,
-                    shadowColor: light_dark ? "white" : "black",
-                    shadowOffset: { width: 1, height: 2 },
-                    shadowOpacity: 0.8,
-                    shadowRadius: 5,
-                    elevation: 3,
-                  },
-                ]}
-                key={thingy.reference}
-                onPress={() => {
-                  router.navigate("/Tourneys/current/curry", {
-                    params: { reference: thingy.reference },
-                  });
-                  //SHOULD REDIRECT TO TOURNAMENT PAGE// LATER PROBLEM
-                }}
-              >
-                <View>
-                  <Text style={{ color: "blue" }}>Date: {thingy.date}</Text>
-                  <Text style={{ color: light_dark ? "white" : "black" }}>
-                    Name: {thingy.name}
-                  </Text>
-                  <Text style={{ color: light_dark ? "white" : "black" }}>
-                    City: {thingy.city}
-                  </Text>
-                  <Text style={{ color: light_dark ? "white" : "black" }}>
-                    State: {thingy.state}
-                  </Text>
-                  <View style={{ flex: 1, flexDirection: "row" }}>
+            if (thingy.normal == true) {
+              let registration_color = "green";
+              if (
+                thingy.registration.includes("Closed") ||
+                thingy.registration.includes("No open registration")
+              ) {
+                registration_color = "red";
+              }
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.tourneyButton,
+                    {
+                      display: thingy.show == "show" ? "flex" : "none",
+                      backgroundColor: light_dark
+                        ? "rgb(0, 0, 0)"
+                        : "lightgray",
+                      borderColor: light_dark ? "white" : "black",
+                      borderWidth: 0,
+                      shadowColor: light_dark ? "white" : "black",
+                      shadowOffset: { width: 1, height: 2 },
+                      shadowOpacity: 0.8,
+                      shadowRadius: 5,
+                      elevation: 3,
+                    },
+                  ]}
+                  key={thingy.reference}
+                  onPress={() => {
+                    router.push({
+                      pathname: "/Tourneys/current/curry",
+                      params: { reference: thingy.reference },
+                    });
+                    //SHOULD REDIRECT TO TOURNAMENT PAGE// LATER PROBLEM
+                  }}
+                >
+                  <View>
+                    <Text style={{ color: "blue" }}>Date: {thingy.date}</Text>
                     <Text style={{ color: light_dark ? "white" : "black" }}>
-                      Type:
+                      Name: {thingy.name}
                     </Text>
-                    <MaterialIcons
-                      display={
-                        thingy.tipe == "O" || thingy.tipe == "PO"
-                          ? "flex"
-                          : "none"
-                      }
-                      name="computer"
-                      size={24}
-                      color="blue"
-                    />
-                    <FontAwesome6
-                      name="person-circle-question"
-                      size={24}
-                      display={thingy.tipe == "Unknown" ? "flex" : "none"}
-                      color={light_dark ? "white" : "black"}
-                    />
-                    <FontAwesome6
-                      name="person"
-                      size={24}
-                      display={
-                        thingy.tipe == "P" || thingy.tipe == "PO"
-                          ? "flex"
-                          : "none"
-                      }
-                      color={light_dark ? "white" : "black"}
-                    />
+                    <Text style={{ color: light_dark ? "white" : "black" }}>
+                      City: {thingy.city}
+                    </Text>
+                    <Text style={{ color: light_dark ? "white" : "black" }}>
+                      State: {thingy.state}
+                    </Text>
+                    <View style={{ flex: 1, flexDirection: "row" }}>
+                      <Text style={{ color: light_dark ? "white" : "black" }}>
+                        Type:
+                      </Text>
+                      <MaterialIcons
+                        display={
+                          thingy.tipe == "O" || thingy.tipe == "PO"
+                            ? "flex"
+                            : "none"
+                        }
+                        name="computer"
+                        size={24}
+                        color="blue"
+                      />
+                      <FontAwesome6
+                        name="person-circle-question"
+                        size={24}
+                        display={thingy.tipe == "Unknown" ? "flex" : "none"}
+                        color={light_dark ? "white" : "black"}
+                      />
+                      <FontAwesome6
+                        name="person"
+                        size={24}
+                        display={
+                          thingy.tipe == "P" || thingy.tipe == "PO"
+                            ? "flex"
+                            : "none"
+                        }
+                        color={light_dark ? "white" : "black"}
+                      />
+                    </View>
+                    <Text style={{ color: registration_color }}>
+                      Registration: {thingy.registration}
+                    </Text>
                   </View>
-                  <Text style={{ color: registration_color }}>
-                    Registration: {thingy.registration}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
+                </TouchableOpacity>
+              );
+            } else if (thingy.normal == false) {
+              console.log(thingy.name);
+
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.tourneyButton,
+                    {
+                      display: thingy.show == "show" ? "flex" : "none",
+                      backgroundColor: light_dark
+                        ? "rgb(0, 0, 0)"
+                        : "lightgray",
+                      borderColor: light_dark ? "white" : "black",
+                      borderWidth: 0,
+                      shadowColor: light_dark ? "white" : "black",
+                      shadowOffset: { width: 1, height: 2 },
+                      shadowOpacity: 0.8,
+                      shadowRadius: 5,
+                      elevation: 3,
+                    },
+                  ]}
+                  key={thingy.reference}
+                  onPress={() => {
+                    router.push({
+                      pathname: "/Tourneys/current/curry",
+                      params: { reference: thingy.reference },
+                    });
+                    //SHOULD REDIRECT TO TOURNAMENT PAGE// LATER PROBLEM
+                  }}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: "blue" }}>Date: {thingy.date}</Text>
+                    <Text style={{ color: light_dark ? "white" : "black" }}>
+                      Name: {thingy.name}
+                    </Text>
+                    <Text style={{ color: light_dark ? "white" : "black" }}>
+                      Location: {thingy.location}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        thingy.view_more = !thingy.view_more;
+                        setTourneys([...tourneys]);
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Text style={{ color: "red" }}>More Details</Text>
+                        <AntDesign
+                          style={{
+                            alignContent: "center",
+                            marginTop: 3,
+                            display: thingy.view_more ? "none" : "flex",
+                          }}
+                          name="arrow-down"
+                          size={15}
+                          color="red"
+                        />
+
+                        <AntDesign
+                          style={{
+                            alignContent: "center",
+                            marginTop: 3,
+                            display: thingy.view_more ? "flex" : "none",
+                          }}
+                          name="arrow-up"
+                          size={15}
+                          color="red"
+                        />
+                      </View>
+                    </TouchableOpacity>
+                    <Text
+                      style={{
+                        color: light_dark ? "white" : "black",
+                        display: thingy.view_more ? "flex" : "none",
+                      }}
+                    >
+                      Circuit: {thingy.circuit}
+                    </Text>
+                    <Text
+                      style={{
+                        color: light_dark ? "white" : "black",
+                        display: thingy.view_more ? "flex" : "none",
+                      }}
+                    >
+                      {"Events: " + thingy.events.join(", ")}
+                    </Text>
+                    <Text
+                      style={{
+                        color: light_dark ? "white" : "black",
+                        display: thingy.view_more ? "flex" : "none",
+                      }}
+                    >
+                      {" "}
+                    </Text>
+                    <Text
+                      style={{
+                        color: light_dark ? "white" : "black",
+                        display: thingy.view_more ? "flex" : "none",
+                      }}
+                    >
+                      {" "}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            }
           })}
           <Text></Text>
           <Text></Text>
