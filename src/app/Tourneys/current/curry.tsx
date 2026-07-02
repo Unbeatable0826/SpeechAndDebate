@@ -1,3 +1,4 @@
+import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -22,7 +23,11 @@ export default function THINGY4() {
   const router = useRouter();
   const [light_dark, setld] = useState(false);
   const [page, setpage] = useState("invite");
-  const [name, setName] = useState("");
+  const [hola, setHola] = useState([" "]);
+  const [institutions, setInstitutions] = useState(false);
+  const [dates, setDates] = useState(false);
+  const [uploads, setUploads] = useState(false);
+  //   const [name, setName] = useState("");
   let bop = "";
   const { reference } = useLocalSearchParams();
 
@@ -45,7 +50,7 @@ export default function THINGY4() {
       goback,
     );
   }, []);
-
+  const bigquery = async () => {};
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -142,143 +147,269 @@ export default function THINGY4() {
       }}
     >
       {/* <Text style={styles.nombre}>{reference}</Text> */}
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={true}
-        contentContainerStyle={{ flexDirection: "row" }}
-        style={{ marginTop: 20 }}
-      >
-        <TouchableOpacity
-          onPress={invite_load}
-          style={[
-            styles.topbuttons,
-            {
-              backgroundColor:
-                page == "invite" ? "rgb(17, 148, 26)" : "rgb(0,0,0)",
-              shadowColor: light_dark ? "white" : "black",
-              shadowOffset: { width: 1, height: 2 },
-              shadowOpacity: 0.8,
-              shadowRadius: 5,
-              elevation: 3,
-              borderColor: light_dark ? "white" : "black",
-              borderWidth: 0.1,
-            },
-          ]}
+      <View style={{ height: 65 }}>
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={true}
+          contentContainerStyle={{ flexDirection: "row" }}
+          style={{ marginTop: 20, height: 0 }}
         >
-          <Text
-            style={{
-              color: light_dark ? "#ffffff" : "#000000",
-              marginLeft: 10,
-              marginRight: 10,
-            }}
+          <TouchableOpacity
+            onPress={invite_load}
+            style={[
+              styles.topbuttons,
+              {
+                backgroundColor:
+                  page == "invite" ? "rgb(17, 148, 26)" : "rgb(0,0,0)",
+                shadowColor: light_dark ? "white" : "black",
+                shadowOffset: { width: 1, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 5,
+                elevation: 3,
+                borderColor: light_dark ? "white" : "black",
+                borderWidth: 0.1,
+              },
+            ]}
           >
-            Invite
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={entries_load}
-          style={[
-            styles.topbuttons,
-            {
-              backgroundColor:
-                page == "entries" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
-              shadowColor: light_dark ? "white" : "black",
-              shadowOffset: { width: 1, height: 2 },
-              shadowOpacity: 0.8,
-              shadowRadius: 5,
-              elevation: 3,
-              borderColor: light_dark ? "white" : "black",
-            },
-          ]}
-        >
-          <Text
-            style={{
-              color: light_dark ? "#ffffff" : "#000000",
-              marginLeft: 10,
-              marginRight: 10,
-            }}
+            <Text
+              style={{
+                color: light_dark ? "#ffffff" : "#000000",
+                marginLeft: 10,
+                marginRight: 10,
+              }}
+            >
+              Invite
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={entries_load}
+            style={[
+              styles.topbuttons,
+              {
+                backgroundColor:
+                  page == "entries" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
+                shadowColor: light_dark ? "white" : "black",
+                shadowOffset: { width: 1, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 5,
+                elevation: 3,
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
           >
-            Entries
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={judges_load}
-          style={[
-            styles.topbuttons,
-            {
-              backgroundColor:
-                page == "judges" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
-              shadowColor: light_dark ? "white" : "black",
-              shadowOffset: { width: 1, height: 2 },
-              shadowOpacity: 0.8,
-              shadowRadius: 5,
-              elevation: 3,
-              borderColor: light_dark ? "white" : "black",
-            },
-          ]}
-        >
-          <Text
-            style={{
-              color: light_dark ? "#ffffff" : "#000000",
-              marginLeft: 10,
-              marginRight: 10,
-            }}
+            <Text
+              style={{
+                color: light_dark ? "#ffffff" : "#000000",
+                marginLeft: 10,
+                marginRight: 10,
+              }}
+            >
+              Entries
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={judges_load}
+            style={[
+              styles.topbuttons,
+              {
+                backgroundColor:
+                  page == "judges" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
+                shadowColor: light_dark ? "white" : "black",
+                shadowOffset: { width: 1, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 5,
+                elevation: 3,
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
           >
-            Judges
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={pairings_load}
-          style={[
-            styles.topbuttons,
-            {
-              backgroundColor:
-                page == "pairings" ? "rgb(17, 148, 26)   " : "rgb(0, 0, 0)",
-              shadowColor: light_dark ? "white" : "black",
-              shadowOffset: { width: 1, height: 2 },
-              shadowOpacity: 0.8,
-              shadowRadius: 5,
-              elevation: 3,
-              borderColor: light_dark ? "white" : "black",
-            },
-          ]}
-        >
-          <Text
-            style={{
-              color: light_dark ? "#ffffff" : "#000000",
-              marginLeft: 10,
-              marginRight: 10,
-            }}
+            <Text
+              style={{
+                color: light_dark ? "#ffffff" : "#000000",
+                marginLeft: 10,
+                marginRight: 10,
+              }}
+            >
+              Judges
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={pairings_load}
+            style={[
+              styles.topbuttons,
+              {
+                backgroundColor:
+                  page == "pairings" ? "rgb(17, 148, 26)   " : "rgb(0, 0, 0)",
+                shadowColor: light_dark ? "white" : "black",
+                shadowOffset: { width: 1, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 5,
+                elevation: 3,
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
           >
-            Pairings
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={results_load}
-          style={[
-            styles.topbuttons,
-            {
-              backgroundColor:
-                page == "results" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
-              shadowColor: light_dark ? "white" : "black",
-              shadowOffset: { width: 1, height: 2 },
-              shadowOpacity: 0.8,
-              shadowRadius: 5,
-              elevation: 3,
-              borderColor: light_dark ? "white" : "black",
-            },
-          ]}
-        >
-          <Text
-            style={{
-              color: light_dark ? "#ffffff" : "#000000",
-              marginLeft: 10,
-              marginRight: 10,
-            }}
+            <Text
+              style={{
+                color: light_dark ? "#ffffff" : "#000000",
+                marginLeft: 10,
+                marginRight: 10,
+              }}
+            >
+              Pairings
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={results_load}
+            style={[
+              styles.topbuttons,
+              {
+                backgroundColor:
+                  page == "results" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
+                shadowColor: light_dark ? "white" : "black",
+                shadowOffset: { width: 1, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 5,
+                elevation: 3,
+                borderColor: light_dark ? "white" : "black",
+              },
+            ]}
           >
-            Results
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={{
+                color: light_dark ? "#ffffff" : "#000000",
+                marginLeft: 10,
+                marginRight: 10,
+              }}
+            >
+              Results
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+      <ScrollView>
+        {hola.map((item) => {
+          if (page == "invite") {
+            console.log("Rendering");
+            return (
+              <View key={item} style={{ flex: 1 }}>
+                <TouchableOpacity
+                  style={[
+                    styles.work,
+                    {
+                      backgroundColor: light_dark ? "rgb(0, 0, 0)" : "white",
+                      borderColor: light_dark ? "#404142" : "#e2e8f0",
+                      shadowColor: light_dark ? "white" : "black",
+                    },
+                  ]}
+                  onPress={() => {
+                    setInstitutions(!institutions);
+                  }}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={{ color: light_dark ? "#ffffff" : "#000000" }}>
+                      Institutions Attending
+                    </Text>
+                    <AntDesign
+                      name="arrow-right"
+                      size={20}
+                      style={{
+                        marginLeft: 15,
+                        display: institutions ? "none" : "flex",
+                      }}
+                      color={light_dark ? "#ffffff" : "#000000"}
+                    />
+                    <AntDesign
+                      name="arrow-down"
+                      size={20}
+                      style={{
+                        marginLeft: 15,
+                        display: !institutions ? "none" : "flex",
+                      }}
+                      color={light_dark ? "#ffffff" : "#000000"}
+                    />
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.work,
+                    {
+                      backgroundColor: light_dark ? "rgb(0, 0, 0)" : "white",
+                      borderColor: light_dark ? "#404142" : "#e2e8f0",
+                      shadowColor: light_dark ? "white" : "black",
+                    },
+                  ]}
+                  onPress={() => {
+                    setDates(!dates);
+                  }}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={{ color: light_dark ? "#ffffff" : "#000000" }}>
+                      Dates & Deadlines
+                    </Text>
+                    <AntDesign
+                      style={{
+                        marginLeft: 15,
+                        display: dates ? "none" : "flex",
+                      }}
+                      name="arrow-right"
+                      size={20}
+                      color={light_dark ? "#ffffff" : "#000000"}
+                    />
+                    <AntDesign
+                      style={{
+                        marginLeft: 15,
+                        display: !dates ? "none" : "flex",
+                      }}
+                      name="arrow-down"
+                      size={20}
+                      color={light_dark ? "#ffffff" : "#000000"}
+                    />
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.work,
+                    {
+                      backgroundColor: light_dark ? "rgb(0, 0, 0)" : "white",
+                      borderColor: light_dark ? "#404142" : "#e2e8f0",
+                      shadowColor: light_dark ? "white" : "black",
+                    },
+                  ]}
+                  onPress={() => {
+                    setUploads(!uploads);
+                  }}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={{ color: light_dark ? "#ffffff" : "#000000" }}>
+                      Pages & Uploads
+                    </Text>
+                    <AntDesign
+                      style={{
+                        marginLeft: 15,
+                        display: uploads ? "none" : "flex",
+                      }}
+                      name="arrow-right"
+                      size={20}
+                      color={light_dark ? "#ffffff" : "#000000"}
+                    />
+                    <AntDesign
+                      style={{
+                        marginLeft: 15,
+                        display: !uploads ? "none" : "flex",
+                      }}
+                      name="arrow-down"
+                      size={20}
+                      color={light_dark ? "#ffffff" : "#000000"}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+        })}
       </ScrollView>
     </View>
   );
@@ -297,5 +428,22 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderWidth: 0.1,
     borderRadius: 15,
+  },
+  work: {
+    marginTop: 10,
+    fontSize: 17,
+    padding: 6,
+    width: 340,
+    marginLeft: 20,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
