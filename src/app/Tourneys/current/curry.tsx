@@ -21,6 +21,7 @@ import { useLocalSearchParams } from "expo-router";
 export default function THINGY4() {
   const router = useRouter();
   const [light_dark, setld] = useState(false);
+  const [page, setpage] = useState("invite");
   const [name, setName] = useState("");
   let bop = "";
   const { reference } = useLocalSearchParams();
@@ -116,30 +117,167 @@ export default function THINGY4() {
       }
     });
   }, []);
+
+  const invite_load = async () => {
+    setpage("invite");
+  };
+  const entries_load = async () => {
+    setpage("entries");
+  };
+  const judges_load = async () => {
+    setpage("judges");
+  };
+  const pairings_load = async () => {
+    setpage("pairings");
+  };
+  const results_load = async () => {
+    setpage("results");
+  };
+
   return (
     <View
-      style={{ flex: 1, backgroundColor: light_dark ? "#000000" : "#ffffff" }}
+      style={{
+        flex: 1,
+        backgroundColor: light_dark ? "rgb(46, 45, 45)" : "#ffffff",
+      }}
     >
-      <Text style={styles.nombre}>{reference}</Text>
+      {/* <Text style={styles.nombre}>{reference}</Text> */}
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={true}
         contentContainerStyle={{ flexDirection: "row" }}
+        style={{ marginTop: 20 }}
       >
-        <TouchableOpacity style={styles.topbuttons}>
-          <Text>Invite</Text>
+        <TouchableOpacity
+          onPress={invite_load}
+          style={[
+            styles.topbuttons,
+            {
+              backgroundColor:
+                page == "invite" ? "rgb(17, 148, 26)" : "rgb(0,0,0)",
+              shadowColor: light_dark ? "white" : "black",
+              shadowOffset: { width: 1, height: 2 },
+              shadowOpacity: 0.8,
+              shadowRadius: 5,
+              elevation: 3,
+              borderColor: light_dark ? "white" : "black",
+              borderWidth: 0.1,
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color: light_dark ? "#ffffff" : "#000000",
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          >
+            Invite
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.topbuttons}>
-          <Text>Entries</Text>
+        <TouchableOpacity
+          onPress={entries_load}
+          style={[
+            styles.topbuttons,
+            {
+              backgroundColor:
+                page == "entries" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
+              shadowColor: light_dark ? "white" : "black",
+              shadowOffset: { width: 1, height: 2 },
+              shadowOpacity: 0.8,
+              shadowRadius: 5,
+              elevation: 3,
+              borderColor: light_dark ? "white" : "black",
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color: light_dark ? "#ffffff" : "#000000",
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          >
+            Entries
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.topbuttons}>
-          <Text>Judges</Text>
+        <TouchableOpacity
+          onPress={judges_load}
+          style={[
+            styles.topbuttons,
+            {
+              backgroundColor:
+                page == "judges" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
+              shadowColor: light_dark ? "white" : "black",
+              shadowOffset: { width: 1, height: 2 },
+              shadowOpacity: 0.8,
+              shadowRadius: 5,
+              elevation: 3,
+              borderColor: light_dark ? "white" : "black",
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color: light_dark ? "#ffffff" : "#000000",
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          >
+            Judges
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.topbuttons}>
-          <Text>Pairings</Text>
+        <TouchableOpacity
+          onPress={pairings_load}
+          style={[
+            styles.topbuttons,
+            {
+              backgroundColor:
+                page == "pairings" ? "rgb(17, 148, 26)   " : "rgb(0, 0, 0)",
+              shadowColor: light_dark ? "white" : "black",
+              shadowOffset: { width: 1, height: 2 },
+              shadowOpacity: 0.8,
+              shadowRadius: 5,
+              elevation: 3,
+              borderColor: light_dark ? "white" : "black",
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color: light_dark ? "#ffffff" : "#000000",
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          >
+            Pairings
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.topbuttons}>
-          <Text>Results</Text>
+        <TouchableOpacity
+          onPress={results_load}
+          style={[
+            styles.topbuttons,
+            {
+              backgroundColor:
+                page == "results" ? "rgb(17, 148, 26)" : "rgb(0, 0, 0)",
+              shadowColor: light_dark ? "white" : "black",
+              shadowOffset: { width: 1, height: 2 },
+              shadowOpacity: 0.8,
+              shadowRadius: 5,
+              elevation: 3,
+              borderColor: light_dark ? "white" : "black",
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color: light_dark ? "#ffffff" : "#000000",
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          >
+            Results
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -157,6 +295,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 10,
     marginRight: 10,
-    borderRadius: 5,
+    borderWidth: 0.1,
+    borderRadius: 15,
   },
 });
