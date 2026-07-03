@@ -23,6 +23,10 @@ export default function THINGY4() {
   const router = useRouter();
   const [light_dark, setld] = useState(false);
   const [page, setpage] = useState("invite");
+  const [institutiondata, setInstitutionData] = useState(
+    "Institutions Attending: ",
+  );
+  const [dateinfo, setDateInfo] = useState("Date: ");
   const [hola, setHola] = useState([" "]);
   const [institutions, setInstitutions] = useState(false);
   const [dates, setDates] = useState(false);
@@ -84,7 +88,7 @@ export default function THINGY4() {
           );
           const pop = await request.text();
           const hi = pop.split("\n");
-          console.log(thingy);
+
           const header_page = {
             Host: "www.tabroom.com",
             Cookie: thingy,
@@ -114,7 +118,7 @@ export default function THINGY4() {
           );
           const pop_page = await request_page.text();
           const hi_page = pop_page.split("\n");
-          console.log(hi_page);
+          //   console.log(hi_page);
         } catch (e) {
           router.replace("/");
         }
@@ -137,6 +141,109 @@ export default function THINGY4() {
   };
   const results_load = async () => {
     setpage("results");
+  };
+  const institution_load = async () => {
+    const thingy = await SecureStore.getItemAsync("cookie");
+    let header = {
+      Host: "www.tabroom.com",
+      Cookie: thingy,
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Referer: "https://www.tabroom.com/index/tourn/index.mhtml?tourn_id=40477",
+      Priority: "u=0, i",
+      Connection: "keep-alive",
+    };
+    const request = await fetch(
+      "https://www.tabroom.com/index/tourn/schools.mhtml?tourn_id=" + reference,
+      { method: "GET", headers: header, redirect: "follow" },
+    );
+    const pop = await request.text();
+    const hi = pop.split("\n");
+    console.log("WORKING");
+    let twemp = "";
+    for (let i = 0; i < hi.length; i++) {
+      if (hi[i].includes("fivesixth nowrap")) {
+        twemp += "(" + hi[i + 5].trim() + ") " + hi[i + 1].trim() + ";\t";
+      }
+    }
+    console.log(twemp);
+    setInstitutionData(
+      twemp.trim() == ""
+        ? "PS: Most tournaments don't upload this for some reason making life Harder, fun! "
+        : "Institutions Attending" + twemp,
+    );
+    setInstitutions(!institutions);
+  };
+
+  const date_load = async () => {
+    const thingy = await SecureStore.getItemAsync("cookie");
+    const headers = {
+      Host: " www.tabroom.com",
+      Cookie: thingy,
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Referer: " https://www.tabroom.com/index/search.mhtml",
+      Priority: " u=0, i",
+    };
+    const request = await fetch(
+      "https://www.tabroom.com/index/tourn/index.mhtml?tourn_id=" + reference,
+      {
+        method: "GET",
+        headers: headers,
+        redirect: "follow",
+      },
+    );
+    const pop = await request.text();
+    const grumpy = pop.split("\n");
+    let information = "";
+    for (let i = 0; i < grumpy.length; i++) {
+      if (
+        grumpy[i].includes("semibold") &&
+        grumpy[i].includes("smaller half")
+      ) {
+        let second_info = "";
+        let found = false;
+        for (let j = i + 2; j < grumpy.length; j++) {
+          if (found) {
+            second_info += grumpy[j].trim() + " ";
+          }
+          if (grumpy[j].includes("smaller half")) {
+            found = true;
+          }
+          if (grumpy[j].includes("</span>") && found) {
+            break;
+          }
+        }
+        information +=
+          grumpy[i + 1].trim() +
+          ":" +
+          second_info.replaceAll("</span>", "") +
+          "\n";
+      }
+    }
+    setDateInfo(information);
   };
 
   return (
@@ -303,11 +410,16 @@ export default function THINGY4() {
                     },
                   ]}
                   onPress={() => {
-                    setInstitutions(!institutions);
+                    institution_load();
                   }}
                 >
                   <View style={{ flexDirection: "row" }}>
-                    <Text style={{ color: light_dark ? "#ffffff" : "#000000" }}>
+                    <Text
+                      style={{
+                        color: light_dark ? "#ffffff" : "#000000",
+                        fontSize: 17,
+                      }}
+                    >
                       Institutions Attending
                     </Text>
                     <AntDesign
@@ -329,6 +441,14 @@ export default function THINGY4() {
                       color={light_dark ? "#ffffff" : "#000000"}
                     />
                   </View>
+                  <Text
+                    style={{
+                      display: institutions ? "flex" : "none",
+                      color: light_dark ? "#ffffff" : "#000000",
+                    }}
+                  >
+                    {institutiondata}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -341,11 +461,17 @@ export default function THINGY4() {
                     },
                   ]}
                   onPress={() => {
+                    date_load();
                     setDates(!dates);
                   }}
                 >
                   <View style={{ flexDirection: "row" }}>
-                    <Text style={{ color: light_dark ? "#ffffff" : "#000000" }}>
+                    <Text
+                      style={{
+                        color: light_dark ? "#ffffff" : "#000000",
+                        fontSize: 17,
+                      }}
+                    >
                       Dates & Deadlines
                     </Text>
                     <AntDesign
@@ -367,6 +493,14 @@ export default function THINGY4() {
                       color={light_dark ? "#ffffff" : "#000000"}
                     />
                   </View>
+                  <Text
+                    style={{
+                      display: dates ? "flex" : "none",
+                      color: light_dark ? "#ffffff" : "#000000",
+                    }}
+                  >
+                    {dateinfo}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -383,7 +517,12 @@ export default function THINGY4() {
                   }}
                 >
                   <View style={{ flexDirection: "row" }}>
-                    <Text style={{ color: light_dark ? "#ffffff" : "#000000" }}>
+                    <Text
+                      style={{
+                        color: light_dark ? "#ffffff" : "#000000",
+                        fontSize: 17,
+                      }}
+                    >
                       Pages & Uploads
                     </Text>
                     <AntDesign
@@ -435,7 +574,6 @@ const styles = StyleSheet.create({
     padding: 6,
     width: 340,
     marginLeft: 20,
-    height: 40,
     borderRadius: 10,
     backgroundColor: "white",
     borderWidth: 1,
