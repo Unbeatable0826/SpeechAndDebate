@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import {
     BackHandler,
+    Linking,
     ScrollView,
     StyleSheet,
     Text,
@@ -31,6 +32,7 @@ export default function THINGY4() {
   const [institutions, setInstitutions] = useState(false);
   const [dates, setDates] = useState(false);
   const [uploads, setUploads] = useState(false);
+  const [uploads_data, setuploaddataa] = useState([{ name: "", link: "" }]);
   //   const [name, setName] = useState("");
   let bop = "";
   const { reference } = useLocalSearchParams();
@@ -245,6 +247,62 @@ export default function THINGY4() {
     }
     setDateInfo(information);
   };
+  const load_uplaods = async () => {
+    const thingy = await SecureStore.getItemAsync("cookie");
+    let headers = {
+      Host: " www.tabroom.com",
+      Cookie: thingy,
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Referer: " https://www.tabroom.com/index/search.mhtml",
+      Priority: " u=0, i",
+    };
+    const request = await fetch(
+      "https://www.tabroom.com/index/tourn/index.mhtml?tourn_id=" + reference,
+      { method: "GET", headers: headers, redirect: "follow" },
+    );
+    const answer = await request.text();
+    const bye = answer.split("\n");
+    let thingyfor = [];
+    for (let i = 0; i < bye.length; i++) {
+      if (bye[i].includes("Pages &amp; Uploads")) {
+        for (let j = i + 1; j < bye.length; j++) {
+          let link = "";
+          let namelink = "";
+          if (bye[j].includes("yellow full")) {
+            // console.log("FOUND");
+            link = bye[j + 1].trim().replace("href=", "").replaceAll('"', "");
+            if (!link.includes("://")) {
+              link = "https://www.tabroom.com" + link;
+              namelink = bye[j + 2]
+                .trim()
+                .replaceAll("</a>", "")
+                .replaceAll(">", "");
+            } else {
+              namelink = bye[j + 4].trim();
+            }
+          }
+          if (namelink != "" && link != "") {
+            thingyfor.push({ link: link, name: namelink });
+          }
+        }
+        break;
+      }
+    }
+    console.log(thingyfor);
+    setuploaddataa(thingyfor);
+  };
 
   return (
     <View
@@ -399,7 +457,7 @@ export default function THINGY4() {
           if (page == "invite") {
             console.log("Rendering");
             return (
-              <View key={item} style={{ flex: 1 }}>
+              <ScrollView key={item} style={{ flex: 1 }}>
                 <TouchableOpacity
                   style={[
                     styles.work,
@@ -513,6 +571,7 @@ export default function THINGY4() {
                     },
                   ]}
                   onPress={() => {
+                    load_uplaods();
                     setUploads(!uploads);
                   }}
                 >
@@ -544,8 +603,42 @@ export default function THINGY4() {
                       color={light_dark ? "#ffffff" : "#000000"}
                     />
                   </View>
+                  <View style={{ display: uploads ? "flex" : "none" }}>
+                    {uploads_data.map((item) => {
+                      return (
+                        <TouchableOpacity
+                          style={{
+                            marginTop: 5,
+                            backgroundColor: light_dark
+                              ? "rgb(122, 126, 15)"
+                              : "white",
+                            padding: 5,
+                          }}
+                          onPress={async () => {
+                            await Linking.openURL(item.link);
+                          }}
+                          key={item.name}
+                        >
+                          <Text
+                            style={{
+                              color: light_dark ? "#ffffff" : "#000000",
+                            }}
+                          >
+                            {item.name}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                 </TouchableOpacity>
-              </View>
+                <Text></Text>
+                <Text></Text>
+                <Text></Text>
+                <Text></Text>
+                <Text></Text>
+                <Text></Text>
+                <Text></Text>
+              </ScrollView>
             );
           }
         })}
