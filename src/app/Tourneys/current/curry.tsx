@@ -30,19 +30,6 @@ export default function THINGY4() {
   const [institutiondata, setInstitutionData] = useState(
     "Institutions Attending: ",
   );
-  const injectedJavaScript = `
-function sendHeight() {
-    window.ReactNativeWebView.postMessage(
-        document.body.getBoundingClientRect().height.toString()
-    );
-}
-
-setTimeout(sendHeight, 300);
-setTimeout(sendHeight, 1000);
-setTimeout(sendHeight, 2000);
-
-true;
-`;
   const [dateinfo, setDateInfo] = useState("Date: ");
   const [hola, setHola] = useState([" "]);
   const [nopurpose, setskdjf] = useState([" "]);
@@ -295,6 +282,9 @@ true;
   useEffect(() => {
     const hello = async () => {
       const thingy = await SecureStore.getItemAsync("cookie");
+      const temp = await AsyncStorage.getItem("theme");
+      const temp_2 = !(temp == "light");
+      const light_dark = temp_2;
       // console.log(thingy);
       const header_page = {
         Host: "www.tabroom.com",
@@ -342,10 +332,36 @@ true;
           found = true;
         }
         if (found) {
-          page_render += hi_page[i] + "\n";
+          page_render += hi_page[i];
         }
       }
-      setInviteData(page_render);
+      const invite_thing =
+        (await page_render
+          .replaceAll(
+            "<p>",
+            "<p style='color: " +
+              (light_dark ? "#ffffff" : "#000000") +
+              "; font-size: 40px;'>",
+          )
+          .replaceAll(
+            '<p style="',
+            '<p style="color: ' +
+              (light_dark ? "#ffffff" : "#000000") +
+              "; font-size: 40px;'>",
+          )
+          .replaceAll(
+            "<td>",
+            '<td style="color: ' +
+              (light_dark ? "#ffffff" : "#000000") +
+              '; font-size: 40px;">',
+          )
+          .replaceAll(
+            "<strong>",
+            "<strong style='color: " +
+              (light_dark ? "#ffffff" : "#000000") +
+              "; font-size: 40px;'>",
+          )) + "\n";
+      setInviteData(invite_thing);
       console.log(page_render);
     };
     hello();
@@ -681,7 +697,13 @@ true;
 
                 <AutoHeightWebView
                   source={{ html: invite_data }}
-                  style={{ width: "100%" }}
+                  style={{
+                    width: "90%",
+                    backgroundColor: light_dark ? "#343232" : "#ffffff",
+                    marginTop: 20,
+                    marginLeft: "5%",
+                    borderRadius: 10,
+                  }}
                   scrollEnabled={false}
                 />
 
