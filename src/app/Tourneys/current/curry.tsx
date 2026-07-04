@@ -1,38 +1,55 @@
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import {
-    BackHandler,
-    Linking,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  BackHandler,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import AutoHeightWebView from "react-native-autoheight-webview";
 import { auth } from "../../../../firebaseConfig.js";
+
 // import { Ionicons } from '@expo/vector-icons';
 // import NavBar from "../NavBar";
-import { useLocalSearchParams } from "expo-router";
-
 //Home Featureset
 //
 export default function THINGY4() {
+  const [invite_data, setInviteData] = useState(``);
+  const [webViewHeight, setWebViewHeight] = useState(500); // 400 is a safe initial default
+
   const router = useRouter();
   const [light_dark, setld] = useState(false);
   const [page, setpage] = useState("invite");
   const [institutiondata, setInstitutionData] = useState(
     "Institutions Attending: ",
   );
+  const injectedJavaScript = `
+function sendHeight() {
+    window.ReactNativeWebView.postMessage(
+        document.body.getBoundingClientRect().height.toString()
+    );
+}
+
+setTimeout(sendHeight, 300);
+setTimeout(sendHeight, 1000);
+setTimeout(sendHeight, 2000);
+
+true;
+`;
   const [dateinfo, setDateInfo] = useState("Date: ");
   const [hola, setHola] = useState([" "]);
+  const [nopurpose, setskdjf] = useState([" "]);
   const [institutions, setInstitutions] = useState(false);
   const [dates, setDates] = useState(false);
   const [uploads, setUploads] = useState(false);
-  const [uploads_data, setuploaddataa] = useState([{ name: "", link: "" }]);
+  const [uploads_data, setuploaddataa] = useState([]); // IT FREAKING WORKS
   //   const [name, setName] = useState("");
   let bop = "";
   const { reference } = useLocalSearchParams();
@@ -91,35 +108,6 @@ export default function THINGY4() {
           const pop = await request.text();
           const hi = pop.split("\n");
 
-          const header_page = {
-            Host: "www.tabroom.com",
-            Cookie: thingy,
-            "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": '"Windows"',
-            "Accept-Language": "en-US,en;q=0.9",
-            "Upgrade-Insecure-Requests": "1",
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-            Accept:
-              "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "Sec-Fetch-Site": "same-origin",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-User": "?1",
-            "Sec-Fetch-Dest": "document",
-            Referer: "https://www.tabroom.com/index/index.mhtml",
-
-            Priority: "u=0, i",
-            Connection: "keep-alive",
-          };
-
-          const request_page = await fetch(
-            "https://www.tabroom.com/index/tourn/index.mhtml?tourn_id=" +
-              reference,
-            { method: "GET", headers: header_page, redirect: "follow" },
-          );
-          const pop_page = await request_page.text();
-          const hi_page = pop_page.split("\n");
           //   console.log(hi_page);
         } catch (e) {
           router.replace("/");
@@ -172,14 +160,14 @@ export default function THINGY4() {
     );
     const pop = await request.text();
     const hi = pop.split("\n");
-    console.log("WORKING");
+    // console.log("WORKING");
     let twemp = "";
     for (let i = 0; i < hi.length; i++) {
       if (hi[i].includes("fivesixth nowrap")) {
         twemp += "(" + hi[i + 5].trim() + ") " + hi[i + 1].trim() + ";\t";
       }
     }
-    console.log(twemp);
+    // console.log(twemp);
     setInstitutionData(
       twemp.trim() == ""
         ? "PS: Most tournaments don't upload this for some reason making life Harder, fun! "
@@ -303,6 +291,65 @@ export default function THINGY4() {
     console.log(thingyfor);
     setuploaddataa(thingyfor);
   };
+
+  useEffect(() => {
+    const hello = async () => {
+      const thingy = await SecureStore.getItemAsync("cookie");
+      // console.log(thingy);
+      const header_page = {
+        Host: "www.tabroom.com",
+        Cookie: thingy,
+        "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Accept-Language": "en-US,en;q=0.9",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        Referer: "https://www.tabroom.com/index/index.mhtml",
+
+        Priority: "u=0, i",
+        Connection: "keep-alive",
+      };
+      const request_page = await fetch(
+        "https://www.tabroom.com/index/tourn/index.mhtml?tourn_id=" + reference,
+        {
+          method: "GET",
+          headers: header_page,
+          redirect: "follow",
+        },
+      );
+      const pop_page = await request_page.text();
+      const hi_page = pop_page.split("\n");
+      let page_render = "";
+      let found = false;
+      for (let i = 0; i < hi_page.length; i++) {
+        if (hi_page[i].includes("</div>") && found) {
+          found = false;
+          break;
+        }
+        if (
+          hi_page[i].includes(
+            "thenines leftalign plain martop whiteback fullscreen padvertmore frontpage",
+          )
+        ) {
+          found = true;
+        }
+        if (found) {
+          page_render += hi_page[i] + "\n";
+        }
+      }
+      setInviteData(page_render);
+      console.log(page_render);
+    };
+    hello();
+  }, []);
 
   return (
     <View
@@ -631,6 +678,13 @@ export default function THINGY4() {
                     })}
                   </View>
                 </TouchableOpacity>
+
+                <AutoHeightWebView
+                  source={{ html: invite_data }}
+                  style={{ width: "100%" }}
+                  scrollEnabled={false}
+                />
+
                 <Text></Text>
                 <Text></Text>
                 <Text></Text>
