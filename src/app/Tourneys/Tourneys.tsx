@@ -7,7 +7,7 @@ import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import {
-  Animated,
+  Animated, //
   BackHandler,
   Easing,
   Keyboard,
@@ -992,7 +992,9 @@ export default function THINGY2() {
                   onPress={() => {
                     router.push({
                       pathname: "/Tourneys/current/curry",
-                      params: { reference: thingy.reference },
+                      params: {
+                        reference: thingy.reference.replaceAll("href", ""),
+                      },
                     });
                     //SHOULD REDIRECT TO TOURNAMENT PAGE// LATER PROBLEM
                   }}
@@ -1070,7 +1072,11 @@ export default function THINGY2() {
                   onPress={() => {
                     router.push({
                       pathname: "/Tourneys/current/curry",
-                      params: { reference: thingy.reference },
+                      params: {
+                        reference: thingy.reference
+                          .replaceAll("href", "")
+                          .trim(),
+                      },
                     });
                     //SHOULD REDIRECT TO TOURNAMENT PAGE// LATER PROBLEM
                   }}

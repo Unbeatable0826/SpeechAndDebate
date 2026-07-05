@@ -21,9 +21,10 @@ import { auth } from "../../../../firebaseConfig.js";
 //Home Featureset
 //
 export default function THINGY4() {
+  const [update, setupdate] = useState([]);
   const [invite_data, setInviteData] = useState(``);
-  const [webViewHeight, setWebViewHeight] = useState(500); // 400 is a safe initial default
-
+  const [webViewHeight, setWebViewHeight] = useState(500);
+  const [entries_data, setEntriesData] = useState([]);
   const router = useRouter();
   const [light_dark, setld] = useState(false);
   const [page, setpage] = useState("invite");
@@ -31,6 +32,7 @@ export default function THINGY4() {
     "Institutions Attending: ",
   );
   const [dateinfo, setDateInfo] = useState("Date: ");
+  const [currevent, setcurrevent] = useState("");
   const [hola, setHola] = useState([" "]);
   const [nopurpose, setskdjf] = useState([" "]);
   const [institutions, setInstitutions] = useState(false);
@@ -222,6 +224,59 @@ export default function THINGY4() {
     }
     setDateInfo(information);
   };
+  const load_entries = async () => {
+    const thingy = await SecureStore.getItemAsync("cookie");
+    let headers = {
+      Host: " www.tabroom.com",
+      Cookie: thingy,
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Priority: " u=0, i",
+    };
+    const request = await fetch(
+      "https://www.tabroom.com/index/tourn/fields.mhtml?tourn_id=" +
+        reference.trim(),
+      { method: "GET", headers: headers, redirect: "follow" },
+    );
+    const name12 = await request.text();
+    // console.log(name12);
+    const name23 = name12.split("\n");
+    const button_page_render = [];
+    for (let i = 0; i < name23.length; i++) {
+      if (
+        name23[i].includes("dkblue full") ||
+        name23[i].includes("blue full")
+      ) {
+        button_page_render.push({
+          linky: name23[i + 1]
+            .replaceAll("href=", "")
+            .replaceAll('"', "")
+            .replaceAll(">", "")
+            .trim(),
+          namey: name23[i + 2].trim(),
+        });
+      }
+    }
+    setEntriesData(button_page_render);
+    setcurrevent(button_page_render[0].namey || "");
+    // console.log(button_page_render);
+  };
+  useEffect(() => {
+    if (page === "entries") {
+      load_entries();
+    }
+  }, [page]);
   const load_uplaods = async () => {
     const thingy = await SecureStore.getItemAsync("cookie");
     let headers = {
@@ -275,9 +330,68 @@ export default function THINGY4() {
         break;
       }
     }
-    console.log(thingyfor);
+    // console.log(thingyfor);
     setuploaddataa(thingyfor);
   };
+  useEffect(() => {
+    const hello = async () => {
+      let event_id = ""; // THIS IS NOT EVENT_ID --> IT IS ACtuAlY SUBLINK under tabroom.com,  I SWEAR BRUV STUFF IS WEIRDDDDD ON THIS WEBSITE
+      for (let i = 0; i < entries_data.length; i++) {
+        if (entries_data[i].namey === currevent) {
+          event_id = entries_data[i].linky;
+          break;
+        }
+      }
+      const thingy = await SecureStore.getItemAsync("cookie");
+      let headers = {
+        Host: " www.tabroom.com",
+        Cookie: thingy,
+        "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Accept-Language": "en-US,en;q=0.9",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        Referer:
+          "https://www.tabroom.com/index/tourn/fields.mhtml?tourn_id=39094",
+        Priority: " u=0, i",
+      };
+      const request = await fetch("https://www.tabroom.com" + event_id, {
+        method: "GET",
+        headers: headers,
+        redirect: "follow",
+      });
+      const response = await request.text();
+      const hi = response.split("\n");
+      let currentpage = [];
+      for (let i = 0; i < hi.length; i++) {
+        if (hi[i].includes("<tr>")) {
+          let entry = "";
+          for (let j = i + 1; j < hi.length; j++) {
+            if (hi[j].includes("<td")) {
+              entry += hi[j + 1].trim().replaceAll("<a", "") + ";";
+            }
+            if (hi[j].includes("</tr>")) {
+              currentpage.push(entry);
+              break;
+            }
+          }
+        }
+        if (hi[i].includes("</tbody>")) {
+          break;
+        }
+      }
+      setupdate(currentpage);
+    };
+    hello();
+  }, [currevent]);
 
   useEffect(() => {
     const hello = async () => {
@@ -362,7 +476,7 @@ export default function THINGY4() {
               "; font-size: 40px;'>",
           )) + "\n";
       setInviteData(invite_thing);
-      console.log(page_render);
+      // console.log(page_render);
     };
     hello();
   }, []);
@@ -518,7 +632,7 @@ export default function THINGY4() {
       <ScrollView>
         {hola.map((item) => {
           if (page == "invite") {
-            console.log("Rendering");
+            // console.log("Rendering");
             return (
               <ScrollView key={item} style={{ flex: 1 }}>
                 <TouchableOpacity
@@ -715,6 +829,78 @@ export default function THINGY4() {
                 <Text></Text>
                 <Text></Text>
               </ScrollView>
+            );
+          } else if (page == "entries") {
+            return (
+              <>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={true}
+                  contentContainerStyle={{ flexDirection: "row" }}
+                  style={{ marginTop: 10, height: 50 }}
+                >
+                  {entries_data.map((item) => {
+                    return (
+                      <TouchableOpacity
+                        key={item.linky}
+                        style={[
+                          styles.topbuttons,
+                          {
+                            backgroundColor:
+                              currevent == item.namey
+                                ? "rgb(231, 147, 21)"
+                                : "rgb(0, 0, 0)",
+                            shadowColor: light_dark ? "white" : "black",
+                            shadowOffset: { width: 1, height: 2 },
+                            shadowOpacity: 0.8,
+                            shadowRadius: 5,
+                            elevation: 3,
+                            borderColor: light_dark ? "white" : "black",
+                          },
+                        ]}
+                        onPress={() => {
+                          setcurrevent(item.namey);
+                        }}
+                      >
+                        <Text style={{ color: light_dark ? "white" : "black" }}>
+                          {item.namey}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+                <ScrollView>
+                  {update.map((item) => {
+                    const thingy = item.split(";");
+                    return (
+                      <TouchableOpacity>
+                        <View style={{ flexDirection: "row" }}>
+                          <Text
+                            style={{ color: light_dark ? "white" : "black" }}
+                          >
+                            Institution: {thingy[0]}
+                          </Text>
+                          <Text
+                            style={{ color: light_dark ? "white" : "black" }}
+                          >
+                            Location: {thingy[1]}
+                          </Text>
+                          <Text
+                            style={{ color: light_dark ? "white" : "black" }}
+                          >
+                            Entry: {thingy[2]}
+                          </Text>
+                          <Text
+                            style={{ color: light_dark ? "white" : "black" }}
+                          >
+                            Code: {thingy[3]}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </>
             );
           }
         })}
