@@ -10,6 +10,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -21,11 +22,15 @@ import { auth } from "../../../../firebaseConfig.js";
 //Home Featureset
 //
 export default function THINGY4() {
-  const [update, setupdate] = useState([]);
+  const [update, setupdate] = useState([{}]);
   const [invite_data, setInviteData] = useState(``);
   const [webViewHeight, setWebViewHeight] = useState(500);
+  const [judges_page_existe, setJudgesPageExist] = useState(true);
+  const [judge_eventy, setJudgeEventy] = useState("");
   const [entries_data, setEntriesData] = useState([]);
   const router = useRouter();
+  const [judging_data, setJudgingData] = useState([]);
+  const [noentriesexisty, setnoentriesexisty] = useState(false);
   const [light_dark, setld] = useState(false);
   const [page, setpage] = useState("invite");
   const [institutiondata, setInstitutionData] = useState(
@@ -269,14 +274,74 @@ export default function THINGY4() {
       }
     }
     setEntriesData(button_page_render);
-    setcurrevent(button_page_render[0].namey || "");
+    if (button_page_render.length > 0) {
+      setcurrevent(button_page_render[0].namey || "");
+    }
     // console.log(button_page_render);
   };
   useEffect(() => {
     if (page === "entries") {
       load_entries();
+    } else if (page === "judges") {
+      load_judges();
     }
   }, [page]);
+  const load_judges = async () => {
+    const thingy = await SecureStore.getItemAsync("cookie");
+    let headers = {
+      Host: " www.tabroom.com",
+      Cookie: thingy,
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Referer:
+        "https://www.tabroom.com/index/tourn/judges.mhtml?tourn_id=" +
+        reference,
+      Priority: " u=0, i",
+    };
+    const request = await fetch(
+      "https://www.tabroom.com/index/tourn/judges.mhtml?tourn_id=" +
+        reference.trim(),
+      {
+        method: "GET",
+        headers: headers,
+        redirect: "follow",
+      },
+    );
+    const response = await request.text();
+    const hi_thing = response.split("\n");
+    let judge_events = [];
+    for (let i = 0; i < hi_thing.length; i++) {
+      if (hi_thing[i].includes("twofifths semibold bluetext padleft")) {
+        judge_events.push({
+          eventy: hi_thing[i + 1].trim(),
+          referency: hi_thing[i + 7]
+            .trim()
+            .replaceAll("href=", "")
+            .replaceAll('"', "")
+            .replaceAll(">", "")
+            .trim(),
+        });
+      }
+    }
+    if (judge_events.length == 0) {
+      setJudgesPageExist(false);
+    } else {
+      setJudgesPageExist(true);
+    }
+    console.log(judge_events);
+    setJudgingData(judge_events);
+  };
   const load_uplaods = async () => {
     const thingy = await SecureStore.getItemAsync("cookie");
     let headers = {
@@ -379,7 +444,7 @@ export default function THINGY4() {
               entry += hi[j + 1].trim().replaceAll("<a", "") + ";";
             }
             if (hi[j].includes("</tr>")) {
-              currentpage.push(entry);
+              currentpage.push({ entry: entry, show: true });
               break;
             }
           }
@@ -387,6 +452,12 @@ export default function THINGY4() {
         if (hi[i].includes("</tbody>")) {
           break;
         }
+      }
+      if (entries_data == null || entries_data.length === 0) {
+        currentpage = [];
+        setnoentriesexisty(true);
+      } else {
+        setnoentriesexisty(false);
       }
       setupdate(currentpage);
     };
@@ -474,7 +545,20 @@ export default function THINGY4() {
             "<strong style='color: " +
               (light_dark ? "#ffffff" : "#000000") +
               "; font-size: 40px;'>",
+          )
+          .replaceAll(
+            "<h4>",
+            "<h4 style='color: " +
+              (light_dark ? "#ffffff" : "#000000") +
+              "; font-size: 60px;'>",
+          )
+          .replaceAll(
+            '<span style="font-size: 14px;">',
+            '<span style="color: ' +
+              (light_dark ? "#ffffff" : "#000000") +
+              '; font-size: 30px;">',
           )) + "\n";
+
       setInviteData(invite_thing);
       // console.log(page_render);
     };
@@ -836,8 +920,13 @@ export default function THINGY4() {
                 <ScrollView
                   horizontal={true}
                   showsHorizontalScrollIndicator={true}
+                  key={item}
                   contentContainerStyle={{ flexDirection: "row" }}
-                  style={{ marginTop: 10, height: 50 }}
+                  style={{
+                    marginTop: 10,
+                    height: 50,
+                    display: noentriesexisty ? "none" : "flex",
+                  }}
                 >
                   {entries_data.map((item) => {
                     return (
@@ -870,38 +959,145 @@ export default function THINGY4() {
                   })}
                 </ScrollView>
                 <ScrollView>
+                  <TextInput
+                    style={{
+                      marginLeft: 20,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      borderColor: light_dark ? "white" : "black",
+                      padding: 10,
+                      color: light_dark ? "white" : "black",
+                      width: "90%",
+                      display: noentriesexisty ? "none" : "flex",
+                    }}
+                    placeholderTextColor={light_dark ? "white" : "black"}
+                    onChangeText={(text) => {
+                      // Honestly , i have no idea how to make this more efficient, cuz it legit runs on every character type, USING 700MB OF RAM FOR SMOE REASON **COUGH COUGH, iphones can't run /j
+                      setupdate(
+                        update.map((item) => {
+                          if (
+                            item.entry
+                              .toLowerCase()
+                              .includes(text.toLowerCase())
+                          ) {
+                            return { ...item, show: true };
+                          } else {
+                            return { ...item, show: false };
+                          }
+                        }),
+                      );
+                    }}
+                    placeholder="Search Entries"
+                  ></TextInput>
                   {update.map((item) => {
-                    const thingy = item.split(";");
+                    if (!item) {
+                      return null;
+                    }
+                    const thingy = item.entry?.split(";");
                     return (
-                      <TouchableOpacity>
-                        <View style={{ flexDirection: "row" }}>
-                          <Text
-                            style={{ color: light_dark ? "white" : "black" }}
-                          >
-                            Institution: {thingy[0]}
-                          </Text>
-                          <Text
-                            style={{ color: light_dark ? "white" : "black" }}
-                          >
-                            Location: {thingy[1]}
-                          </Text>
-                          <Text
-                            style={{ color: light_dark ? "white" : "black" }}
-                          >
-                            Entry: {thingy[2]}
-                          </Text>
-                          <Text
-                            style={{ color: light_dark ? "white" : "black" }}
-                          >
-                            Code: {thingy[3]}
-                          </Text>
-                        </View>
+                      <TouchableOpacity
+                        key={thingy[3]}
+                        style={[
+                          styles.work,
+                          {
+                            display: item.show ? "flex" : "none",
+                            backgroundColor: light_dark
+                              ? "rgb(0, 0, 0)"
+                              : "white",
+                            borderColor: light_dark ? "#404142" : "#e2e8f0",
+                            shadowColor: light_dark ? "white" : "black",
+                          },
+                        ]}
+                      >
+                        <Text style={{ color: "green" }}>
+                          Institution: {thingy[0]}
+                        </Text>
+                        <Text style={{ color: light_dark ? "white" : "black" }}>
+                          Location: {thingy[1]}
+                        </Text>
+                        <Text style={{ color: "red" }}>Entry: {thingy[2]}</Text>
+                        <Text style={{ color: light_dark ? "white" : "black" }}>
+                          Code: {thingy[3]}
+                        </Text>
                       </TouchableOpacity>
                     );
                   })}
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      display: noentriesexisty ? "flex" : "none",
+                      color: light_dark ? "white" : "black",
+                    }}
+                  >
+                    No Entries Found; Some tournament may not have released them
+                    yet or umm, they just don't show them.
+                  </Text>
+                  <Text></Text>
+                  <Text></Text>
+                  <Text></Text>
+                  <Text></Text>
+                  <Text></Text>
                 </ScrollView>
               </>
             );
+          } else if ("judges" == page) {
+            {
+              return (
+                <>
+                  <ScrollView
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={true}
+                    key={item}
+                    contentContainerStyle={{ flexDirection: "row" }}
+                    style={{
+                      marginTop: 10,
+                      height: 50,
+                      display: !judges_page_existe ? "none" : "flex",
+                    }}
+                  >
+                    {judging_data.map((item) => {
+                      return (
+                        <TouchableOpacity
+                          key={item.referency}
+                          style={[
+                            styles.topbuttons,
+                            {
+                              alignContent: "center",
+                              justifyContent: "center",
+                              minWidth: 70,
+                              backgroundColor:
+                                judge_eventy == item.eventy
+                                  ? "rgb(231, 147, 21)"
+                                  : "rgb(0, 0, 0)",
+                              shadowColor: light_dark ? "white" : "black",
+                              shadowOffset: { width: 1, height: 2 },
+                              shadowOpacity: 0.8,
+                              shadowRadius: 5,
+                              elevation: 3,
+                              borderColor: light_dark ? "white" : "black",
+                            },
+                          ]}
+                          onPress={() => {
+                            setJudgeEventy(item.eventy);
+                          }}
+                        >
+                          <Text
+                            style={{
+                              // alignItems: "center",
+                              // justifyContent: "center",
+                              color: light_dark ? "white" : "black",
+                              alignSelf: "center",
+                            }}
+                          >
+                            {item.eventy}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </>
+              );
+            }
           }
         })}
       </ScrollView>
