@@ -27,6 +27,7 @@ export default function THINGY4() {
   const [webViewHeight, setWebViewHeight] = useState(500);
   const [judges_page_existe, setJudgesPageExist] = useState(true);
   const [judge_eventy, setJudgeEventy] = useState("");
+  const [judge_page, setJudgePage] = useState([{}]);
   const [entries_data, setEntriesData] = useState([]);
   const router = useRouter();
   const [judging_data, setJudgingData] = useState([]);
@@ -461,6 +462,7 @@ export default function THINGY4() {
         let first_thing = 0;
         let information = "";
         let paradigm = "";
+        let ran = false;
         if (hi[i].includes('tr class="smaller"')) {
           for (let j = i + 1; j < hi.length; j++) {
             if (hi[j].includes("</tr>")) {
@@ -478,9 +480,6 @@ export default function THINGY4() {
                   .replaceAll('"', "")
                   .replaceAll("href  =", "")
                   .replaceAll("href=", "");
-              } else if (hi[j + 1].includes("</td>")) {
-                information += judge_info_fields[first_thing] + ":" + " " + ";";
-                first_thing++;
               } else if (
                 !hi[j + 1].includes("</td>") &&
                 !hi[j + 2].includes(
@@ -501,8 +500,9 @@ export default function THINGY4() {
                   hi[j + 1].includes("<a") &&
                   hi[j + 4].includes("white full padvert padleft")
                 ) {
-                  information +=
-                    judge_info_fields[first_thing] + ":" + " " + ";";
+                  // information +=
+                  //   judge_info_fields[first_thing] + ":" + " " + ";";
+                  continue;
                 } else {
                   information +=
                     judge_info_fields[first_thing] +
@@ -515,14 +515,82 @@ export default function THINGY4() {
               }
             }
           }
-          plain_information.push({ info: information, paradime: paradigm });
+          plain_information.push({
+            info: information,
+            paradime: paradigm,
+            show: true,
+            expand: false,
+            details: "",
+          });
         }
       }
-      console.log(plain_information);
-      console.log(judge_info_fields);
+      setJudgePage(plain_information);
     };
     hello();
   }, [judge_eventy]);
+
+  const run_info_fetch = async (linkfetch) => {
+    const thingy = await SecureStore.getItemAsync("cookie");
+    let eventpr = "";
+    for (let i = 0; i < judging_data.length; i++) {
+      if (judging_data[i].eventy === judge_eventy) {
+        eventpr = judging_data[i].referency;
+        break;
+      }
+    }
+    let headers = {
+      Host: " www.tabroom.com",
+      Cookie: thingy,
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Referer: "https://www.tabroom.com" + eventpr,
+      Priority: " u=0, i",
+    };
+    const request = await fetch("https://www.tabroom.com/" + linkfetch, {
+      method: "GET",
+      headers: headers,
+      redirect: "follow",
+    });
+    const response = await request.text();
+    const hi = response.split("\n");
+    let data_curry = "";
+    let end = false;
+    for (let i = 0; i < hi.length; i++) {
+      if (hi[i].includes("</div>") && end) {
+        break;
+      }
+      if (end) {
+        console.log(hi[i]);
+        data_curry += hi[i] + "\n";
+      }
+      if (hi[i].includes("paradigm ltborderbottom")) {
+        end = true;
+      }
+    }
+
+    setJudgePage(
+      judge_page.map((item) => {
+        if (item.paradime == linkfetch) {
+          return { ...item, details: data_curry, expand: true };
+        }
+        return item;
+      }),
+    );
+    // console.log(response);
+
+    //paradigm ltborderbottom
+  };
 
   useEffect(() => {
     const hello = async () => {
@@ -1221,7 +1289,151 @@ export default function THINGY4() {
                       );
                     })}
                   </ScrollView>
-                  <ScrollView></ScrollView>
+                  <TextInput
+                    style={{
+                      marginLeft: 20,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      borderColor: light_dark ? "white" : "black",
+                      padding: 10,
+                      color: light_dark ? "white" : "black",
+                      width: "90%",
+                      display: !judges_page_existe ? "none" : "flex",
+                    }}
+                    placeholderTextColor={light_dark ? "white" : "black"}
+                    placeholder="Search Judge"
+                    onChangeText={(text) => {
+                      setJudgePage(
+                        judge_page.map((item) => {
+                          if (
+                            item.info.toLowerCase().includes(text.toLowerCase())
+                          ) {
+                            return { ...item, show: true };
+                          } else {
+                            return { ...item, show: false };
+                          }
+                        }),
+                      );
+                    }}
+                  ></TextInput>
+                  <ScrollView>
+                    {judge_page.map((item) => {
+                      const pwr = item.info.split(";");
+                      let details = "";
+                      // console.log(pwr);
+                      return (
+                        <TouchableOpacity
+                          key={item.info}
+                          style={[
+                            styles.work,
+                            {
+                              display: item.show ? "flex" : "none",
+                              backgroundColor: light_dark
+                                ? "rgb(0, 0, 0)"
+                                : "white",
+                              borderColor: light_dark ? "#404142" : "#e2e8f0",
+                              shadowColor: light_dark ? "white" : "black",
+                            },
+                          ]}
+                        >
+                          {pwr.map((item2) => {
+                            // console.log(item2);
+                            return (
+                              <Text
+                                style={{
+                                  color:
+                                    item2.includes("First") ||
+                                    item2.includes("Last")
+                                      ? "green"
+                                      : item2.includes("Institution")
+                                        ? "red"
+                                        : light_dark
+                                          ? "white"
+                                          : "black",
+                                }}
+                                key={item2 + item.info + ""}
+                              >
+                                {item2}
+                              </Text>
+                            );
+                          })}
+                          <TouchableOpacity
+                            style={{
+                              alignSelf: "flex-end",
+                              display: item.paradime != "" ? "flex" : "none",
+                            }}
+                            onPress={() => {
+                              setJudgePage((prev) =>
+                                prev.map((judge) =>
+                                  judge.info === item.info
+                                    ? { ...judge, expand: !judge.expand }
+                                    : judge,
+                                ),
+                              );
+                              if (!item.expand) {
+                                run_info_fetch(item.paradime);
+                              }
+                            }}
+                          >
+                            <View style={{ flexDirection: "row" }}>
+                              <Text
+                                style={{
+                                  color: light_dark ? "white" : "black",
+                                }}
+                              >
+                                More Details
+                              </Text>
+                              <AntDesign
+                                style={{
+                                  alignContent: "center",
+                                  display: !item.expand ? "flex" : "none",
+                                  marginTop: 3,
+                                }}
+                                name="arrow-up"
+                                size={15}
+                                color="red"
+                              />
+                              <AntDesign
+                                style={{
+                                  display: item.expand ? "flex" : "none",
+                                  alignContent: "center",
+                                  marginTop: 3,
+                                }}
+                                name="arrow-down"
+                                size={15}
+                                color="red"
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          <AutoHeightWebView
+                            style={{
+                              display: item.expand ? "flex" : "none",
+                              width: "80%",
+                            }}
+                            source={{
+                              html: `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+        </style>
+      </head>
+      <body>
+        ${item.details}
+      </body>
+    </html>
+  `,
+                            }}
+                          />
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
                 </>
               );
             }
