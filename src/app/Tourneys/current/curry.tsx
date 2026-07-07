@@ -337,11 +337,13 @@ export default function THINGY4() {
     if (judge_events.length == 0) {
       setJudgesPageExist(false);
     } else {
+      setJudgeEventy(judge_events[0].eventy);
       setJudgesPageExist(true);
     }
     console.log(judge_events);
     setJudgingData(judge_events);
   };
+
   const load_uplaods = async () => {
     const thingy = await SecureStore.getItemAsync("cookie");
     let headers = {
@@ -398,6 +400,130 @@ export default function THINGY4() {
     // console.log(thingyfor);
     setuploaddataa(thingyfor);
   };
+
+  useEffect(() => {
+    const hello = async () => {
+      const thingy = await SecureStore.getItemAsync("cookie");
+      const header = {
+        Host: " www.tabroom.com",
+        Cookie: thingy,
+        "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Accept-Language": "en-US,en;q=0.9",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        Referer:
+          "https://www.tabroom.com/index/tourn/fields.mhtml?tourn_id=" +
+          reference.trim(),
+        Priority: " u=0, i",
+      };
+      let eventpr = "";
+      for (let i = 0; i < judging_data.length; i++) {
+        if (judging_data[i].eventy === judge_eventy) {
+          eventpr = judging_data[i].referency;
+          break;
+        }
+      }
+
+      const request = await fetch("https://www.tabroom.com" + eventpr, {
+        method: "GET",
+        headers: header,
+        redirect: "follow",
+      });
+      let judge_info_fields = [];
+      const response = await request.text();
+      const hi = response.split("\n");
+      let times = 0;
+      let plain_information = [];
+      for (let i = 0; i < hi.length; i++) {
+        if (hi[i].includes("<thead>")) {
+          for (let j = i + 1; j < hi.length; j++) {
+            if (hi[j].includes("</thead>")) {
+              break;
+            }
+            if (
+              hi[j].includes("<th") &&
+              !hi[j + 1].includes("Record") &&
+              !hi[j + 1].includes("Paradigm")
+            ) {
+              judge_info_fields.push(hi[j + 1].trim());
+            }
+          }
+        }
+        let first_thing = 0;
+        let information = "";
+        let paradigm = "";
+        if (hi[i].includes('tr class="smaller"')) {
+          for (let j = i + 1; j < hi.length; j++) {
+            if (hi[j].includes("</tr>")) {
+              break;
+            }
+            if (hi[j].includes("<td")) {
+              if (
+                hi[j + 1].includes("<a") &&
+                hi[j + 3].includes(
+                  "buttonwhite bluetext fa fa-xs fa-file-text-o padless padleft",
+                )
+              ) {
+                paradigm = hi[j + 2]
+                  .trim()
+                  .replaceAll('"', "")
+                  .replaceAll("href  =", "")
+                  .replaceAll("href=", "");
+              } else if (hi[j + 1].includes("</td>")) {
+                information += judge_info_fields[first_thing] + ":" + " " + ";";
+                first_thing++;
+              } else if (
+                !hi[j + 1].includes("</td>") &&
+                !hi[j + 2].includes(
+                  "buttonwhite bluetext fa fa-sm padless fa-file-text marno",
+                )
+              ) {
+                if (
+                  hi[j + 1].includes("<a") &&
+                  !hi[j + 4].includes("white full padvert padleft")
+                ) {
+                  information +=
+                    judge_info_fields[first_thing] +
+                    ":" +
+                    " " +
+                    hi[j + 4].trim() +
+                    ";";
+                } else if (
+                  hi[j + 1].includes("<a") &&
+                  hi[j + 4].includes("white full padvert padleft")
+                ) {
+                  information +=
+                    judge_info_fields[first_thing] + ":" + " " + ";";
+                } else {
+                  information +=
+                    judge_info_fields[first_thing] +
+                    ":" +
+                    " " +
+                    hi[j + 1].trim() +
+                    ";";
+                }
+                first_thing++;
+              }
+            }
+          }
+          plain_information.push({ info: information, paradime: paradigm });
+        }
+      }
+      console.log(plain_information);
+      console.log(judge_info_fields);
+    };
+    hello();
+  }, [judge_eventy]);
+
   useEffect(() => {
     const hello = async () => {
       let event_id = ""; // THIS IS NOT EVENT_ID --> IT IS ACtuAlY SUBLINK under tabroom.com,  I SWEAR BRUV STUFF IS WEIRDDDDD ON THIS WEBSITE
@@ -1095,6 +1221,7 @@ export default function THINGY4() {
                       );
                     })}
                   </ScrollView>
+                  <ScrollView></ScrollView>
                 </>
               );
             }
