@@ -22,6 +22,8 @@ import { auth } from "../../../../firebaseConfig.js";
 //Home Featureset
 //
 export default function THINGY4() {
+  const [panel2, setpanel2] = useState([{}]);
+  const [panel2selected, setpanel2selected] = useState("");
   const [pairing_eventy, setpairing_eventy] = useState("");
   const [pairing_page_existe, setPairingPageExist] = useState(true);
   const [update, setupdate] = useState([{}]);
@@ -115,7 +117,77 @@ export default function THINGY4() {
     });
   }, []);
   useEffect(() => {
-    console.log("RUNNNING");
+    const hello = async () => {
+      const thingy = await SecureStore.getItemAsync("cookie");
+      let headers = {
+        Host: "www.tabroom.com",
+        "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Accept-Language": "en-US,en;q=0.9",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        Priority: "u=0, i",
+      };
+
+      const request = await fetch(
+        "https://www.tabroom.com/index/tourn/postings/index.mhtml?tourn_id=" +
+          reference,
+        {
+          method: "GET",
+          headers: headers,
+          redirect: "follow",
+        },
+      );
+      const response = await request.text();
+      const hi = response.split("\n");
+      let current_clicky = "";
+      for (let i = 0; i < pairing_panel_1.length; i++) {
+        if (pairing_eventy === pairing_panel_1[i].nameything) {
+          current_clicky = pairing_panel_1[i].value_ref;
+        }
+      }
+      let rouns = [];
+      for (let i = 0; i < hi.length; i++) {
+        if (
+          hi[i].includes("padleft blueborderleft eventListing hidden") &&
+          hi[i].includes(current_clicky.trim())
+        ) {
+          for (let j = i + 1; j < hi.length; j++) {
+            if (hi[j].includes("padleft blueborderleft eventListing hidden")) {
+              break;
+            }
+            if (hi[j].includes("/index/tourn/postings/round.mhtml")) {
+              let round_name = "";
+              for (let y = j + 2; y < hi.length; y++) {
+                if (hi[y].includes("</a>")) {
+                  break;
+                }
+                round_name += hi[y].trim() + "";
+              }
+
+              rouns.push({
+                ref: hi[j].trim().replaceAll("href=", "").replaceAll('"', ""),
+                name: round_name,
+              });
+            }
+          }
+
+          break;
+        }
+      }
+      setpanel2(rouns);
+      setpanel2selected(rouns[0].name);
+    };
+
+    hello();
   }, [pairing_eventy]);
 
   const invite_load = async () => {
@@ -1409,7 +1481,7 @@ export default function THINGY4() {
                       // console.log(pwr);
                       return (
                         <TouchableOpacity
-                          key={item.info}
+                          key={item.info + ""}
                           style={[
                             styles.work,
                             {
@@ -1587,6 +1659,54 @@ export default function THINGY4() {
                         </Text>
                       </TouchableOpacity>
                     );
+                  })}
+                </ScrollView>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={true}
+                  key={item.namey}
+                  contentContainerStyle={{ flexDirection: "row" }}
+                  style={{
+                    marginTop: 10,
+                    height: 50,
+                    display: !pairing_page_existe ? "none" : "flex",
+                  }}
+                >
+                  {panel2.map((thing) => {
+                    if (pairing_page_existe) {
+                      return (
+                        <TouchableOpacity
+                          key={thing.name}
+                          style={[
+                            styles.topbuttons,
+                            {
+                              alignContent: "center",
+                              justifyContent: "center",
+                              minWidth: 70,
+                              backgroundColor:
+                                panel2selected == thing.name
+                                  ? "rgb(231, 147, 21)"
+                                  : "rgb(0, 0, 0)",
+                              shadowColor: light_dark ? "white" : "black",
+                              shadowOffset: { width: 1, height: 2 },
+                              shadowOpacity: 0.8,
+                              shadowRadius: 5,
+                              elevation: 3,
+                              borderColor: light_dark ? "white" : "black",
+                            },
+                          ]}
+                          onPress={() => {
+                            setpanel2selected(thing.name);
+                          }}
+                        >
+                          <Text
+                            style={{ color: light_dark ? "white" : "black" }}
+                          >
+                            {thing.name}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    }
                   })}
                 </ScrollView>
               </>
