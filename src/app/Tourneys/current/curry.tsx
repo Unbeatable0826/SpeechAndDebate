@@ -21,6 +21,7 @@ import { auth } from "../../../../firebaseConfig.js";
 // import NavBar from "../NavBar";
 //Home Featureset
 //
+// [[{ref: existe, actual thing}, {ref: existe, actual thing}], [], [], []] -- > 2d is another person, well another pairing / THE MASTER PLAN
 export default function THINGY4() {
   const [panel2, setpanel2] = useState([{}]);
   const [panel2selected, setpanel2selected] = useState("");
@@ -73,7 +74,121 @@ export default function THINGY4() {
       goback,
     );
   }, []);
-  const bigquery = async () => {};
+  useEffect(() => {
+    const hello = async () => {
+      const thingy = await SecureStore.getItemAsync("cookie");
+      let reference = "";
+      for (let i = 0; i < panel2.length; i++) {
+        if (panel2[i].name === panel2selected) {
+          reference = panel2[i].ref.trim();
+        }
+      }
+      let headers = {
+        Host: "www.tabroom.com",
+        "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Accept-Language": "en-US,en;q=0.9",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        Referer:
+          "https://www.tabroom.com/index/tourn/postings/round.mhtml?tourn_id=40497&round_id=1535084",
+        Priority: "u=0, i",
+      };
+      const request = await fetch("https:/www.tabroom.com" + reference);
+      const response = await request.text();
+      const hi = response.split("\n");
+      if (response.includes('<tr class="smallish">')) {
+        let pairings = [];
+        let roomys = [];
+        for (let i = 0; i < hi.length; i++) {
+          if (hi[i].includes('<tr class="yellowrow smallish padless">')) {
+            for (let j = i; j < hi.length; j++) {
+              if (hi[j].includes("</tr>")) {
+                break;
+              }
+              if (
+                hi[j].includes("centeralign") &&
+                !hi[j + 1].includes("</th>")
+              ) {
+                roomys.push(hi[j + 1].trim());
+              } else if (
+                hi[j].includes("centeralign") &&
+                hi[j + 1].includes("</th>")
+              ) {
+                roomys.push(" ");
+              }
+            }
+          } // ROOMYYY STUFF
+          let propy = [];
+          if (hi[i].includes('<tr class="smallish">')) {
+            // bUNCH of these exist
+            let counter = 0;
+            for (let j = i; j < hi.length; j++) {
+              // UNDER THE TR, WHICH MEANS ONE PAIRING ENTRY THING
+              let linky = "";
+              let namey = "";
+              if (hi[j].includes("</tr>")) {
+                break;
+              }
+              if (hi[j].includes("<td")) {
+                // ONE FIELD
+
+                for (let y = j; y < hi.length; y++) {
+                  if (hi[y].trim() == "") {
+                    continue;
+                  } else if (hi[y].includes("/index/tourn")) {
+                    linky = hi[y]
+                      .trim()
+                      .replaceAll(" ", "")
+                      .replaceAll("href=", "")
+                      .replaceAll('"', "")
+                      .replaceAll('target = "_blank"', "");
+                  } else if (hi[y].includes("http")) {
+                    linky = hi[y]
+                      .trim()
+                      .replaceAll(" ", "")
+                      .replaceAll("href=", "")
+                      .replaceAll('"', "")
+                      .replaceAll('target = "_blank"', "");
+                  } else if (
+                    hi[y].trim() != "" &&
+                    !hi[y].includes("<") &&
+                    !hi[y].includes(">") &&
+                    !hi[y].includes("class")
+                  ) {
+                    namey += hi[y]
+                      .trim()
+                      .replaceAll('target = "_blank"', "")
+                      .replaceAll('"', "");
+                  }
+                  if (hi[y].includes("</td>")) {
+                    break;
+                  }
+                }
+                propy.push({
+                  link: linky,
+                  name: roomys[counter] + " : " + namey,
+                });
+                counter++;
+              }
+              pairings.push(propy);
+            }
+          }
+        }
+        console.log(pairings);
+      }
+    };
+    hello();
+  }, [panel2selected]);
+
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
