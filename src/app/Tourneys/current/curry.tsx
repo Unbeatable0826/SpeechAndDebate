@@ -23,6 +23,7 @@ import { auth } from "../../../../firebaseConfig.js";
 //
 // [[{ref: existe, actual thing}, {ref: existe, actual thing}], [], [], []] -- > 2d is another person, well another pairing / THE MASTER PLAN
 export default function THINGY4() {
+  const [pairings_info, setpairingsinfo] = useState([{}]);
   const [panel2, setpanel2] = useState([{}]);
   const [panel2selected, setpanel2selected] = useState("");
   const [pairing_eventy, setpairing_eventy] = useState("");
@@ -183,7 +184,75 @@ export default function THINGY4() {
             }
           }
         }
-        console.log(pairings);
+        setpairingsinfo(pairings);
+      } else if (response.includes("<tr>")) {
+        let pairingss = [];
+        let roomys = [];
+        for (let i = 0; i < hi.length; i++) {
+          if (hi[i].includes('<tr class="yellowrow">')) {
+            for (let j = i; j < hi.length; j++) {
+              if (hi[j].includes("</tr>")) {
+                break;
+              }
+              if (hi[j].includes("<th") && !hi[j + 1].includes("</th>")) {
+                roomys.push(hi[j + 1].trim().replaceAll("&amp;", "&"));
+              } else if (hi[j].includes("<th") && hi[j + 1].includes("</th>")) {
+                roomys.push(" ");
+              }
+            }
+          }
+          let propy = [];
+          if (hi[i].includes("<tr>")) {
+            let counter = 0;
+            for (let j = i; j < hi.length; j++) {
+              let linky = "";
+              let namey = "";
+              if (hi[j].includes("</tr>")) {
+                break;
+              }
+              if (hi[j].includes("<td")) {
+                for (let y = j; y < hi.length; y++) {
+                  if (hi[y].trim() == "") {
+                    continue;
+                  } else if (hi[y].includes("/index/tourn")) {
+                    linky = hi[y]
+                      .trim()
+                      .replaceAll(" ", "")
+                      .replaceAll("href=", "")
+                      .replaceAll('"', "");
+                  } else if (hi[y].includes("http")) {
+                    linky = hi[y]
+                      .trim()
+                      .replaceAll(" ", "")
+                      .replaceAll("href=", "")
+                      .replaceAll('"', "");
+                  } else if (
+                    hi[y].trim() != "" &&
+                    !hi[y].includes("<") &&
+                    !hi[y].includes(">") &&
+                    !hi[y].includes("class") &&
+                    !hi[y].includes("data-text") &&
+                    !hi[y].includes("style=") &&
+                    !hi[y].includes("title=")
+                  ) {
+                    namey += hi[y].trim().replaceAll('"', "") + " ";
+                  }
+                  if (hi[y].includes("</td>")) {
+                    break;
+                  }
+                }
+                propy.push({
+                  link: linky,
+                  name: roomys[counter] + " : " + namey,
+                });
+                counter++;
+              }
+            }
+            pairingss.push(propy);
+          }
+        }
+        console.log(pairingss);
+        console.log(roomys);
       }
     };
     hello();
@@ -299,7 +368,9 @@ export default function THINGY4() {
         }
       }
       setpanel2(rouns);
-      setpanel2selected(rouns[0].name);
+      if (rouns.length > 0) {
+        setpanel2selected(rouns[0].name);
+      }
     };
 
     hello();
