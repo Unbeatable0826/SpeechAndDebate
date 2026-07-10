@@ -180,6 +180,7 @@ export default function THINGY4() {
                   }
                 }
                 propy.push({
+                  show: true,
                   link: linky,
                   name: roomys[counter] + " : " + namey,
                 });
@@ -190,8 +191,8 @@ export default function THINGY4() {
           }
         }
         setpairingsinfo(pairings);
-        console.log(pairings);
       } else if (response.includes("<tr>")) {
+        setCurrentPairingEvent("speech");
         let pairingss = [];
         let roomys = [];
         for (let i = 0; i < hi.length; i++) {
@@ -250,6 +251,7 @@ export default function THINGY4() {
                 propy.push({
                   link: linky,
                   name: roomys[counter] + " : " + namey,
+                  show: true,
                 });
                 counter++;
               }
@@ -257,9 +259,11 @@ export default function THINGY4() {
             pairingss.push(propy);
           }
         }
-        console.log(pairingss);
-        console.log(roomys);
+        // console.log(pairingss);
+        // console.log(roomys);
+        setpairingsinfo(pairingss);
       } else if (response.includes('<tr class="yellowrow smaller">')) {
+        setCurrentPairingEvent("congress");
         let roomys = [];
         let pairings = [];
         for (let i = 0; i < hi.length; i++) {
@@ -319,6 +323,7 @@ export default function THINGY4() {
                 propy.push({
                   link: linky,
                   name: roomys[counter] + " : " + namey,
+                  show: true,
                 });
                 counter++;
               }
@@ -326,7 +331,8 @@ export default function THINGY4() {
             pairings.push(propy);
           }
         }
-        console.log(pairings);
+
+        setpairingsinfo(pairings);
       }
     };
     hello();
@@ -1604,35 +1610,42 @@ export default function THINGY4() {
                   {update.map((item) => {
                     if (!item) {
                       return null;
+                    } else {
+                      const thingy = item.entry?.split(";");
+                      return (
+                        <TouchableOpacity
+                          key={thingy[3]}
+                          style={[
+                            styles.work,
+                            {
+                              display: item.show ? "flex" : "none",
+                              backgroundColor: light_dark
+                                ? "rgb(0, 0, 0)"
+                                : "white",
+                              borderColor: light_dark ? "#404142" : "#e2e8f0",
+                              shadowColor: light_dark ? "white" : "black",
+                            },
+                          ]}
+                        >
+                          <Text style={{ color: "green" }}>
+                            Institution: {thingy[0]}
+                          </Text>
+                          <Text
+                            style={{ color: light_dark ? "white" : "black" }}
+                          >
+                            Location: {thingy[1]}
+                          </Text>
+                          <Text style={{ color: "red" }}>
+                            Entry: {thingy[2]}
+                          </Text>
+                          <Text
+                            style={{ color: light_dark ? "white" : "black" }}
+                          >
+                            Code: {thingy[3]}
+                          </Text>
+                        </TouchableOpacity>
+                      );
                     }
-                    const thingy = item.entry?.split(";");
-                    return (
-                      <TouchableOpacity
-                        key={thingy[3]}
-                        style={[
-                          styles.work,
-                          {
-                            display: item.show ? "flex" : "none",
-                            backgroundColor: light_dark
-                              ? "rgb(0, 0, 0)"
-                              : "white",
-                            borderColor: light_dark ? "#404142" : "#e2e8f0",
-                            shadowColor: light_dark ? "white" : "black",
-                          },
-                        ]}
-                      >
-                        <Text style={{ color: "green" }}>
-                          Institution: {thingy[0]}
-                        </Text>
-                        <Text style={{ color: light_dark ? "white" : "black" }}>
-                          Location: {thingy[1]}
-                        </Text>
-                        <Text style={{ color: "red" }}>Entry: {thingy[2]}</Text>
-                        <Text style={{ color: light_dark ? "white" : "black" }}>
-                          Code: {thingy[3]}
-                        </Text>
-                      </TouchableOpacity>
-                    );
                   })}
                   <Text
                     style={{
@@ -1964,6 +1977,138 @@ export default function THINGY4() {
                           >
                             {thing.name}
                           </Text>
+                        </TouchableOpacity>
+                      );
+                    }
+                  })}
+                </ScrollView>
+                <ScrollView>
+                  {pairings_info.map((item) => {
+                    if (item[0] && current_pairing_event == "debate") {
+                      return (
+                        <TouchableOpacity
+                          style={[
+                            styles.work,
+                            {
+                              display: item[0].show ? "flex" : "none",
+                              backgroundColor: light_dark
+                                ? "rgb(0, 0, 0)"
+                                : "white",
+                              borderColor: light_dark ? "#404142" : "#e2e8f0",
+                              shadowColor: light_dark ? "white" : "black",
+                            },
+                          ]}
+                        >
+                          {item.map((item2) => {
+                            if (item2.link != "") {
+                              return (
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    if (item2.link.includes("/index/tourn")) {
+                                      console.log(item2.link);
+                                      Linking.openURL(
+                                        "https://tabroom.com" + item2.link,
+                                      );
+                                    } else if (
+                                      item2.link.includes("judge.mhtml")
+                                    ) {
+                                      Linking.openURL(
+                                        "https://tabroom.com/index/tourn/postings/" +
+                                          item2.link,
+                                      );
+                                    } else {
+                                      console.log(item2.link);
+                                      Linking.openURL(item2.link);
+                                    }
+                                  }}
+                                >
+                                  <Text
+                                    style={{
+                                      color: light_dark ? "white" : "black",
+                                    }}
+                                  >
+                                    {item2.name}
+                                  </Text>
+                                </TouchableOpacity>
+                              );
+                            } else {
+                              return (
+                                <Text
+                                  style={{
+                                    color: light_dark ? "white" : "black",
+                                  }}
+                                >
+                                  {item2.name}
+                                </Text>
+                              );
+                            }
+                          })}
+                        </TouchableOpacity>
+                      );
+                    } else if (item[0] && current_pairing_event == "speech") {
+                      return (
+                        <TouchableOpacity
+                          style={[
+                            styles.work,
+                            {
+                              display: item[0].show ? "flex" : "none",
+                              backgroundColor: light_dark
+                                ? "rgb(0, 0, 0)"
+                                : "white",
+                              borderColor: light_dark ? "#404142" : "#5",
+                              shadowColor: light_dark ? "white" : "black",
+                            },
+                          ]}
+                        >
+                          {item.map((item2) => {
+                            console.log(item2.name);
+                            if (!item2.name.includes("href")) {
+                              if (item2.link != "") {
+                                return (
+                                  <TouchableOpacity
+                                    onPress={() => {
+                                      if (item2.link.includes("/index/tourn")) {
+                                        console.log(item2.link);
+                                        Linking.openURL(
+                                          "https://tabroom.com" + item2.link,
+                                        );
+                                      } else if (
+                                        item2.link.includes("judge.mhtml")
+                                      ) {
+                                        Linking.openURL(
+                                          "https://tabroom.com/index/tourn/postings/" +
+                                            item2.link,
+                                        );
+                                      } else {
+                                        console.log(item2.link);
+                                        Linking.openURL(item2.link);
+                                      }
+                                    }}
+                                  >
+                                    <Text
+                                      style={{
+                                        color: light_dark ? "white" : "black",
+                                      }}
+                                    >
+                                      {item2.name}
+                                    </Text>
+                                  </TouchableOpacity>
+                                );
+                              } else {
+                                return (
+                                  <Text
+                                    style={{
+                                      color: light_dark ? "white" : "black",
+                                    }}
+                                  >
+                                    {item2.name}
+                                  </Text>
+                                );
+                              }
+                            } else if (item2.name.includes("href")) {
+                              console.log(item2.name);
+                            }
+                          })}
                         </TouchableOpacity>
                       );
                     }
