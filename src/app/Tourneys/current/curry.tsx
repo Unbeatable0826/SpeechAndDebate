@@ -23,6 +23,8 @@ import { auth } from "../../../../firebaseConfig.js";
 //
 // [[{ref: existe, actual thing}, {ref: existe, actual thing}], [], [], []] -- > 2d is another person, well another pairing / THE MASTER PLAN
 export default function THINGY4() {
+  const [result_2, setResult_2] = useState([]);
+  const [selectedresult, setSelectedResult] = useState("");
   const [results_events, setResultsEvents] = useState([]);
   const [curr_result_event, setcurryresult] = useState("");
   const [resultsexiste, setresultsexiste] = useState(true);
@@ -35,7 +37,7 @@ export default function THINGY4() {
   const [pairing_panel_1, setPairingPanel1] = useState([{}]);
   const [current_pairing_event, setCurrentPairingEvent] = useState("");
   const [invite_data, setInviteData] = useState(``);
-  const [webViewHeight, setWebViewHeight] = useState(500);
+  // const [webViewHeight, setWebViewHeight] = useState(500);
   const [judges_page_existe, setJudgesPageExist] = useState(true);
   const [judge_eventy, setJudgeEventy] = useState("");
   const [judge_page, setJudgePage] = useState([{}]);
@@ -711,13 +713,72 @@ export default function THINGY4() {
   useEffect(() => {
     let current = "";
     const hello = async () => {
+      const thingy = await SecureStore.getItemAsync("cookie");
       for (let i = 0; i < results_events.length; i++) {
         if (results_events[i].name === curr_result_event) {
           current = results_events[i].ref;
           break;
         }
       }
-      console.log(current);
+      let gop = new URLSearchParams();
+      gop.append("tourn_id", reference.trim());
+      gop.append("event_id", current);
+
+      let header = {
+        Host: "www.tabroom.com",
+        Cookie: thingy,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Accept-Language": "en-US,en;q=0.9",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+
+        Referer:
+          "Referer: https://www.tabroom.com/index/tourn/results/index.mhtml",
+        Priority: " u=0, i",
+      };
+      const request = await fetch(
+        "https://www.tabroom.com/index/tourn/results/index.mhtml?tourn_id=" +
+          reference.trim(),
+        {
+          method: "POST",
+          headers: header,
+          redirect: "follow",
+          body: gop,
+        },
+      );
+      const response = await request.text();
+      const hi = response.split("\n");
+      let results_2 = [];
+      for (let i = 0; i < hi.length; i++) {
+        if (hi[i].includes('class="blue full nowrap"')) {
+          results_2.push({
+            ref: hi[i + 1]
+              .replaceAll("href=", "")
+              .replaceAll('"', "")
+              .replaceAll(">", "")
+              .trim(),
+            name: hi[i + 3].includes("span")
+              ? hi[i + 4].trim()
+              : hi[i + 2].trim(),
+          });
+        }
+      }
+
+      setResult_2(results_2);
+      if (results_2.length === 0) {
+      } else {
+        setSelectedResult(results_2[0].name);
+      }
     };
     hello();
   }, [curr_result_event]);
@@ -2261,50 +2322,96 @@ export default function THINGY4() {
             );
           } else if (page == "results") {
             return (
-              <ScrollView
-                horizontal={true}
-                showsHorizontalScrollIndicator={true}
-                key={item}
-                contentContainerStyle={{ flexDirection: "row" }}
-                style={{
-                  marginTop: 10,
-                  height: 50,
-                  display: !resultsexiste ? "none" : "flex",
-                }}
-              >
-                {results_events.map((item) => {
-                  return (
-                    <TouchableOpacity
-                      key={item.name}
-                      style={[
-                        styles.topbuttons,
-                        {
-                          alignContent: "center",
-                          justifyContent: "center",
-                          minWidth: 70,
-                          backgroundColor:
-                            curr_result_event == item.name
-                              ? "rgb(231, 147, 21)"
-                              : "rgb(0, 0, 0)",
-                          shadowColor: light_dark ? "white" : "black",
-                          shadowOffset: { width: 1, height: 2 },
-                          shadowOpacity: 0.8,
-                          shadowRadius: 5,
-                          elevation: 3,
-                          borderColor: light_dark ? "white" : "black",
-                        },
-                      ]}
-                      onPress={() => {
-                        setcurryresult(item.name);
-                      }}
-                    >
-                      <Text style={{ color: light_dark ? "white" : "black" }}>
-                        {item.name}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
+              <>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={true}
+                  key={item}
+                  contentContainerStyle={{ flexDirection: "row" }}
+                  style={{
+                    marginTop: 10,
+                    height: 50,
+                    display: !resultsexiste ? "none" : "flex",
+                  }}
+                >
+                  {results_events.map((item) => {
+                    return (
+                      <TouchableOpacity
+                        key={item.name}
+                        style={[
+                          styles.topbuttons,
+                          {
+                            alignContent: "center",
+                            justifyContent: "center",
+                            minWidth: 70,
+                            backgroundColor:
+                              curr_result_event == item.name
+                                ? "rgb(231, 147, 21)"
+                                : "rgb(0, 0, 0)",
+                            shadowColor: light_dark ? "white" : "black",
+                            shadowOffset: { width: 1, height: 2 },
+                            shadowOpacity: 0.8,
+                            shadowRadius: 5,
+                            elevation: 3,
+                            borderColor: light_dark ? "white" : "black",
+                          },
+                        ]}
+                        onPress={() => {
+                          setcurryresult(item.name);
+                        }}
+                      >
+                        <Text style={{ color: light_dark ? "white" : "black" }}>
+                          {item.name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={true}
+                  key={item + Date.now()}
+                  contentContainerStyle={{ flexDirection: "row" }}
+                  style={{
+                    marginTop: 10,
+                    height: 50,
+                    display: !resultsexiste ? "none" : "flex",
+                  }}
+                >
+                  {result_2.map((item) => {
+                    return (
+                      <TouchableOpacity
+                        key={item.name}
+                        style={[
+                          styles.topbuttons,
+                          {
+                            alignContent: "center",
+                            justifyContent: "center",
+                            minWidth: 70,
+                            backgroundColor:
+                              selectedresult == item.name
+                                ? "rgb(231, 147, 21)"
+                                : "rgb(0, 0, 0)",
+                            shadowColor: light_dark ? "white" : "black",
+                            shadowOffset: { width: 1, height: 2 },
+                            shadowOpacity: 0.8,
+                            shadowRadius: 5,
+                            elevation: 3,
+                            borderColor: light_dark ? "white" : "black",
+                          },
+                        ]}
+                        onPress={() => {
+                          setSelectedResult(item.name);
+                        }}
+                      >
+                        <Text style={{ color: light_dark ? "white" : "black" }}>
+                          {item.name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </>
             );
           }
         })}
