@@ -145,7 +145,10 @@ export default function THINGY4() {
                 for (let y = j; y < hi.length; y++) {
                   if (hi[y].trim() == "") {
                     continue;
-                  } else if (hi[y].includes("/index/tourn")) {
+                  } else if (
+                    hi[y].includes("/index/tourn") ||
+                    hi[y].includes("tourn_id")
+                  ) {
                     linky = hi[y]
                       .trim()
                       .replaceAll(" ", "")
@@ -165,10 +168,12 @@ export default function THINGY4() {
                     !hi[y].includes(">") &&
                     !hi[y].includes("class")
                   ) {
-                    namey += hi[y]
-                      .trim()
-                      .replaceAll('target = "_blank"', "")
-                      .replaceAll('"', "");
+                    namey +=
+                      " " +
+                      hi[y]
+                        .trim()
+                        .replaceAll('target = "_blank"', "")
+                        .replaceAll('"', "");
                   }
                   if (hi[y].includes("</td>")) {
                     break;
@@ -180,11 +185,12 @@ export default function THINGY4() {
                 });
                 counter++;
               }
-              pairings.push(propy);
             }
+            pairings.push(propy);
           }
         }
         setpairingsinfo(pairings);
+        console.log(pairings);
       } else if (response.includes("<tr>")) {
         let pairingss = [];
         let roomys = [];
@@ -253,6 +259,74 @@ export default function THINGY4() {
         }
         console.log(pairingss);
         console.log(roomys);
+      } else if (response.includes('<tr class="yellowrow smaller">')) {
+        let roomys = [];
+        let pairings = [];
+        for (let i = 0; i < hi.length; i++) {
+          if (hi[i].includes('<tr class="yellowrow smaller">')) {
+            for (let j = i; j < hi.length; j++) {
+              if (hi[j].includes("</tr>")) {
+                break;
+              }
+              if (hi[j].includes("<th") && !hi[j + 1].includes("</th>")) {
+                roomys.push(hi[j + 1].trim().replaceAll("&amp;", "&"));
+              } else if (hi[j].includes("<th") && hi[j + 1].includes("</th>")) {
+                roomys.push(" ");
+              }
+            }
+          }
+          let propy = [];
+          if (hi[i].includes("<tr")) {
+            let counter = 0;
+            for (let j = i; j < hi.length; j++) {
+              let linky = "";
+              let namey = "";
+              if (hi[j].includes("</tr>")) {
+                break;
+              }
+              if (hi[j].includes("<td")) {
+                for (let y = j; y < hi.length; y++) {
+                  if (hi[y].trim() == "") {
+                    continue;
+                  } else if (hi[y].includes("/index/tourn")) {
+                    linky = hi[y]
+                      .trim()
+                      .replaceAll(" ", "")
+                      .replaceAll("href=", "")
+                      .replaceAll('"', "");
+                  } else if (hi[y].includes("http")) {
+                    linky = hi[y]
+                      .trim()
+                      .replaceAll(" ", "")
+                      .replaceAll("href=", "")
+                      .replaceAll('"', "");
+                  } else if (
+                    hi[y].trim() != "" &&
+                    !hi[y].includes("<") &&
+                    !hi[y].includes(">") &&
+                    !hi[y].includes("class") &&
+                    !hi[y].includes("data-text") &&
+                    !hi[y].includes("style=") &&
+                    !hi[y].includes("title=") &&
+                    !hi[y].includes("_blank")
+                  ) {
+                    namey += "; " + hi[y].trim().replaceAll('"', "") + " ";
+                  }
+                  if (hi[y].includes("</td>")) {
+                    break;
+                  }
+                }
+                propy.push({
+                  link: linky,
+                  name: roomys[counter] + " : " + namey,
+                });
+                counter++;
+              }
+            }
+            pairings.push(propy);
+          }
+        }
+        console.log(pairings);
       }
     };
     hello();
