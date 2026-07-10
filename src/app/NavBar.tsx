@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const NAV_THINGY = [
-  { name: "Home", icon: "home", place: "/Home/Home" },
+  // { name: "Home", icon: "home", place: "/Home/Home" },
   { name: "Tourneys", icon: "trophy", place: "/Tourneys/Tourneys" },
   { name: "Results", icon: "book", place: "/Speechdrop/Speechdrop" },
   { name: "Messages", icon: "chatbubbles", place: "/Messages/Messages" },

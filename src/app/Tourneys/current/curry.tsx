@@ -23,6 +23,9 @@ import { auth } from "../../../../firebaseConfig.js";
 //
 // [[{ref: existe, actual thing}, {ref: existe, actual thing}], [], [], []] -- > 2d is another person, well another pairing / THE MASTER PLAN
 export default function THINGY4() {
+  const [results_events, setResultsEvents] = useState([]);
+  const [curr_result_event, setcurryresult] = useState("");
+  const [resultsexiste, setresultsexiste] = useState(true);
   const [pairings_info, setpairingsinfo] = useState([{}]);
   const [panel2, setpanel2] = useState([{}]);
   const [panel2selected, setpanel2selected] = useState("");
@@ -636,6 +639,88 @@ export default function THINGY4() {
     }
     // console.log(button_page_render);
   };
+
+  const load_results = async () => {
+    const thingy = await SecureStore.getItemAsync("cookie");
+    let header = {
+      Host: "www.tabroom.com",
+      Cookie: thingy,
+      "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Accept-Language": "en-US,en;q=0.9",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      Referer:
+        "https://www.tabroom.com/index/tourn/results/event_results.mhtml?tourn_id=" +
+        reference.trim(),
+      Priority: " u=0, i",
+    };
+    const request = await fetch(
+      "https://www.tabroom.com/index/tourn/results/index.mhtml?tourn_id=" +
+        reference.trim(),
+      {
+        method: "GET",
+        headers: header,
+        redirect: "follow",
+      },
+    );
+    const response = await request.text();
+    const hi = response.split("\n");
+    // console.log(response);
+    let events = [];
+    for (let i = 0; i < hi.length; i++) {
+      if (hi[i].includes("<select")) {
+        for (let j = i + 1; j < hi.length; j++) {
+          if (hi[j].includes("<option")) {
+            events.push({
+              ref: hi[j + 1]
+                .trim()
+                .replaceAll("value=", "")
+                .replaceAll('"', ""),
+              name: hi[j + 3]
+                .trim()
+                .replaceAll("</option>", "")
+                .replaceAll(">", ""),
+            });
+          }
+          if (hi[j].includes("</select>")) {
+            break;
+          }
+        }
+
+        break;
+      }
+    }
+    if (events.length == 0) {
+      setresultsexiste(false);
+    } else {
+      setresultsexiste(true);
+      setResultsEvents(events);
+      setcurryresult(events[0].name);
+    }
+  };
+
+  useEffect(() => {
+    let current = "";
+    const hello = async () => {
+      for (let i = 0; i < results_events.length; i++) {
+        if (results_events[i].name === curr_result_event) {
+          current = results_events[i].ref;
+          break;
+        }
+      }
+      console.log(current);
+    };
+    hello();
+  }, [curr_result_event]);
   useEffect(() => {
     if (page === "entries") {
       load_entries();
@@ -643,6 +728,10 @@ export default function THINGY4() {
       load_judges();
     } else if (page == "pairings") {
       load_pairings();
+    } else if (page == "results") {
+      console.log("fefeRESULTSSS");
+
+      load_results();
     }
   }, [page]);
   const load_judges = async () => {
@@ -699,7 +788,7 @@ export default function THINGY4() {
       setJudgeEventy(judge_events[0].eventy);
       setJudgesPageExist(true);
     }
-    console.log(judge_events);
+    // console.log(judge_events);
     setJudgingData(judge_events);
   };
 
@@ -2169,6 +2258,53 @@ export default function THINGY4() {
                   <Text></Text>
                 </ScrollView>
               </>
+            );
+          } else if (page == "results") {
+            return (
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={true}
+                key={item}
+                contentContainerStyle={{ flexDirection: "row" }}
+                style={{
+                  marginTop: 10,
+                  height: 50,
+                  display: !resultsexiste ? "none" : "flex",
+                }}
+              >
+                {results_events.map((item) => {
+                  return (
+                    <TouchableOpacity
+                      key={item.name}
+                      style={[
+                        styles.topbuttons,
+                        {
+                          alignContent: "center",
+                          justifyContent: "center",
+                          minWidth: 70,
+                          backgroundColor:
+                            curr_result_event == item.name
+                              ? "rgb(231, 147, 21)"
+                              : "rgb(0, 0, 0)",
+                          shadowColor: light_dark ? "white" : "black",
+                          shadowOffset: { width: 1, height: 2 },
+                          shadowOpacity: 0.8,
+                          shadowRadius: 5,
+                          elevation: 3,
+                          borderColor: light_dark ? "white" : "black",
+                        },
+                      ]}
+                      onPress={() => {
+                        setcurryresult(item.name);
+                      }}
+                    >
+                      <Text style={{ color: light_dark ? "white" : "black" }}>
+                        {item.name}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
             );
           }
         })}
