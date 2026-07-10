@@ -28,8 +28,9 @@ export default function THINGY4() {
   const [panel2selected, setpanel2selected] = useState("");
   const [pairing_eventy, setpairing_eventy] = useState("");
   const [pairing_page_existe, setPairingPageExist] = useState(true);
-  const [update, setupdate] = useState([{}]);
+  const [update, setupdate] = useState([]);
   const [pairing_panel_1, setPairingPanel1] = useState([{}]);
+  const [current_pairing_event, setCurrentPairingEvent] = useState("");
   const [invite_data, setInviteData] = useState(``);
   const [webViewHeight, setWebViewHeight] = useState(500);
   const [judges_page_existe, setJudgesPageExist] = useState(true);
@@ -107,6 +108,7 @@ export default function THINGY4() {
       const response = await request.text();
       const hi = response.split("\n");
       if (response.includes('<tr class="smallish">')) {
+        setCurrentPairingEvent("debate");
         let pairings = [];
         let roomys = [];
         for (let i = 0; i < hi.length; i++) {
@@ -242,7 +244,11 @@ export default function THINGY4() {
                     !hi[y].includes("style=") &&
                     !hi[y].includes("title=")
                   ) {
-                    namey += hi[y].trim().replaceAll('"', "") + " ";
+                    if (hi[y].includes("href")) {
+                      namey += "\n";
+                    } else {
+                      namey += hi[y].trim().replaceAll('"', "") + " ";
+                    }
                   }
                   if (hi[y].includes("</td>")) {
                     break;
@@ -314,7 +320,13 @@ export default function THINGY4() {
                     !hi[y].includes("title=") &&
                     !hi[y].includes("_blank")
                   ) {
-                    namey += "; " + hi[y].trim().replaceAll('"', "") + " ";
+                    if (hi[y].includes("href")) {
+                      namey += "\n";
+                    } else {
+                      namey += hi[y].trim().replaceAll('"', "") + ", ";
+                    }
+                  } else if (hi[y].includes("quarter")) {
+                    namey += "\n";
                   }
                   if (hi[y].includes("</td>")) {
                     break;
@@ -1983,6 +1995,45 @@ export default function THINGY4() {
                   })}
                 </ScrollView>
                 <ScrollView>
+                  <TextInput
+                    style={{
+                      marginLeft: 20,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      borderColor: light_dark ? "white" : "black",
+                      padding: 10,
+                      color: light_dark ? "white" : "black",
+                      width: "90%",
+                      display: !judges_page_existe ? "none" : "flex",
+                    }}
+                    placeholderTextColor={light_dark ? "white" : "black"}
+                    placeholder="Search Pairings"
+                    onChangeText={(text) => {
+                      const working = pairings_info.map((thingpls) => {
+                        const thingmatches = thingpls.some((thingl) => {
+                          if (thingl.name) {
+                            return thingl?.name
+                              .toLowerCase()
+                              .includes(text.toLowerCase());
+                          } else {
+                            return false;
+                          }
+                        });
+                        if (thingmatches) {
+                          return [
+                            { ...thingpls[0], show: true },
+                            ...thingpls.slice(1),
+                          ];
+                        } else {
+                          return [
+                            { ...thingpls[0], show: false },
+                            ...thingpls.slice(1),
+                          ];
+                        }
+                      });
+                      setpairingsinfo(working);
+                    }}
+                  ></TextInput>
                   {pairings_info.map((item) => {
                     if (item[0] && current_pairing_event == "debate") {
                       return (
@@ -2045,7 +2096,7 @@ export default function THINGY4() {
                           })}
                         </TouchableOpacity>
                       );
-                    } else if (item[0] && current_pairing_event == "speech") {
+                    } else if (item[0] && current_pairing_event !== "debate") {
                       return (
                         <TouchableOpacity
                           style={[
@@ -2062,7 +2113,7 @@ export default function THINGY4() {
                         >
                           {item.map((item2) => {
                             console.log(item2.name);
-                            if (!item2.name.includes("href")) {
+                            if (true) {
                               if (item2.link != "") {
                                 return (
                                   <TouchableOpacity
@@ -2105,14 +2156,17 @@ export default function THINGY4() {
                                   </Text>
                                 );
                               }
-                            } else if (item2.name.includes("href")) {
-                              console.log(item2.name);
                             }
                           })}
                         </TouchableOpacity>
                       );
                     }
                   })}
+                  <Text></Text>
+                  <Text></Text>
+                  <Text></Text>
+                  <Text></Text>
+                  <Text></Text>
                 </ScrollView>
               </>
             );
