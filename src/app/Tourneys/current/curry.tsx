@@ -61,7 +61,156 @@ export default function THINGY4() {
   //   const [name, setName] = useState("");
   let bop = "";
   const { reference } = useLocalSearchParams();
+  useEffect(() => {
+    const hello = async () => {
+      const thingy = await SecureStore.getItemAsync("cookie");
+      let bop = "";
+      for (let i = 0; i < result_2.length; i++) {
+        if (result_2[i].name === selectedresult) {
+          bop = result_2[i].ref.trim();
+          break;
+        }
+      }
+      console.log(bop);
+      let headers = {
+        Host: "www.tabroom.com",
+        Cookie: thingy,
+        "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Accept-Language": "en-US,en;q=0.9",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        Referer: "https://www.tabroom.com" + bop.trim(),
+        Priority: "u=0, i",
+      };
+      const request = await fetch("https://www.tabroom.com" + bop, {
+        method: "GET",
+        headers: headers,
+        redirect: "follow",
+      });
+      const response = await request.text();
+      const hi = response.split("\n");
+      // [{}, {}, {}, {}]
+      // console.log(response);
+      if (response.includes("yellowrow rotation")) {
+        let current = [];
+        let resulty = [];
+        for (let i = 0; i < hi.length; i++) {
+          if (hi[i].includes("yellowrow rotation")) {
+            console.log("EXISTSS");
+            current = [];
+            for (let j = i; j < hi.length; j++) {
+              if (hi[j].includes("<th")) {
+                let pushy = "";
+                for (let k = j; k < hi.length; k++) {
+                  if (hi[k].includes("</th")) {
+                    current.push(pushy);
+                    break;
+                  } else if (
+                    !hi[k].replaceAll(" ", "").includes("class=") &&
+                    !hi[k].includes("/span") &&
+                    hi[k].trim().replaceAll(" ", "") !== "" &&
+                    !hi[k].includes("hidden") &&
+                    !hi[k].includes("title=") &&
+                    !hi[k].replaceAll(" ", "").includes(">") &&
+                    !hi[k].includes("<")
+                  ) {
+                    pushy += hi[k].trim().replaceAll("&ndash;", "-");
+                  }
+                }
+                if (hi[j].includes("</tr>")) {
+                  break;
+                }
+              }
+            }
+          }
+          if (hi[i].includes("<tr>")) {
+            let counter = 0;
+            let thingy = [];
+            for (let x = i; x < hi.length; x++) {
+              if (hi[x].includes("</tr>")) {
+                break;
+              } else if (hi[x].includes("<td")) {
+                console.log("FIND");
+                let field = "";
+                for (let j = x; j < hi.length; j++) {
+                  if (hi[j].includes("</td>")) {
+                    break;
+                  } else if (
+                    !hi[j].includes("class=") &&
+                    !hi[j].includes("hidden") &&
+                    !hi[j].includes("title=") &&
+                    !hi[j].includes("span") &&
+                    hi[j].trim() !== ""
+                  ) {
+                    if (field != "") {
+                      field += "; " + hi[j].trim();
+                    } else {
+                      field += hi[j].trim();
+                    }
+                  }
+                }
+                thingy.push(current[counter] + " : " + field);
+                counter++;
+              }
+            }
+            resulty.push(thingy);
+          }
+        }
+        console.log(resulty);
+      } else if (response.includes('<tr class="yellowrow smallish padvert">')) {
+        let current = [];
+        let resulty = [];
+        for (let i = 0; i < hi.length; i++) {
+          if (hi[i].includes('<tr class="yellowrow smallish padvert">')) {
+            current = [];
+            for (let j = i; j < hi.length; j++) {
+              if (hi[j].includes("</tr>")) {
+                break;
+              }
+              if (hi[j].includes("<th")) {
+                for (let k = j; k < hi.length; k++) {
+                  if (hi[k].includes("</th>")) {
+                    break;
+                  }
+                  if (
+                    !hi[k].includes(">") &&
+                    !hi[k].includes("<") &&
+                    !hi[k].includes("class=") &&
+                    !hi[k].includes("title=") &&
+                    !hi[k].includes("span") &&
+                    hi[k].trim() !== "" &&
+                    !hi[k].includes('"') &&
+                    !hi[k - 3].includes("hidden")
+                  ) {
+                    current.push(hi[k].trim());
+                  } else if (hi[k].includes("<thead>")) {
+                    const th = hi[k]
+                      .replaceAll("<thead>", "")
+                      .replaceAll('<tr class="yellowrow smallish padvert">', "")
+                      .split("<th>");
+                    console.log(th);
+                  }
+                }
+              }
+            }
+          }
+        }
 
+        console.log(current);
+      }
+    };
+
+    hello();
+  }, [selectedresult]);
   useEffect(() => {
     const workpls = async () => {
       const temp = await AsyncStorage.getItem("theme");
