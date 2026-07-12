@@ -258,6 +258,71 @@ export default function THINGY4() {
         }
         console.log(resulty);
         console.log(current);
+      } else if (response.includes("yellowrow")) {
+        let current = [];
+        let resulty = [];
+        for (let i = 0; i < hi.length; i++) {
+          if (hi[i].includes("yellowrow")) {
+            for (let j = i; j < hi.length; j++) {
+              if (hi[j].includes("/tr>")) {
+                break;
+              }
+              if (hi[j].includes("<th")) {
+                let field = "";
+                for (let x = j; x < hi.length; x++) {
+                  if (hi[x].includes("/th>")) {
+                    break;
+                  }
+                  if (
+                    !hi[x].includes("title=") &&
+                    hi[x].trim() != "" &&
+                    !hi[x].includes(">") &&
+                    !hi[x].includes("<") &&
+                    !hi[x].includes("span") &&
+                    !hi[x].includes("class=")
+                  ) {
+                    field += hi[x].trim();
+                  }
+                }
+                current.push(field);
+              }
+            }
+          }
+          if (hi[i].includes("<tr>")) {
+            let stuffy = [];
+            let counter = 0;
+            for (let j = i; j < hi.length; j++) {
+              if (hi[j].includes("</tr>")) {
+                break;
+              }
+              if (hi[j].includes("<td")) {
+                let feeld = "";
+                for (let x = j; x < hi.length; x++) {
+                  if (hi[x].includes("</td>")) {
+                    break;
+                  }
+                  if (
+                    !hi[x].includes("title=") &&
+                    hi[x].trim() != "" &&
+                    !hi[x].includes(">") &&
+                    !hi[x].includes("<") &&
+                    !hi[x].includes("span") &&
+                    !hi[x].includes("class=") &&
+                    !hi[x].includes("href")
+                  ) {
+                    feeld += hi[x].trim() + " ";
+                  }
+                }
+                stuffy.push(current[counter] + " : " + feeld);
+                counter++;
+              }
+            }
+            resulty.push(stuffy);
+          }
+        }
+
+        console.log(current);
+        console.log(resulty);
       }
     };
 
