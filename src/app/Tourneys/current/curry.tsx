@@ -177,6 +177,20 @@ export default function THINGY4() {
                 break;
               }
               if (hi[j].includes("<th")) {
+                if (hi[j].includes("<thead>")) {
+                  console.log("INCLUDES");
+                  let th = hi[j]
+                    .replaceAll("<thead>", "")
+                    .replaceAll('<tr class="yellowrow smallish padvert">', "")
+                    .split("</th>");
+                  let final = [];
+                  for (let l = 0; l < th.length; l++) {
+                    if (th[l].trim() !== "") {
+                      current.push(th[l].replaceAll("<th>", "").trim());
+                    }
+                  }
+                  // console.log(final);
+                }
                 for (let k = j; k < hi.length; k++) {
                   if (hi[k].includes("</th>")) {
                     break;
@@ -192,19 +206,57 @@ export default function THINGY4() {
                     !hi[k - 3].includes("hidden")
                   ) {
                     current.push(hi[k].trim());
-                  } else if (hi[k].includes("<thead>")) {
-                    const th = hi[k]
-                      .replaceAll("<thead>", "")
-                      .replaceAll('<tr class="yellowrow smallish padvert">', "")
-                      .split("<th>");
-                    console.log(th);
                   }
                 }
               }
             }
           }
-        }
+          if (hi[i].includes("<tr") && hi[i].includes('id="')) {
+            let currys = [];
+            let counter = 0;
 
+            for (let j = i + 1; j < hi.length; j++) {
+              if (hi[j].includes("<tr") && hi[j].includes('id="')) {
+                break;
+              }
+              if (hi[j].includes("<td") && hi[j].includes("/td>")) {
+                let jk = hi[j]
+                  .replaceAll("<td class='centeralign smallish'>", "")
+                  .split("</td>");
+                for (let l = 0; l < jk.length; l++) {
+                  if (jk[l].trim() !== "" && !jk[l].includes("class")) {
+                    currys.push(current[counter] + " : " + jk[l].trim());
+                    counter++;
+                  }
+                }
+                currys.push(current[counter] + " : " + hi[j + 1].trim());
+                counter++;
+                console.log(jk);
+              } else if (hi[j].includes("<td")) {
+                for (let k = j + 1; k < hi.length; k++) {
+                  if (hi[k].includes("</td>")) {
+                    break;
+                  }
+                  if (
+                    !hi[k].includes(">") &&
+                    !hi[k].includes("<") &&
+                    !hi[k].includes("class=") &&
+                    !hi[k].includes("title=") &&
+                    !hi[k].includes("span") &&
+                    hi[k].trim() !== "" &&
+                    !hi[k].includes('"') &&
+                    !hi[k - 3].includes("hidden")
+                  ) {
+                    currys.push(current[counter] + " : " + hi[k].trim());
+                  }
+                }
+                counter++;
+              }
+            }
+            resulty.push(currys);
+          }
+        }
+        console.log(resulty);
         console.log(current);
       }
     };
