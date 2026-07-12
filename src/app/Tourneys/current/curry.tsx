@@ -23,6 +23,7 @@ import { auth } from "../../../../firebaseConfig.js";
 //
 // [[{ref: existe, actual thing}, {ref: existe, actual thing}], [], [], []] -- > 2d is another person, well another pairing / THE MASTER PLAN
 export default function THINGY4() {
+  const [result_view, setresult_view] = useState([]);
   const [result_2, setResult_2] = useState([]);
   const [selectedresult, setSelectedResult] = useState("");
   const [results_events, setResultsEvents] = useState([]);
@@ -135,6 +136,7 @@ export default function THINGY4() {
           if (hi[i].includes("<tr>")) {
             let counter = 0;
             let thingy = [];
+            thingy.push("show");
             for (let x = i; x < hi.length; x++) {
               if (hi[x].includes("</tr>")) {
                 break;
@@ -165,7 +167,7 @@ export default function THINGY4() {
             resulty.push(thingy);
           }
         }
-        console.log(resulty);
+        setresult_view(resulty);
       } else if (response.includes('<tr class="yellowrow smallish padvert">')) {
         let current = [];
         let resulty = [];
@@ -213,6 +215,7 @@ export default function THINGY4() {
           }
           if (hi[i].includes("<tr") && hi[i].includes('id="')) {
             let currys = [];
+            currys.push("show");
             let counter = 0;
 
             for (let j = i + 1; j < hi.length; j++) {
@@ -256,7 +259,7 @@ export default function THINGY4() {
             resulty.push(currys);
           }
         }
-        console.log(resulty);
+        setresult_view(resulty);
         console.log(current);
       } else if (response.includes("yellowrow")) {
         let current = [];
@@ -290,6 +293,7 @@ export default function THINGY4() {
           }
           if (hi[i].includes("<tr>")) {
             let stuffy = [];
+            stuffy.push("show");
             let counter = 0;
             for (let j = i; j < hi.length; j++) {
               if (hi[j].includes("</tr>")) {
@@ -322,7 +326,7 @@ export default function THINGY4() {
         }
 
         console.log(current);
-        console.log(resulty);
+        setresult_view(resulty);
       }
     };
 
@@ -2676,6 +2680,81 @@ export default function THINGY4() {
                       </TouchableOpacity>
                     );
                   })}
+                </ScrollView>
+                <ScrollView>
+                  <TextInput
+                    style={{
+                      marginLeft: 20,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      borderColor: light_dark ? "white" : "black",
+                      padding: 10,
+                      color: light_dark ? "white" : "black",
+                      width: "90%",
+                      display: !judges_page_existe ? "none" : "flex",
+                    }}
+                    placeholderTextColor={light_dark ? "white" : "black"}
+                    placeholder="Search Results"
+                    onChangeText={(text) => {
+                      let listyys = [...result_view];
+                      for (let i = 0; i < listyys.length; i++) {
+                        let matches = false;
+                        for (let x = 0; x < listyys[i].length; x++) {
+                          if (
+                            listyys[i][x]
+                              .toLowerCase()
+                              .includes(text.toLowerCase())
+                          ) {
+                            matches = true;
+                            break;
+                          }
+                        }
+                        if (!matches) {
+                          listyys[i][0] = "hide";
+                        } else {
+                          listyys[i][0] = "show";
+                        }
+                      }
+                      setresult_view(listyys);
+                    }}
+                  ></TextInput>
+                  {result_view.map((itemy) => {
+                    return (
+                      <TouchableOpacity
+                        style={[
+                          styles.work,
+                          {
+                            display: itemy[0].includes("show")
+                              ? "flex"
+                              : "none",
+                            backgroundColor: light_dark
+                              ? "rgb(0, 0, 0)"
+                              : "white",
+                            borderColor: light_dark ? "#404142" : "#5",
+                            shadowColor: light_dark ? "white" : "black",
+                          },
+                        ]}
+                      >
+                        {itemy.map((item2) => {
+                          if (item2 !== "show") {
+                            return (
+                              <Text
+                                style={{
+                                  color: light_dark ? "white" : "black",
+                                }}
+                              >
+                                {item2.replaceAll("undefined", "Round Info")}
+                              </Text>
+                            );
+                          }
+                        })}
+                      </TouchableOpacity>
+                    );
+                  })}
+                  <Text></Text>
+                  <Text></Text>
+                  <Text></Text>
+                  <Text></Text>
                 </ScrollView>
               </>
             );
