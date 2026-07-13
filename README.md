@@ -4,6 +4,8 @@ The speech and debate application of Tabroom, is extremely hard during rounds an
 
 ## VIDEO
 
+https://youtu.be/aLbyU7xmNR4?si=-Y0hE4ebv691UjAW --APPRENTLY THIS LINK WAS UMM taken down for some reason from youtube sooo use this google drive link for now ; https://drive.google.com/file/d/1GOzFzObiOh3Oc7s91ZNZADGTSjFVOLxn/view?usp=drivesdk
+
 ## USING
 
 YOU NEED A TABROOM ACCOUNT TO USE THE APPLICATION THE THING wONT EVEN LET YOU CREATE OR LOGIN UNTIL UNLESS YOUR EMAIL AND PASSWORD ARE NOT THE SAME AS TABROOM AND I SWEAR I AIN"T STEALING YOUR PASSWORDDDDDDDDSSSS I SWEAR ITS ALL STOrED ON YOUR PHONE.
