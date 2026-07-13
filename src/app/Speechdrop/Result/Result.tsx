@@ -1,33 +1,41 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
-
 import { useEffect, useState } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
+    BackHandler,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { auth } from "../../../firebaseConfig.js";
+import { auth } from "../../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
-import { Text } from "react-native";
-import NavBar from "../NavBar";
+// import NavBar from "../NavBar";
 //Home Featureset
 //
-export default function THINGY5() {
+export default function THING322() {
+  const { result } = useLocalSearchParams();
   const router = useRouter();
   const [name, setName] = useState("");
   const [light_dark, setld] = useState(false);
-  const [result_one, setresultone] = useState([]);
-
+  const [rounds_res, setroundres] = useState([]);
   let bop = "";
+  useEffect(() => {
+    const workpls = async () => {
+      const temp = await AsyncStorage.getItem("theme");
+      const temp_2 = !(temp == "light");
+      setld(temp_2);
+    };
+    workpls();
+  }, []);
+
   useEffect(() => {
     const hello = async () => {
       const thingy = await SecureStore.getItemAsync("cookie");
-      let headers = {
+      let header = {
         Host: "www.tabroom.com",
         Cookie: thingy,
         "Sec-Ch-Ua": '"Not-A.Brand";v="24", "Chromium";v="146"',
@@ -39,83 +47,89 @@ export default function THINGY5() {
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
         Accept:
           "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-Site": "same-origin",
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-User": "?1",
         "Sec-Fetch-Dest": "document",
+        Referer: "https://www.tabroom.com/user/student/index.mhtml?err=&msg=",
         Priority: "u=0, i",
       };
       const request = await fetch(
-        "https://www.tabroom.com/user/student/index.mhtml?err=&msg=",
-        { method: "GET", headers: headers, redirect: "follow" },
+        "https://tabroom.com/user/student/" + result.replaceAll(">", ""),
+        { method: "GET", headers: header, redirect: "follow" },
       );
       const response = await request.text();
       const hi = response.split("\n");
       let current = [];
       let resulty = [];
       for (let i = 0; i < hi.length; i++) {
-        if (hi[i].includes('<tr class="yellowrow">')) {
+        let ploop = [];
+
+        if (hi[i].includes('<tr class="smallish semibold yellowrow">')) {
           for (let j = i; j < hi.length; j++) {
-            if (hi[j].includes("</tr>")) {
+            if (hi[j].includes("/tr>")) {
               break;
             }
             if (hi[j].includes("<th")) {
-              current.push(hi[j + 1].trim());
+              current.push(hi[j + 1].trim().replaceAll("&amp;", "&"));
             }
           }
         }
-        if (hi[i].includes('<tr class="smallish">')) {
+        if (hi[i].includes('<tr class="row">')) {
           let counter = 0;
-          let one = [];
+
           for (let j = i; j < hi.length; j++) {
-            if (hi[j].includes("</tr>")) break;
+            let information = "";
+
+            if (hi[j].includes("/tr>")) {
+              // DEAL WITH JUDGE FEEDBACK
+              break;
+            }
             if (hi[j].includes("<td")) {
               for (let k = j; k < hi.length; k++) {
-                if (hi[k].includes("</td>")) {
+                if (hi[k].includes("/td>")) {
                   break;
                 }
                 if (
-                  hi[k].includes("href") &&
-                  hi[k].includes("history.mhtml?")
-                ) {
-                  one.push(
-                    hi[k]
-                      .replaceAll(" ", "")
-                      .replaceAll("href=", "")
-                      .replaceAll('"', ""),
-                  );
-                } else if (
-                  !hi[k].trim().includes("title") &&
-                  !hi[k].includes("data-text") &&
                   !hi[k].includes(">") &&
                   !hi[k].includes("<") &&
-                  !hi[k].includes("class") &&
-                  !hi[k].includes('"') &&
-                  hi[k].trim() != ""
+                  hi[k].trim() !== "" &&
+                  !hi[k].replaceAll(" ", "").includes("class=") &&
+                  !hi[k].includes("href") &&
+                  !hi[k].includes("data-text") &&
+                  !hi[k].includes("=")
                 ) {
-                  one.push(current[counter] + " : " + hi[k].trim());
+                  information += hi[k].trim() + " ";
                 }
               }
+
+              ploop.push(current[counter] + " : " + information);
               counter++;
             }
           }
-          one.push("show");
-          resulty.push(one);
+          resulty.push(ploop);
+          ploop = [];
         }
       }
-      // console.log(current);
-      setresultone(resulty);
+      console.log(current);
+      setroundres(resulty);
     };
     hello();
   }, []);
 
   useEffect(() => {
-    const workpls = async () => {
-      const temp = await AsyncStorage.getItem("theme");
-      const temp_2 = !(temp == "light");
-      setld(temp_2);
+    const goback = () => {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        BackHandler.exitApp();
+      }
+      return true;
     };
-    workpls();
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      goback,
+    );
   }, []);
 
   useEffect(() => {
@@ -149,27 +163,16 @@ export default function THINGY5() {
             "https://www.tabroom.com/user/login/profile.mhtml",
             { method: "GET", headers: header, redirect: "follow" },
           );
-          const pop = await request.text();
-          if (!pop.includes('<span class="threefifths padright">')) {
-            router.replace("/");
-          }
-          // console.log(hi);
-          let Last_name = "";
-          let run = 0;
         } catch (e) {
           router.replace("/");
         }
       } else {
+        router.replace("/");
       }
     });
   }, []);
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: light_dark ? "rgb(77, 76, 76)" : "white",
-      }}
-    >
+    <View style={{ flex: 1 }}>
       <Stack.Screen
         options={{
           title: "Results",
@@ -180,45 +183,12 @@ export default function THINGY5() {
         }}
       />
       <ScrollView>
-        <TextInput
-          style={{
-            marginLeft: 20,
-            borderWidth: 1,
-            marginTop: 10,
-            borderRadius: 10,
-            borderColor: light_dark ? "white" : "black",
-            padding: 10,
-            color: light_dark ? "white" : "black",
-            width: "90%",
-          }}
-          placeholderTextColor={light_dark ? "white" : "black"}
-          placeholder="Search Pairings"
-          onChangeText={(text) => {
-            let propy = [...result_one];
-            for (let i = 0; i < propy.length; i++) {
-              let match = false;
-              for (let j = 0; j < propy[i].length; j++) {
-                if (propy[i][j].toLowerCase().includes(text.toLowerCase())) {
-                  match = true;
-                  break;
-                }
-              }
-              if (match) {
-                propy[i][propy[i].length - 1] = "show";
-              } else {
-                propy[i][propy[i].length - 1] = "hide";
-              }
-            }
-            setresultone(propy);
-          }}
-        ></TextInput>
-        {result_one.map((item) => {
+        {rounds_res.map((item) => {
           return (
             <TouchableOpacity
               style={[
                 styles.tourneyButton,
                 {
-                  display: item[item.length - 1] == "show" ? "flex" : "none",
                   backgroundColor: light_dark ? "rgb(0, 0, 0)" : "lightgray",
                   borderColor: light_dark ? "white" : "black",
                   borderWidth: 0,
@@ -229,23 +199,13 @@ export default function THINGY5() {
                   elevation: 3,
                 },
               ]}
-              onPress={() => {
-                router.push({
-                  pathname: "/Speechdrop/Result/Result",
-                  params: {
-                    result: item[item.length - 2],
-                  },
-                });
-              }}
             >
               {item.map((item2) => {
-                if (item2 != "show" && !item2.includes("history.mhtml?")) {
-                  return (
-                    <Text style={{ color: light_dark ? "white" : "black" }}>
-                      {item2}
-                    </Text>
-                  );
-                }
+                return (
+                  <Text style={{ color: light_dark ? "white" : "black" }}>
+                    {item2}
+                  </Text>
+                );
               })}
             </TouchableOpacity>
           );
@@ -257,10 +217,7 @@ export default function THINGY5() {
         <Text></Text>
         <Text></Text>
         <Text></Text>
-        <Text></Text>
       </ScrollView>
-
-      <NavBar />
     </View>
   );
 }
