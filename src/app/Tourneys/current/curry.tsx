@@ -1,6 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -61,7 +61,7 @@ export default function THINGY4() {
   const [uploads_data, setuploaddataa] = useState([]); // IT FREAKING WORKS
   //   const [name, setName] = useState("");
   let bop = "";
-  const { reference } = useLocalSearchParams();
+  const { reference, tournname } = useLocalSearchParams();
   useEffect(() => {
     const hello = async () => {
       const thingy = await SecureStore.getItemAsync("cookie");
@@ -1622,6 +1622,15 @@ export default function THINGY4() {
         backgroundColor: light_dark ? "rgb(46, 45, 45)" : "#ffffff",
       }}
     >
+      <Stack.Screen
+        options={{
+          title: tournname,
+          headerStyle: {
+            backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
+          },
+          headerTintColor: light_dark ? "#ffffff" : "black",
+        }}
+      />
       {/* <Text style={styles.nombre}>{reference}</Text> */}
       <View style={{ height: 65 }}>
         <ScrollView

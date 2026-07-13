@@ -1,16 +1,21 @@
-import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Stack, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
+
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { auth } from "../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../NavBar";
+
 //Home Featureset
 //
 export default function THINGY5() {
   const router = useRouter();
   const [name, setName] = useState("");
+  const [light_dark, setld] = useState(false);
+
   let bop = "";
   const styles = StyleSheet.create({
     nombre: {
@@ -19,6 +24,15 @@ export default function THINGY5() {
       fontFamily: "Petemoss",
     },
   });
+
+  useEffect(() => {
+    const workpls = async () => {
+      const temp = await AsyncStorage.getItem("theme");
+      const temp_2 = !(temp == "light");
+      setld(temp_2);
+    };
+    workpls();
+  }, []);
 
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -67,7 +81,15 @@ export default function THINGY5() {
   }, []);
   return (
     <View style={{ flex: 1 }}>
-      <Text style={styles.nombre}>SPEECH</Text>
+      <Stack.Screen
+        options={{
+          title: "Results",
+          headerStyle: {
+            backgroundColor: light_dark ? "rgb(46, 45, 45)" : "white",
+          },
+          headerTintColor: light_dark ? "#ffffff" : "black",
+        }}
+      />
       <NavBar />
     </View>
   );
