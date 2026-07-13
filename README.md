@@ -40,3 +40,7 @@ BTW THIS ENTIR ETHING IS STILL IN DEVLOPEMENT. IT IS FAR FROM COMPLETE
 
 I kinda didn't really didn't use AI to write this app except just asking for AI to figure out the error, because if I ask AI from COPILOT TO FIX SOMETHING I WILL COME BACK TO FIND OUT MY ENTIRE CODE IS GONE AND ITS REPLACED IT WITH SOMETHING THAT IS ACTUALLY GARBAGE
 I also technically used AI for autocode completion, the inline suggestion stuff. IT WAS HELPFUL and also just using my way of coding/ what I did like 20 minutes ago to spam it again, so jsut saved time rather than help me write.
+
+## CREDIT
+
+The loading animation in the beginning was actually copied and taken directly from someone else, because well, IDK, I can't rllyyyyy create a loading animation with plain CSS but apparently a bunch of people on the internet have REALLYYYY COOL LOOKING Ones, sooo I used that,SO that credit goes to Nawsome from Universe.io
