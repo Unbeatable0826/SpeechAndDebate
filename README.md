@@ -44,3 +44,9 @@ I also technically used AI for autocode completion, the inline suggestion stuff.
 ## CREDIT
 
 The loading animation in the beginning was actually copied and taken directly from someone else, because well, IDK, I can't rllyyyyy create a loading animation with plain CSS but apparently a bunch of people on the internet have REALLYYYY COOL LOOKING Ones, sooo I used that,SO that credit goes to Nawsome from Universe.io
+
+## Permissions
+
+To install this app, installing from unknown sources must be allowed on your device
+
+- The only current permission required is basic, internet access as well as notifcations. Nothing more.
