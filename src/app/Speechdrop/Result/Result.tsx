@@ -172,7 +172,12 @@ export default function THING322() {
     });
   }, []);
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: light_dark ? "rgb(77, 76, 76)" : "white",
+      }}
+    >
       <Stack.Screen
         options={{
           title: "Results",
