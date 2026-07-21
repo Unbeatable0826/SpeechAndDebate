@@ -230,10 +230,15 @@ export default function THINGY5() {
                 },
               ]}
               onPress={() => {
+                const bleep = item[0]
+                  .replaceAll("Tourn", "")
+                  .replaceAll("Round", "Round ")
+                  .replaceAll(":", "");
                 router.push({
                   pathname: "/Speechdrop/Result/Result",
                   params: {
                     result: item[item.length - 2],
+                    name: bleep,
                   },
                 });
               }}

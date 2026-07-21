@@ -21,9 +21,8 @@ import { auth } from "../../../../firebaseConfig.js";
 //Home Featureset
 //
 export default function THING322() {
-  const { result } = useLocalSearchParams();
+  const { result, name } = useLocalSearchParams();
   const router = useRouter();
-  const [name, setName] = useState("");
   const [light_dark, setld] = useState(false);
   const [rounds_res, setroundres] = useState([]);
   let bop = "";
@@ -115,7 +114,7 @@ export default function THING322() {
             }
           }
 
-          ploop.push("expand");
+          ploop.push("collapse");
           resulty.push(ploop);
           ploop = [];
         } else if (
@@ -131,21 +130,19 @@ export default function THING322() {
               break;
             }
             if (light_dark) {
-              curren +=
-                hi[j]
-                  .trim()
-                  .replaceAll(/<h([1-6])/g, '<h$1 style="color: white;"') // REGEX IS EXTREMELY HELPFULLLLLLLLLLLL, EVERYWHERE
-                  .replaceAll("<p", '<p style="color: white;"') + " ";
+              curren += hi[j].trim();
+              // .replaceAll(/<h([1-6])/g, '<h$1 style="color: white;"') // REGEX IS EXTREMELY HELPFULLLLLLLLLLLL, EVERYWHERE
+              // .replaceAll("<p", '<p style="color: white;"') + " ";
             } else {
               curren += hi[j].trim() + " ";
             }
           }
           resulty[resulty.length - 1][resulty[resulty.length - 1].length - 1] =
             curren;
-          resulty[resulty.length - 1].push("expand");
+          resulty[resulty.length - 1].push("collapse");
         }
       }
-      console.log(current);
+      console.log(resulty);
       setroundres(resulty);
     };
     hello();
@@ -222,6 +219,19 @@ export default function THING322() {
         }}
       />
       <TouchableOpacity
+        onPress={() => {
+          const hop = result.split("&");
+          const rek = hop[0]
+            .replace("history.mhtml?", "")
+            .replaceAll("tourn_id=", "");
+          router.push({
+            pathname: "/Tourneys/current/curry",
+            params: {
+              reference: rek,
+              tournname: name,
+            },
+          });
+        }}
         style={{ marginTop: 5, alignSelf: "flex-end", marginRight: 20 }}
       >
         <EvilIcons name="trophy" size={40} color="blue" />
@@ -231,6 +241,7 @@ export default function THING322() {
         {rounds_res.map((item) => {
           return (
             <TouchableOpacity
+              key={item[0]}
               style={[
                 styles.tourneyButton,
                 {
@@ -244,6 +255,20 @@ export default function THING322() {
                   elevation: 3,
                 },
               ]}
+              onPress={() => {
+                console.log(Date.now());
+                let thing = [...rounds_res]; // APPARENTLY THIS ONLY GENERATES A FREEKING SHALLOW COPY WHICH IS SCREWING EVERYTHING UP.. UGHHH
+                for (let i = 0; i < thing.length; i++) {
+                  if (thing[i][0] == item[0]) {
+                    thing[i][thing[i].length - 1] =
+                      thing[i][thing[i].length - 1] == "collapse"
+                        ? "expand"
+                        : "collapse";
+                  }
+                }
+                // console.log(thing);
+                setroundres(thing);
+              }}
             >
               {item.map((item2) => {
                 if (
@@ -252,14 +277,31 @@ export default function THING322() {
                   !item2.includes("</td>")
                 ) {
                   return (
-                    <Text style={{ color: light_dark ? "white" : "black" }}>
+                    <Text
+                      style={{
+                        color:
+                          item[item.length - 2].includes("</div>") &&
+                          item2 == item[0]
+                            ? "green"
+                            : light_dark
+                              ? "white"
+                              : "black",
+                      }}
+                    >
                       {item2}
                     </Text>
                   );
-                } else if (item2.includes("</td>")) {
+                } else if (
+                  item2.includes("</div>") &&
+                  item[item.length - 1] == "expand"
+                ) {
                   return (
                     <AutoheightWebView
-                      style={{ width: "100%" }}
+                      style={{
+                        width: "100%",
+                        display:
+                          item[item.length - 1] == "collapse" ? "none" : "flex",
+                      }}
                       source={{
                         html: `
                             <!DOCTYPE html>
