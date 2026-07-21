@@ -4,13 +4,17 @@ import * as SecureStore from "expo-secure-store";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import {
-    BackHandler,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  BackHandler,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+
+import AutoheightWebView from "react-native-autoheight-webview"; //still no render?
 import { auth } from "../../../../firebaseConfig.js";
 // import { Ionicons } from '@expo/vector-icons';
 // import NavBar from "../NavBar";
@@ -62,7 +66,8 @@ export default function THING322() {
       const hi = response.split("\n");
       let current = [];
       let resulty = [];
-      for (let i = 0; i < hi.length; i++) {
+      for (let i = 0; i < hi.length - 4; i++) {
+        // -4 for the sake of the other for loop working cuz well FUN AND WEIRD CRAP
         let ploop = [];
 
         if (hi[i].includes('<tr class="smallish semibold yellowrow">')) {
@@ -97,7 +102,9 @@ export default function THING322() {
                   !hi[k].replaceAll(" ", "").includes("class=") &&
                   !hi[k].includes("href") &&
                   !hi[k].includes("data-text") &&
-                  !hi[k].includes("=")
+                  !hi[k].includes("=") &&
+                  !hi[k].includes('"') &&
+                  information.includes(hi[k].trim()) == false
                 ) {
                   information += hi[k].trim() + " ";
                 }
@@ -107,8 +114,35 @@ export default function THING322() {
               counter++;
             }
           }
+
+          ploop.push("expand");
           resulty.push(ploop);
           ploop = [];
+        } else if (
+          hi[i].includes("<tr") &&
+          hi[i + 1].includes("hidden") &&
+          hi[i + 2].includes("feedback") &&
+          hi[i + 3].includes("id")
+        ) {
+          console.log("WORKS"); // IG
+          let curren = "";
+          for (let j = i + 5; j < hi.length; j++) {
+            if (hi[j].includes("/tr>")) {
+              break;
+            }
+            if (light_dark) {
+              curren +=
+                hi[j]
+                  .trim()
+                  .replaceAll(/<h([1-6])/g, '<h$1 style="color: white;"') // REGEX IS EXTREMELY HELPFULLLLLLLLLLLL, EVERYWHERE
+                  .replaceAll("<p", '<p style="color: white;"') + " ";
+            } else {
+              curren += hi[j].trim() + " ";
+            }
+          }
+          resulty[resulty.length - 1][resulty[resulty.length - 1].length - 1] =
+            curren;
+          resulty[resulty.length - 1].push("expand");
         }
       }
       console.log(current);
@@ -187,6 +221,12 @@ export default function THING322() {
           headerTintColor: light_dark ? "#ffffff" : "black",
         }}
       />
+      <TouchableOpacity
+        style={{ marginTop: 5, alignSelf: "flex-end", marginRight: 20 }}
+      >
+        <EvilIcons name="trophy" size={40} color="blue" />
+      </TouchableOpacity>
+
       <ScrollView>
         {rounds_res.map((item) => {
           return (
@@ -206,11 +246,46 @@ export default function THING322() {
               ]}
             >
               {item.map((item2) => {
-                return (
-                  <Text style={{ color: light_dark ? "white" : "black" }}>
-                    {item2}
-                  </Text>
-                );
+                if (
+                  item2 != "expand" &&
+                  item2 != "collapse" &&
+                  !item2.includes("</td>")
+                ) {
+                  return (
+                    <Text style={{ color: light_dark ? "white" : "black" }}>
+                      {item2}
+                    </Text>
+                  );
+                } else if (item2.includes("</td>")) {
+                  return (
+                    <AutoheightWebView
+                      style={{ width: "100%" }}
+                      source={{
+                        html: `
+                            <!DOCTYPE html>
+                            <html>
+                              <head>
+                                <meta name="viewport" content="width=device-width, initial-scale=1">
+                                <style>
+                                  body {
+                                    margin: 0;
+                                    padding: 0;
+                                    color: ${light_dark ? "white" : "black"};
+
+                                  }
+                                </style>
+                              </head>
+                              <body>
+                                ${item2.replaceAll('<span style="color: #0a0a0a;', '<span style="color: ' + (light_dark ? "white" : "black") + ";")}
+                                </body>
+                            </html>
+                            `,
+                      }}
+                      scalesPageToFit={true}
+                      viewportContent={"width=device-width, user-scalable=no"}
+                    />
+                  );
+                }
               })}
             </TouchableOpacity>
           );

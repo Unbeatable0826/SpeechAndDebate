@@ -42,7 +42,7 @@ export default function THINGY4() {
   // const [webViewHeight, setWebViewHeight] = useState(500);
   const [judges_page_existe, setJudgesPageExist] = useState(true);
   const [judge_eventy, setJudgeEventy] = useState("");
-  const [judge_page, setJudgePage] = useState([{}]);
+  const [judge_page, setJudgePage] = useState([]);
   const [entries_data, setEntriesData] = useState([]);
   const router = useRouter();
   const [judging_data, setJudgingData] = useState([]);
@@ -1286,9 +1286,7 @@ export default function THINGY4() {
                   hi[j + 1].includes("<a") &&
                   hi[j + 4].includes("white full padvert padleft")
                 ) {
-                  // information +=
-                  //   judge_info_fields[first_thing] + ":" + " " + ";";
-                  continue;
+                  information += judge_info_fields[first_thing] + ": ;";
                 } else {
                   information +=
                     judge_info_fields[first_thing] +
@@ -1310,10 +1308,12 @@ export default function THINGY4() {
           });
         }
       }
+      // console.log(plain_information);
       setJudgePage(plain_information);
     };
     hello();
   }, [judge_eventy]);
+  // BRO CAN I CRASH OUT BC THIS STUPID THING WONT WORKKRKRKRKRKKRKR 'internal crying'
 
   const run_info_fetch = async (linkfetch) => {
     const thingy = await SecureStore.getItemAsync("cookie");
