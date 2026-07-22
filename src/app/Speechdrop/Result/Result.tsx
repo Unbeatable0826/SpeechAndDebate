@@ -143,7 +143,7 @@ export default function THING322() {
         }
       }
       console.log(resulty);
-      setroundres(resulty);
+      await setroundres(resulty);
     };
     hello();
   }, []);
@@ -255,19 +255,21 @@ export default function THING322() {
                   elevation: 3,
                 },
               ]}
-              onPress={() => {
-                console.log(Date.now());
-                let thing = [...rounds_res]; // APPARENTLY THIS ONLY GENERATES A FREEKING SHALLOW COPY WHICH IS SCREWING EVERYTHING UP.. UGHHH
+              onPress={async () => {
+                let thing = await [...rounds_res]; // APPARENTLY THIS ONLY GENERATES A FREEKING SHALLOW COPY WHICH IS SCREWING EVERYTHING UP.. UGHHH
                 for (let i = 0; i < thing.length; i++) {
                   if (thing[i][0] == item[0]) {
-                    thing[i][thing[i].length - 1] =
-                      thing[i][thing[i].length - 1] == "collapse"
-                        ? "expand"
-                        : "collapse";
+                    if (item[item.length - 1] == "collapse") {
+                      thing[i][thing[i].length - 1] = "expand";
+                    } else {
+                      thing[i][thing[i].length - 1] = "collapse";
+                    }
+                    break;
                   }
                 }
-                // console.log(thing);
                 setroundres(thing);
+
+                console.log(thing);
               }}
             >
               {item.map((item2) => {
@@ -296,14 +298,19 @@ export default function THING322() {
                   item[item.length - 1] == "expand"
                 ) {
                   return (
-                    <AutoheightWebView
+                    <View
                       style={{
-                        width: "100%",
                         display:
                           item[item.length - 1] == "collapse" ? "none" : "flex",
                       }}
-                      source={{
-                        html: `
+                    >
+                      <AutoheightWebView
+                        key={"FJDKFJ"}
+                        style={{
+                          width: "100%",
+                        }}
+                        source={{
+                          html: `
                             <!DOCTYPE html>
                             <html>
                               <head>
@@ -322,10 +329,11 @@ export default function THING322() {
                                 </body>
                             </html>
                             `,
-                      }}
-                      scalesPageToFit={true}
-                      viewportContent={"width=device-width, user-scalable=no"}
-                    />
+                        }}
+                        scalesPageToFit={true}
+                        viewportContent={"width=device-width, user-scalable=no"}
+                      />
+                    </View>
                   );
                 }
               })}
