@@ -215,6 +215,7 @@ export default function THINGY5() {
         {result_one.map((item) => {
           return (
             <TouchableOpacity
+              key={item[1]}
               style={[
                 styles.tourneyButton,
                 {
